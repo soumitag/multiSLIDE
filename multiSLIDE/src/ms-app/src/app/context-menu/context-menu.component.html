@@ -1,0 +1,30 @@
+<!--
+<button mat-button [matMenuTriggerFor]="menu">Menu</button>
+<mat-menu #menu="matMenu">
+  <button mat-menu-item>Item 1</button>
+  <button mat-menu-item>Item 2</button>
+</mat-menu>
+-->
+
+<div [matMenuTriggerFor]="genes_menu" [matMenuTriggerData]="{entrez: '12345'}">CDK1</div>
+<mat-menu #genes_menu="matMenu">
+  <ng-template matMenuContent let-entrez="entrez">
+    <button mat-menu-item [matMenuTriggerFor]="feature_list_menu">Add to List</button>
+    <button mat-menu-item [matMenuTriggerFor]="neightbors_menu">Show Neighbors</button>
+    <button mat-menu-item (click)="onContextMenuAction2(entrez)">Show Info</button>
+    <button mat-menu-item (click)="onContextMenuAction2(entrez)">Hide From Current View</button>
+    <button mat-menu-item (click)="onContextMenuAction2(entrez)">Show Aliases</button>
+  </ng-template>
+</mat-menu>
+
+<mat-menu #feature_list_menu="matMenu">
+      <button mat-menu-item (click)="onContextMenuAction2(entrez)">New List</button>
+      <button mat-menu-item (click)="onContextMenuAction2(entrez)">My List 1</button>
+      <button mat-menu-item (click)="onContextMenuAction2(entrez)">My List 2</button>
+</mat-menu>
+
+<mat-menu #neightbors_menu="matMenu">
+    <button mat-menu-item (click)="onContextMenuAction2(entrez)">Protein-Protein Interaction</button>
+    <button mat-menu-item (click)="onContextMenuAction2(entrez)">miRNA Targets</button>
+    <button mat-menu-item (click)="onContextMenuAction2(entrez)">Transcription Factor Targets</button>
+</mat-menu>

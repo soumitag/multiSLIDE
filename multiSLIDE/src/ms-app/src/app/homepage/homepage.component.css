@@ -1,0 +1,201 @@
+div.input {
+    color: #888;
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    text-align: left; 
+    height: 30px;
+    display: inline-block;
+    text-align:center;
+}
+
+button {
+    font-family: 'Poppins', sans-serif;
+    /*background-color: rgb(255,127,80);*/
+    background-color: rgb(43,49,55);
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: bold;
+    color: white;
+    text-transform: uppercase;
+    border: 2px solid white;
+    border-radius: 20px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    width: 100px;
+}
+
+button:hover {
+    border-color: rgb(205,91,69);
+    color: rgb(205,91,69);
+    background-color: rgb(43,49,55);
+}
+
+div.errorMsg {
+    color: rgb(205,91,69);
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    text-align: left; 
+    height: 20px;
+    display: inline-block;
+}
+
+.container {
+    border-radius: 0px;
+    background-color: rgb(43,49,55);
+    padding-top: 20px;
+    /*padding-left: 50px;
+    padding-right: 50px;
+    text-align:right;*/
+    width: 100%;
+    min-width: 920px;
+    height: 350px;
+    position: absolute;
+    top: 200px;
+    left: 0px;
+}
+
+.divider {
+    width:30px;
+    height:auto;
+    display:inline-block;  
+}
+
+label {
+    width: 100%;
+    padding: 2px;
+    margin-top: 6px;
+    margin-bottom: 16px;
+    resize: vertical;
+    /*color: #95DB9A;*/
+    color: black;
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+}
+
+input[type=text] {
+    width: 75%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-top: 6px;
+    margin-bottom: 16px;
+    resize: vertical;
+}
+
+.main_content {
+    margin: auto;
+    width: 920px;
+}
+
+.right_panel {
+    width: 500px;
+    margin-top: 20px;
+    margin-left: 350px;
+}
+
+.left_panel {
+    /*position: relative;
+    left: 0px;*/
+    width: 600px;
+    margin-top: 20px;
+    margin-left: 0px;
+    margin-right: 0px;
+    float: left;
+}
+
+.title_div {
+    position: relative;
+    top: 20px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 55px;
+    color: white;
+    width: 500px;
+    letter-spacing: 6px;
+}
+
+.subtitle_div {
+    position: relative;
+    top: 40px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 18px;
+    color: white;
+    width: 600px;
+    letter-spacing: 2px;
+    font-weight: lighter;
+}
+
+.multi_font {
+    font-family: 'Crimson Text', sans-serif;
+    font-size: 55px;
+    color: white;
+    letter-spacing: 6px;
+}
+
+.buttons_panel {
+    float: right;
+    width: 320px;
+    margin-top: 30px;
+}
+
+.button_container {
+    width: 320px;
+}
+
+.button_text_disp_panel {
+    float: left;
+    width: 200px;
+    height: 40px;
+    top: 12px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    font-weight: 100;
+    color: rgb(205,91,69);
+    text-align: right;
+}
+
+.gapper {
+    width: 20px;
+    float: left;
+}
+
+.form_container {
+    border-radius: 5px;
+    background-color: white;
+    padding-top: 20px;
+    /*padding-left: 50px;
+    padding-right: 50px;
+    text-align:right;*/
+    width: 100%;
+    min-width: 920px;
+    height: 350px;
+    position: absolute;
+    top: 580px;
+    left: 0px;
+}
+
+.form_content {
+    margin: auto;
+    width: 560px;
+    background-color: white;
+}
+
+.highlight_button {
+    font-family: 'Poppins', sans-serif;
+    /*background-color: rgb(255,127,80);*/
+    background-color: rgb(205,91,69);
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: bold;
+    color: white;
+    text-transform: uppercase;
+    border: 2px solid rgb(205,91,69);
+    border-radius: 20px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    width: 110px;
+}
+
+.highlight_button:hover {
+    background-color: white;
+}

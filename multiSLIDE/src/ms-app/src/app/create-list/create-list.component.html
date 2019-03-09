@@ -1,0 +1,16 @@
+<div class="create_list_title">Specify a List Name</div>
+<div style="position:relative; top:10px; left:10px; width:500px;">
+
+  <form #createListForm='ngForm' name="createListForm">
+    <div class="create_list_controls">
+      <label class="create_list_label" for="listname">Enter a List Name</label>
+      <input class="create_list_item" type="text" id="listname" name="listname" [(ngModel)]="listnameStr" [value]="listnameStr" maxlength="30" size="30" required>
+      <div class="errorMsgListName" *ngIf="listNameErr">
+          &nbsp;{{listNameErrMsg}}
+      </div>
+    </div>
+    <div class="apply_changes_div">
+        <button type="button" (click)="saveChanges()">Save Changes</button>
+      </div>
+  </form>
+</div>

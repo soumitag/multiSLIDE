@@ -1,0 +1,104 @@
+.map_controls_title {
+    text-align:left;
+    font-family: verdana;
+    font-size: 20px;
+    font-weight: normal;
+    margin-top: 10px;
+    padding-bottom: 10px;
+    line-height: 25px;
+    width: 500px; 
+    border-bottom: 1px black solid;
+}
+
+.map_control_labels {
+    text-align:left;
+    font-family: verdana;
+    font-size: 14px;
+    font-weight: normal;
+    margin-top: 10px;
+    line-height: 25px;
+    font-weight: bold;
+}
+
+.map_settings_controls {
+    text-align:left;
+    font-family: verdana;
+    font-size: 14px;
+    font-weight: normal;
+    margin-top: 10px;
+}
+
+.map_settings_control_items {
+    padding-left: 10px;
+    text-align:left;
+    font-family: verdana;
+    font-size: 14px;
+    font-weight: normal;
+    margin-left: 10px;
+    margin-top: 5px;
+}
+
+.map_settings_control_inner_items {
+    margin-left: 30px;
+    margin-top: 5px;
+    text-align:left;
+    font-family: verdana;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 10px
+}
+
+.apply_changes_div {
+    position: relative; 
+    top: 30px; 
+    width: 500px; 
+    padding-top: 18px;
+    border-top: black 1px solid; 
+    align-content: center;
+    text-align: center;
+}
+
+button {
+    background-color: #F8F8F8;
+    padding: 5px 16px;
+    font-size: 11px;
+    color: #505050;
+    text-transform: uppercase;
+    border: 1px solid #505050;
+    border-radius: 10px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    font-family: 'Verdana';
+}
+
+button:hover {
+    border-color: rgb(255,99,23);
+    color: rgb(255,99,0);
+    background-color: #fbfbfb;
+}
+
+.colormap {
+    position: absolute;
+    left: 130px;
+}
+
+.errorMsgNumColors {
+    margin-left: 1%;
+    color: rgb(179, 34, 34);
+    font-family: Cambria, Georgia, Calibri, Verdana;
+    font-size: 15px;
+    text-align: left; 
+    float: right;
+    width: 250px;
+}
+
+.errorMsgRange {
+    margin-left: 1%;
+    color: rgb(179, 34, 34);
+    font-family: Cambria, Georgia, Calibri, Verdana;
+    font-size: 15px;
+    text-align: left; 
+    float: right;
+    width: 220px;
+    line-height: normal;
+}

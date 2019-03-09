@@ -1,0 +1,12 @@
+<app-selection-panel 
+    [analysis_name]="analysis_name" 
+    (notifyChanges)="notifyChangesToMapContainer($event)">
+</app-selection-panel>
+<app-menu-panel 
+    [analysis_name]="analysis_name">
+</app-menu-panel>
+<app-map-container 
+    [analysis_name]="analysis_name" 
+    [load_count]="load_count" 
+    [containerDisplayOn]="containerDisplayOn">
+</app-map-container>

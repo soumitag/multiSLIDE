@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+  <Properties>
+    <Property name="install_path"></Property>
+  </Properties>
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+    </Console>
+    <File name="LogFile" fileName="${install_path}/logs/multi-slide.log" immediateFlush="true" append="true">
+      <PatternLayout pattern="%d{yyyy-MMM-dd&#9;HH:mm:ss.SSS}&#9;[%t]&#9;%-5level&#9;%logger{36}&#9;%msg%n"/>
+    </File>
+  </Appenders>
+  <Loggers>
+    <Root level="ALL">
+      <AppenderRef ref="Console"/>
+      <AppenderRef ref="LogFile"/>
+    </Root>
+  </Loggers>
+</Configuration>

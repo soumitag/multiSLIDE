@@ -1,0 +1,32 @@
+<div class="list_panel_heading">User Lists</div>
+<div *ngFor="let list of lists; let i = index" class="list_panel" (click)="showListDetails(i)">
+  <ng-container *ngIf="list.type=='feature_list'; then FeatureList; else SampleList">
+  </ng-container>
+    <ng-template #FeatureList>
+      <label class="list_panel_group_heading">
+        {{list.name}} ({{list.entrez.length}}), Feature List
+      </label>
+      <div class="minus_button" matTooltip="{{'Delete ' + list.name}}" (click)="removeList(list.name)"></div>
+      <div class="download_button" matTooltip="{{'Download ' + list.name}}" (click)="serializeList(list.name)"></div>
+    </ng-template>
+    <ng-template #SampleList>
+      <label class="list_panel_group_heading">
+        {{list.name}} ({{list.entrez.length}}), Feature List
+      </label>
+      <div class="minus_button" (click)="removeList(list.name)"></div>
+      <div class="download_button" (click)="serializeList(list.name)"></div>
+    </ng-template>
+  <div id="{{'details_'+i}}" class="list_panel_inner">
+    <table>
+      <tr *ngFor="let entrez of list.entrez; let j = index" class="list_entry">
+        <td>{{entrez}}</td>
+        <td>{{list.group_names[list.entrez_group_ids[j]]}}</td>
+        <td width='25%'>
+          <div class="minus_button" 
+            matTooltip="{{'Remove ' + entrez + ' from ' + list.name}}" 
+            (click)="removeFromList(i,j)"></div>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>

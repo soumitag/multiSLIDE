@@ -1,0 +1,137 @@
+<ng-container *ngIf="new_map_config; else loading">
+
+  <div class="map_controls_title">Settings for {{datasetName}} Heatmap</div>
+  <div style="position:relative; top:10px; left:10px; width:500px;">
+
+    <form #settingsForm='ngForm' name="settingsForm">
+      <div class="map_settings_controls">
+        <label class="map_control_labels" for="columnLabel">Column Label</label>
+        <select name="columnLabel" [(ngModel)]="new_map_config.columnLabel" class="map_settings_control_items" required >
+            <!--
+            <option id="entrez" value="entrez_2021158607524066" checked >Entrez</option>
+            <option id="genesymbol" value="genesymbol_2021158607524066" >Gene Symbol</option>
+            <option id="refseq" value="refseq_2021158607524066" >RefSeq Gene</option>
+            <option id="ensembl_gene_id" value="ensembl_gene_id_2021158607524066" >Ensembl Gene Id</option>
+            <option id="ensembl_transcript_id" value="ensembl_transcript_id_2021158607524066" >Ensembl Transcript Id</option>
+            <option id="ensembl_protein_id" value="ensembl_protein_id_2021158607524066" >Ensembl Protein Id</option>
+            <option id="uniprot_id" value="uniprot_id_2021158607524066" >Uniprot Id</option>
+            -->
+          <option 
+            *ngFor="let gene_identifier of standard_gene_identifiers; let i = index" 
+            [value]="gene_identifier + '_2021158607524066'"
+            [attr.selected]="gene_identifier + '_2021158607524066' == new_map_config.columnLabel ? true : null">
+            {{standard_gene_identifier_display_names[i]}}
+          </option>
+          <option *ngFor="let gene_identifier of custom_gene_identifiers" [value]="gene_identifier">{{gene_identifier}}</option>
+        </select>
+      </div>
+
+      <div class="map_settings_controls">
+        <label class="map_control_labels" for="numColors">Number of Colors</label>
+        <input class="map_settings_control_items" type="text" id="numColors" name="numColors" [(ngModel)]="numColorsStr" [value]="numColorsStr" maxlength="4" size="4" required>
+        <label>&nbsp;&nbsp;(Valid Values: 0-255)
+        <div class="errorMsgNumColors" *ngIf="numColorsErr">
+          &nbsp;{{numColorsErrMsg}}
+        </div>
+        </label>
+      </div>
+    
+      <div class="map_settings_controls">
+          <label class="map_control_labels" for="binningRange">Binning Range</label> <br>
+          <input class="map_settings_control_items" 
+            style="margin-top:5px" 
+            type="radio" 
+            name="binningRange" 
+            [(ngModel)]="new_map_config.binningRange" value="data_bins"   
+            [checked]="new_map_config.binningRange == 'data_bins'"> 
+            Use Min and Max of Data (Min={{data_min}}, Max={{data_max}})<br>
+
+          <input class="map_settings_control_items" 
+            type="radio" 
+            name="binningRange" 
+            [(ngModel)]="new_map_config.binningRange" 
+            value="symmetric_bins" 
+            [checked]="new_map_config.binningRange == 'symmetric_bins'"> 
+            Use Symmetric Bins (about 0)<br>
+          
+          <input class="map_settings_control_items" 
+            type="radio" 
+            name="binningRange" 
+            [(ngModel)]="new_map_config.binningRange" 
+            value="user_specified" 
+            [checked]="new_map_config.binningRange == 'user_specified'"> 
+            Use Range <br>
+          
+          <div class="map_settings_control_inner_items">
+              Start <input type="text" id="binningRangeStart" 
+              name="binningRangeStart" [(ngModel)]="binningRangeStartStr" 
+              [value]="binningRangeStartStr" size="5" 
+              [disabled]="new_map_config.binningRange == 'user_specified' ? null : true"/>
+              and End <input type="text" id="binningRangeEnd" 
+              name="binningRangeEnd" [(ngModel)]="binningRangeEndStr" 
+              [value]="binningRangeEndStr" size="5" 
+              [disabled]="new_map_config.binningRange == 'user_specified' ? null : true" />
+              <div class="errorMsgRange" *ngIf="rangeErr">
+                {{rangeErrMsg}}
+              </div>
+          </div>
+      </div>
+
+      <div class="map_settings_controls">
+        <label class="map_control_labels">Heatmap Color Scheme </label><br>
+        <ng-container *ngFor="let map of colormaps; let p = index">
+            <input 
+              class="map_settings_control_items" 
+              type="radio" 
+              name="colorScheme" 
+              [(ngModel)]="new_map_config.colorScheme" 
+              [value]="map"
+              [checked]="map==new_map_config.colorScheme">
+            {{map}} <img class="colormap" [src]="'assets/img/' + map + '.png'" height="15px" width="255px"> <br>
+        </ng-container>
+      </div>
+
+      <!--
+      <div class="map_settings_controls">
+        <label class="map_control_labels">Heatmap Color Scheme </label><br>
+        <input class="map_settings_control_items" type="radio" name="colorScheme" [(ngModel)]="new_map_config.colorScheme" value="SEISMIC"> 
+          SEISMIC <img class="colormap" src="assets/img/SEISMIC.png" height="15px" width="255px"> <br>
+        <input class="map_settings_control_items" type="radio" name="colorScheme" [(ngModel)]="new_map_config.colorScheme" value="BWR"> 
+          BWR <img class="colormap" src="assets/img/BWR.png" height="15px" width="255px"> <br>
+        <input class="map_settings_control_items" type="radio" name="colorScheme" [(ngModel)]="new_map_config.colorScheme" value="COOLWARM"> 
+          COOLWARM <img class="colormap" src="assets/img/COOLWARM.png" height="15px" width="255px"> <br>
+        <input class="map_settings_control_items" type="radio" name="colorScheme" [(ngModel)]="new_map_config.colorScheme" value="BRBG" checked > 
+          BRBG <img class="colormap" src="assets/img/BRBG.png" height="15px" width="255px"> <br>
+        <input class="map_settings_control_items" type="radio" name="colorScheme" [(ngModel)]="new_map_config.colorScheme" value="PRGN"> 
+          PRGN <img class="colormap" src="assets/img/PRGN.png" height="15px" width="255px"> <br>
+        <input class="map_settings_control_items" type="radio" name="colorScheme" [(ngModel)]="new_map_config.colorScheme" value="PIYG"> 
+          PIYG <img class="colormap" src="assets/img/PIYG.png" height="15px" width="255px"> <br>
+        <input class="map_settings_control_items" type="radio" name="colorScheme" [(ngModel)]="new_map_config.colorScheme" value="RDYLGN"> 
+          RDYLGN <img class="colormap" src="assets/img/RDYLGN.png" height="15px" width="255px"> <br>
+        <input class="map_settings_control_items" type="radio" name="colorScheme" [(ngModel)]="new_map_config.colorScheme" value="RDBU"> 
+          RDBU <img class="colormap" src="assets/img/RDBU.png" height="15px" width="255px"> <br>
+        <input class="map_settings_control_items" type="radio" name="colorScheme" [(ngModel)]="new_map_config.colorScheme" value="RDYLBU"> 
+          RDYLBU <img class="colormap" src="assets/img/RDYLBU.png" height="15px" width="255px"> <br>
+        <input class="map_settings_control_items" type="radio" name="colorScheme" [(ngModel)]="new_map_config.colorScheme" value="SPECTRAL"> 
+          SPECTRAL <img class="colormap" src="assets/img/SPECTRAL.png" height="15px" width="255px"> <br>
+        <input class="map_settings_control_items" type="radio" name="colorScheme" [(ngModel)]="new_map_config.colorScheme" value="VIRIDIS"> 
+          VIRIDIS <img class="colormap" src="assets/img/VIRIDIS.png" height="15px" width="255px"> <br>
+        <input class="map_settings_control_items" type="radio" name="colorScheme" [(ngModel)]="new_map_config.colorScheme" value="CIVIDIS"> 
+          CIVIDIS <img class="colormap" src="assets/img/CIVIDIS.png" height="15px" width="255px"> <br>
+        <input class="map_settings_control_items" type="radio" name="colorScheme" [(ngModel)]="new_map_config.colorScheme" value="INFERNO"> 
+          INFERNO <img class="colormap" src="assets/img/INFERNO.png" height="15px" width="255px"> <br>
+        <input class="map_settings_control_items" type="radio" name="colorScheme" [(ngModel)]="new_map_config.colorScheme" value="MAGMA"> 
+          MAGMA <img class="colormap" src="assets/img/MAGMA.png" height="15px" width="255px"> <br>
+        <input class="map_settings_control_items" type="radio" name="colorScheme" [(ngModel)]="new_map_config.colorScheme" value="PLASMA">
+          PLASMA <img class="colormap" src="assets/img/PLASMA.png" height="15px" width="255px"> <br>
+      </div>
+      -->
+    </form>
+  </div>
+
+  <div class="apply_changes_div">
+    <button type="button" (click)="saveChanges()">Save Changes</button>
+  </div>
+
+</ng-container>
+<ng-template #loading>Fetching Heatmap Settings...</ng-template>

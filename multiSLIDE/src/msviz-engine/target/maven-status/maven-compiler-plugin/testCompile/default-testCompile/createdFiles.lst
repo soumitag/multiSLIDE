@@ -1,0 +1,5 @@
+tests\DataParserTester.class
+tests\CreateAnalysisTest.class
+tests\SearchTests.class
+tests\ClinicalInfoTester.class
+tests\GTFTestStub.class

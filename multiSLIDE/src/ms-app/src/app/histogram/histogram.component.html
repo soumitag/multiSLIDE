@@ -1,0 +1,34 @@
+<p>
+  histogram works!
+</p>
+
+<ng-container *ngIf="hist_data; else loading">
+  <svg [attr.width]="hist_data.svg_width" [attr.height]="hist_data.svg_height">
+    <!-- the histogram bars -->
+    <ng-container *ngFor="let color of hist_data.hist_colors; let i = index">
+      <rect [attr.x]="hist_data.bar_x[i]"
+            [attr.y]="hist_data.bar_y"
+            [attr.width]="hist_data.bar_width"
+            [attr.height]="hist_data.bar_height"
+            [style.fill]="'rgb(' + color[0] + ',' + color[1] + ',' + color[2] + ')'" />
+
+      <line [attr.x1]="hist_data.hist_bin_centers[i]"
+            [attr.x2]="hist_data.hist_bin_centers[i]"
+            [attr.y1]="hist_data.x_tick_ystart"
+            [attr.y2]="hist_data.x_tick_yend"
+            stroke="black"
+            vector-effect="non-scaling-stroke" />
+    </ng-container>
+
+    <ng-container *ngFor="let ypos of hist_data.y_tick_ypositions; let i = index">
+      <line [attr.x1]="hist_data.y_tick_xstart"
+            [attr.x2]="hist_data.y_tick_xend"
+            [attr.y1]="ypos"
+            [attr.y2]="ypos"
+            stroke="black"
+            vector-effect="non-scaling-stroke" />
+    </ng-container>
+
+  </svg>
+</ng-container>
+<ng-template #loading>Fetching Histogram...</ng-template>

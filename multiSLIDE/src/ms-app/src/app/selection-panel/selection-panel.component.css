@@ -1,0 +1,154 @@
+button {
+    background-color: #F8F8F8;
+    padding: 5px 16px;
+    font-size: 11px;
+    color: #505050;
+    text-transform: uppercase;
+    border: 1px solid #505050;
+    border-radius: 10px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    font-family: 'Verdana';
+}
+
+button:hover {
+    border-color: rgb(255,99,23);
+    color: rgb(255,99,0);
+    background-color: #fbfbfb;
+}
+
+.select_block {
+    text-align:left;
+    border-radius: 7px; 
+    border: 1px solid #CCCCCC; 
+    padding: 5px 16px; 
+    float: left;
+    /*display: inline-block;*/
+    background-color:#FDFDFD;
+    margin-left: 10px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    font-family: verdana;
+    font-size: 12px;
+    font-weight: normal;
+}
+
+.container_block {
+    height: 100px;
+    overflow-y: scroll;
+    border: 1px solid #000000;
+}
+
+.select_item {
+    position: relative; 
+    top: 5px; 
+    left: 5px; 
+    height: 30px; 
+    width: 263px; 
+    background-color:rgb(214, 212, 212); 
+    line-height: 30px;
+    cursor: pointer;
+    border-bottom: 3px solid white;
+    font-family: verdana;
+    font-size: 16px;
+    font-weight: bolder;
+    padding-left: 7px;
+}
+
+.select_item_open {
+    position: relative; 
+    top: 5px; 
+    left: 5px; 
+    height: 30px; 
+    width: 263px; 
+    background-color:rgb(214, 212, 212); 
+    line-height: 30px;
+    cursor: pointer;
+    border-bottom: 3px solid white;
+    font-family: verdana;
+    font-size: 16px;
+    font-weight: bolder;
+    color: rgb(194, 25, 3);
+    padding-left: 7px;
+}
+
+.apply_changes_div {
+    position: relative; 
+    top: 0px; 
+    left: 0px; 
+    width: 280px; 
+    height: 80px; 
+    border-top: black 1px solid; 
+    align-content: center;
+    text-align: center;
+    background-color: #F6F6F6;
+}
+
+.msg {
+    font-family: verdana;
+    font-size: 12px;
+    font-weight: normal;
+}
+
+.mark_change {
+    position: relative;
+    top: 6px;
+    border-radius: 50%;
+    width: 8px;
+    height: 8px;
+    position: relative;
+    float: left;
+    background-color: rgb(194, 25, 3);
+    border: rgb(214, 212, 212) 5px solid; 
+    margin-left: 2px;
+    margin-right: 1px;
+}
+
+.select_block2 {
+    text-align:left;
+    float: left;
+    background-color:#FDFDFD;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    font-family: verdana;
+    font-size: 12px;
+    letter-spacing: 2px;
+    font-weight: normal;
+    height: 18px;
+    width: 92%;
+    overflow-y: hidden;
+    /*border-bottom: 1px solid white;*/
+}
+
+.select_block2_text {
+    width:75%; 
+    overflow-y: hidden;
+    float: left;
+    height: 100%;
+    line-height: 18px;
+}
+
+.select_block2:hover {
+    color: #026b0b;
+    /*border-bottom: 1px solid black;*/
+}
+
+.remove_div {
+    position: relative;
+    margin-top: 3px;
+    font-size: 12px;
+    float: right;
+    color: rgb(194, 25, 3);
+    cursor: pointer;
+}
+
+.minus_button {
+    width: 18px;
+    height: 18px;
+    float: right;
+    cursor: pointer;
+    background-image: url('assets/img/minus512_green_filled.png');
+    background-size: 18px 18px;
+}

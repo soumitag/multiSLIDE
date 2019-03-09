@@ -1,0 +1,70 @@
+<div class="container">
+<!--<div class="main">-->
+
+  <form #uploadForm='ngForm' name="uploadForm">
+    <div class="data_upload_text">
+        3. Please Upload -omics Data File(s) using this module
+    </div>
+
+    <!--<div class="input">-->
+      <div class="data_upload_input">
+      <label for="selectedUploadType">Data Type</label><br>
+      <select name="selectedUploadType" [(ngModel)]="selectedUploadType" (ngModelChange)="uplog()" required>
+        <option *ngFor="let type of allowedUploadTypes" [value]="type">{{type}}</option>
+      </select>
+        <div class="errorMsg" *ngIf="submitTouched && (selectedUploadType == '' || selectedUploadType == null)">
+      Please select data type.
+    </div>
+
+    <br><br>  
+      <label for="file">Data File Upload</label><br>
+      <input #fileInput type="file" id="file_selector" name="file_selector" (change)="handleFileInput($event.target.files)" required>
+
+    <div class="errorMsg" *ngIf="submitTouched && fileToUpload == null">
+      File is required.
+    </div>
+
+    <br><br>  
+      <label for="selectedDelimiter">Data File Delimiter</label><br>
+      <select name="selectedDelimiter" [(ngModel)]="selectedDelimiter" (ngModelChange)="ftlog()" required>
+        <option *ngFor="let delim of allowedDelimiters" [value]="delim">{{delim}}</option>
+      </select>
+ 
+    <div class="errorMsg" *ngIf="submitTouched && (selectedDelimiter == '' || selectedDelimiter == null)">
+      Please select a delimiter.
+    </div>
+
+    <br><br>
+
+    <!--
+    <div class="input">
+      <label for="selectedIdentifier">Select Identifier</label>
+      <select name="selectedIdentifier" [(ngModel)]="selectedIdentifier" (ngModelChange)="idlog()" required>
+        <option *ngFor="let id of allowedIdentifiers" [value]="id">{{id}}</option>
+      </select>
+    </div>
+    <div class="errorMsg" *ngIf="submitTouched && (selectedIdentifier == '' || selectedIdentifier == null)">
+      Please select an identifier.
+    </div>
+    -->   
+
+    <!--<div>
+      {{selectedDelimiter}}
+    </div>-->
+
+  
+      <button type="button" class="reset_button" (click)="handleReset()">Reset</button>
+      <div class="divider"></div>
+      <button type="button" class="highlight_button" (click)="handleSubmit()">Submit</button>
+    </div>
+    <!--
+    <div class="data_server_response_msg_panel">
+    <div class="errorMsg" *ngIf="server_response">
+      {{server_response.detailed_reason}}
+    </div>
+  </div>
+  -->
+  </form>
+</div>
+<!--</div>-->
+<!--</div>-->

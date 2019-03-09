@@ -1,0 +1,60 @@
+<ng-container *ngIf="preview; else loading">
+<div class="metadata_map_title">Metadata Column Selection and Identifier Mapping</div>
+<div style="position:relative; top:10px; left:10px; width:500px;">
+
+  <form #createListForm='ngForm' name="metaDataMapForm">
+    <div class="metadata_map_controls">
+        <label for="selectedMetaDataCols">Metadata Columns</label><br>
+        <select name="selectedMetaDataCols" [(ngModel)]="selectedMetaDataCols" (ngModelChange)="metalog()" required>
+          <!--<option *ngFor="let rows of preview.data" [value]="rows">{{rows}}</option>-->
+          <option *ngFor="let rows of column_names" [value]="rows">{{rows}}</option>
+        </select>
+        <div class="divider"></div>
+        <button type="button" (click)="addMetaDataCols()">Add</button>
+        <br>
+        <div class="container_block" style="position: relative; top: 10px; left: 5px; width: 268px; height: 150px;">
+          <div *ngFor="let cols of selected_metadata_cols_new" id="metadata_cols_div" class="select_block2">
+            {{cols}}
+            <div class="minus_button" (click)="removeMetaDataCols(cols)"></div>
+          </div>
+        </div>
+       
+        <label for="MetaDataColsMap">Metadata Columns -> Standard Identifier Mapping</label><br>
+        <br>
+        <label for="selectedMetaDataCols2">Metadata Columns Selected</label><br>
+        <select name="selectedMetaDataCols2" [(ngModel)]="selectedMetaDataCols2" (ngModelChange)="metaDataCols_log()">
+          <option *ngFor="let cols of selected_metadata_cols_new" [value]="cols">{{cols}}</option>
+        </select>
+        <br>
+        <label for="identifierCols">Standard Identifiers</label><br>
+        <!--<select name="identifierCols" [(ngModel)]="identifierCols" (ngModelChange)="identifierCols_log()">
+          <option id="entrez" value="entrez">Entrez</option>
+          <option id="genesymbol" value="genesymbol" >Gene Symbol</option>
+          <option id="refseq" value="refseq" >RefSeq ID</option>
+          <option id="ensembl_gene_id" value="ensembl_gene_id" >Ensembl gene ID</option>
+          <option id="ensembl_transcript_id" value="ensembl_transcript_id" >Ensembl transcript ID</option>
+          <option id="ensembl_protein_id" value="ensembl_protein_id" >Ensembl protein ID</option>
+          <option id="uniprot_id" value="uniprot_id" >UniProt ID</option>
+        </select>
+        -->
+        <select name="identifierCols" [(ngModel)]="selected_identifier_value" (ngModelChange)="identifierCols_log()">
+          <option *ngFor="let col of identifierCols" [value]="col.value">{{col.text}}</option>
+        </select>
+        <div class="divider"></div>
+        <button type="button" (click)="addMetaDataIdentifierCols()">Add</button>
+        <br>
+        <div class="container_block" style="position: relative; top: 10px; left: 5px; width: 400px; height: 150px;">
+            <div *ngFor="let mappings of identifier_mapping_new" id="identifier_col_container" class="select_block2">
+              {{mappings}}
+              <div class="minus_button" (click)="removeMetaDataIdentifierCols(cols)"></div>
+            </div>
+        </div>
+
+    </div>
+    <div class="apply_changes_div">
+        <button type="button" (click)="updateMetaDataInfo()">Save Changes</button>
+      </div><br><br><br>
+  </form>
+</div>
+</ng-container>
+<ng-template #loading>Fetching Column Headers...</ng-template>
