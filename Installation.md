@@ -9,8 +9,6 @@ Below shows some of the typical Windows and MacOS systems configuration that **m
 
 ### Windows 
 
-Markdown | Less | Pretty
---- | --- | ---
 *Still* | `renders` | **nicely**
 1 | 2 | 3
 
