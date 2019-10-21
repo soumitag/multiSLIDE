@@ -11,6 +11,7 @@
 ## Resources
 
 * [Online Version](http://137.132.97.109:56695/multislide/#/) 
-* [Installation Guide](Installation.md)
+* [Installation Guide](Installation.md) 
+* [User Guide] 
 
 
