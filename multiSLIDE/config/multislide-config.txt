@@ -1,9 +1,0 @@
-#install-dir
-
-#java-dir
-
-#glassfish-dir
-
-#mongodb-dir
-
-#python-dir

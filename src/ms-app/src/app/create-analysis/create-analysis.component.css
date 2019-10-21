@@ -1,0 +1,449 @@
+.container {
+    float: left;
+    width: 100%;
+    height:100%;
+    border-radius: 0px;
+    background-color: rgb(43,49,55);
+    padding: 0px;
+    /*text-align:center;*/
+}
+
+div.main {
+    /*position: relative;
+    top: 15px;
+    left: 15px;    
+    margin: 20px;
+    border: 3px #73AD21 solid;
+    text-align: center;*/
+    width: 100%;
+    padding: 20px;
+    border-radius: 15px;
+}
+
+div.errorMsg {
+    color: rgb(205,91,69);
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    height: 20px;    
+}
+
+div.serverMsg {
+    color: rgb(149,219,154);
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    height: 20px; 
+    word-wrap: break-word;   
+}
+
+.species_container {
+    width: 900px;
+    height: 200px;
+}
+
+.clinical_container {
+    width: 900px;
+    height: 400px;
+}
+
+.each_data_container {
+    width: 900px;
+    height: 500px;
+}
+
+.species_text {
+    /*float: left;*/
+    position: absolute;
+    width: 200px;
+    height: 40px;
+    top: 12px;
+    left: 20px;
+    padding: 18px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    font-weight: 100;
+    color: white;
+    text-align: right;
+    
+}
+
+h2 {
+    color:white;
+}
+
+.clinical_text {
+    /*float: left;*/
+    position: absolute;
+    width: 200px;
+    height: 40px;
+    top: 212px;
+    left: 20px;
+    padding: 18px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    font-weight: 100;
+    color: white;
+    text-align: right;
+    
+}
+
+
+.species_input {
+    /*float: left;*/
+    position: absolute;
+    width: 300px;
+    left: 300px;
+    border-radius: 5px;
+    background-color: white;
+    padding: 18px;
+    margin: 0px;
+    /*text-align:center;*/
+}
+
+.clinical_input {
+    /*float: right;*/
+    position: absolute;
+    top: 500 px;
+    width: 300px;
+    left: 300px;
+    border-radius: 5px;
+    background-color: white;
+    padding: 18px;
+    margin: 0px;
+    /*text-align:center;*/
+}
+
+.species_err_msg_panel{
+    /*float: right;*/
+    position: absolute;
+    left:670px;
+    top: 12 px;
+    width: 200px;
+    height: 40px;
+    padding: 18px;
+    text-align: left;
+}
+
+.clinical_err_msg_panel{
+    /*float: right;*/
+    position: absolute;
+    left:670px;
+    top: 12 px;
+    width: 200px;
+    height: 40px;
+    padding: 18px;
+    text-align: left;
+}
+
+.server_response_msg_panel{
+    position: absolute;
+    left:670px;
+    top: 12 px;
+    width: 200px;
+    height: 40px;
+    padding: 18px;
+    text-align: left;
+}
+
+option {
+    font-family:  'Poppins', sans-serif;
+}
+
+input[type=text], select {
+    width: 300px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-top: 6px;
+    margin-bottom: 16px;
+    resize: vertical;
+    font-size: 16px;    
+}
+
+
+input[type=file] {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    cursor: pointer;
+    font-family:  'Poppins', sans-serif;
+    font-size: 16px;  
+}
+
+label {
+    width: 100%;
+    padding: 2px;
+    margin-top: 6px;
+    margin-bottom: 16px;
+    resize: vertical;
+    /*color: #95DB9A;*/
+    color: black;
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+}
+
+button {
+    background-color: #F8F8F8;
+    padding: 5px 16px;
+    font-size: 18px;
+    color: #505050;
+    text-transform: uppercase;
+    border: 1px solid #505050;
+    border-radius: 10px;
+    cursor: pointer;
+    letter-spacing: 2px;
+}
+
+button:hover {
+    border-color: rgb(255,99,23);
+    color: rgb(255,99,0);
+    background-color: #fbfbfb;
+}
+
+.divider {
+    width:30px;
+    height:auto;
+    display:inline-block;  
+}
+
+.highlight_button {
+    font-family: 'Poppins', sans-serif;
+    /*background-color: rgb(255,127,80);*/
+    background-color: rgb(205,91,69);
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: bold;
+    color: white;
+    text-transform: uppercase;
+    border: 2px solid rgb(205,91,69);
+    border-radius: 20px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    width: 300px;
+}
+
+.highlight_button:hover {
+    background-color: white;
+}
+
+
+.create_button {
+    font-family: 'Poppins', sans-serif;
+    /*background-color: rgb(255,127,80);*/
+    background-color: rgb(205,91,69);
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: bold;
+    color: white;
+    text-transform: uppercase;
+    border: 2px solid rgb(205,91,69);
+    border-radius: 20px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    width: 350px;
+    position: absolute;
+    right: 10px;
+}
+
+.create_button:hover {
+    background-color: white;
+}
+
+.reset_button {
+    font-family: 'Poppins', sans-serif;
+    /*background-color: rgb(255,127,80);*/
+    background-color:rgb(43,49,55);
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: bold;
+    color: rgb(205,91,69);
+    text-transform: uppercase;
+    border: 2px solid rgb(43,49,55);
+    border-radius: 20px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    width: 350px;
+}
+
+.reset_button:hover {
+    background-color: rgb(43,49,55);
+}
+
+
+.upload_table_container {
+    /*float: right;
+    display: inline-block;
+    position: relative;
+    top: 0px;
+    left: 400px;
+    margin-left: 300px;*/
+    left:1000px;
+    width: 800px;
+    border-radius: 5px;
+    background-color: white;
+    padding: 18px;
+    margin: 0px;
+    /*text-align:center;*/
+}
+
+table {
+    table-layout: fixed;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    border-collapse: collapse;
+    width: 100%;    
+}
+
+th {
+    border: 1px solid #808080;
+    text-align: left;
+    padding: 8px;
+    color: black;
+    background-color: #dddddd;
+
+}
+  
+td {
+    border: 1px solid #808080;
+    text-align: left;
+    padding: 8px;
+    color: black;
+    word-wrap:break-word;
+    min-width: 50px;
+}
+
+tr {
+    background-color: white;
+} 
+
+.left_panel {
+    /*float: left;*/
+    width: 1000px;
+    height: 100%;
+    padding: 20px;
+}
+
+.right_panel {
+    /*float: left;*/
+    position: absolute;
+    left: 1000px;
+    top:12px;
+    padding: 18px;
+}
+
+.table_button {
+    font-family: 'Poppins', sans-serif;
+    /*background-color: rgb(255,127,80);*/
+    background-color: #dddddd;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: bold;
+    color: rgb(205,91,69);
+    text-transform: uppercase;
+    border: 2px solid #dddddd;
+    border-radius: 20px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    width: 100px;
+}
+
+.table_button:hover {
+    background-color: #dddddd;
+}
+
+.form_main_button_panel {
+    width: 800px;
+}
+
+.edit_button {
+    width: 22px;
+    height: 22px;
+    float: right;
+    cursor: pointer;
+    background-image: url('assets/img/icons8-pencil-drawing-96_grey.png');
+    background-color: white;
+    background-size: 22px 22px;
+    padding-left: 20px;
+    background-repeat: no-repeat;
+    border-width: 0px;
+}
+
+.edit_button:hover {
+    background-image: url('assets/img/icons8-pencil-drawing-96_orange.png');
+}
+
+.save_button {
+    width: 22px;
+    height: 22px;
+    float: right;
+    cursor: pointer;
+    background-image: url('assets/img/icons8-save-90_grey.png');
+    background-color: white;
+    background-size: 22px 22px;
+    padding-left: 20px;
+    margin-top: 3px;
+    background-repeat: no-repeat;
+    border-width: 0px;
+}
+
+.save_button:hover {
+    background-image: url('assets/img/icons8-save-90_orange.png');
+}
+
+.preview_button {
+    width: 22px;
+    height: 22px;
+    float: right;
+    cursor: pointer;
+    background-image: url('assets/img/icons8-open-book-filled-grey.png');
+    background-color: white;
+    background-size: 22px 22px;
+    padding-left: 20px;
+    padding-right: 20px;
+    background-repeat: no-repeat;
+    border-width: 0px;
+}
+
+.preview_button:hover {
+    background-image: url('assets/img/icons8-open-book-filled-orange.png');
+}
+
+
+.close_preview_button {
+    width: 22px;
+    height: 22px;
+    float: right;
+    cursor: pointer;
+    background-image: url('assets/img/icons8-book-filled-grey.png');
+    background-color: white;
+    background-size: 22px 22px;
+    padding-left: 20px;
+    padding-right: 20px;
+    background-repeat: no-repeat;
+    border-width: 0px;
+}
+
+.close_preview_button:hover {
+    background-image: url('assets/img/icons8-book-filled-orange.png');
+}
+
+.remove_button {
+    width: 22px;
+    height: 22px;
+    float: right;
+    cursor: pointer;
+    background-image: url('assets/img/icons8-trash-can-grey.png');
+    background-color: white;
+    background-size: 22px 22px;
+    padding-left: 20px;
+    background-repeat: no-repeat;
+    border-width: 0px;
+}
+
+.remove_button:hover {
+    background-image: url('assets/img/icons8-trash-can-orange.png');
+}
+
+
+
+
+

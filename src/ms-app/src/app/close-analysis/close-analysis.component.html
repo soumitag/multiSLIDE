@@ -1,0 +1,21 @@
+<div class="hc_title">Close Analysis</div>
+<div class="hc_module_controls">
+    <ng-container *ngIf="is_closed; else default">
+        <div class="message_div">
+          {{message}}
+        </div>
+        <div class="apply_changes_div">
+          <button type="button" (click)="goHome()">Home</button>
+        </div><br><br>
+    </ng-container>
+    <ng-template #default>
+      <div class="message_div">
+        Closing this analysis will remove all related data from server. 
+        Please ensure that the workspace is locally saved before closing. 
+        If this analysis is open in other browser tabs, they will no longer function after closing.
+      </div>
+      <div class="apply_changes_div">
+          <button type="button" (click)="deleteAndForget()">Close Analysis</button>
+      </div><br><br>
+    </ng-template>
+</div>

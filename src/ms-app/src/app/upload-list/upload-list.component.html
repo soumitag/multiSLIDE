@@ -1,0 +1,51 @@
+<div class="upload_list_title">Upload a List Name</div>
+<div style="position:relative; top:10px; left:10px; width:500px;">
+
+  <form #createListForm='ngForm' name="uploadListForm">
+    <label for="listname">Enter a List Name</label><br>
+      <input class="upload_list_item" type="text" id="listname" name="listname" [(ngModel)]="listnameStr" [value]="listnameStr" maxlength="30" size="30" required>
+      <div class="errorMsg" 
+          *ngIf="uploadTouched && (listnameStr == '' || listnameStr == null)">
+          A unique list name is required
+      </div>
+    
+      <br>
+      <br>
+        <label for="file">Upload a List</label><br>
+        <input #fileInput type="file" id="file_selector" name="file_selector"
+          (change)="handleFileInput($event.target.files)" required>
+        <div class="errorMsg" *ngIf="uploadTouched && listfileToUpload == null">
+          File is required.
+        </div>
+      
+      <br>
+      <br>
+      <label for="selectedDelimiter">File Delimiter</label><br>
+      <select name="selectedDelimiter" [(ngModel)]="selectedDelimiter" (ngModelChange)="ftlog()"
+        required>
+        <option *ngFor="let delim of allowedDelimiters" [value]="delim">{{delim}}</option>
+      </select>
+      <div class="errorMsg"
+        *ngIf="uploadTouched && (selectedDelimiter == '' || selectedDelimiter == null)">
+        Please select a delimiter.
+      </div>
+      <br>
+      <br>
+      <label for="selectedIdentifier">Identifier</label><br>
+      <select name="selectedIdentifier" [(ngModel)]="selectedIdentifier" (ngModelChange)="idlog()"
+        required>
+        <option *ngFor="let id of allowedIdentifiers; let i = index" [value]="standard_gene_identifiers[i] + '_2021158607524066'">{{id}}</option>
+      </select>
+      <div class="errorMsg"
+        *ngIf="uploadTouched && (selectedIdentifier == '' || selectedIdentifier == null)">
+        Please select an identifier.
+      </div>
+      <br>
+      <br>
+      <br>
+    <div class="apply_changes_div">
+        <button type="button" (click)="uploadList()">Upload</button>
+      </div>
+  </form>
+</div>
+

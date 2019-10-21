@@ -1,0 +1,101 @@
+.apply_changes_div {
+    position: relative; 
+    top: 30px; 
+    width: 640px; 
+    padding-top: 18px;
+    border-top: black 1px solid; 
+    align-content: center;
+    text-align: center;
+}
+
+button {
+    background-color: #F8F8F8;
+    padding: 5px 16px;
+    font-size: 11px;
+    color: #505050;
+    text-transform: uppercase;
+    border: 1px solid #505050;
+    border-radius: 10px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    font-family: 'Verdana';
+}
+
+button:hover {
+    border-color: rgb(255,99,23);
+    color: rgb(255,99,0);
+    background-color: #fbfbfb;
+}
+
+.select_block {
+    text-align:left;
+    border-radius: 7px; 
+    border: 1px solid #CCCCCC; 
+    padding: 5px 16px; 
+    float: left;
+    /*display: inline-block;*/
+    background-color:#FDFDFD;
+    margin-left: 10px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    font-family: verdana;
+    font-size: 12px;
+    font-weight: normal;
+}
+
+.search_result_td {
+    color: #3b3b3b;
+    cursor: pointer;
+    font-family: 'Verdana';
+    font-size: 13px;
+    padding-right: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.search_result_td_selected {
+    color: #026b0b;
+    cursor: pointer;
+    font-family: 'Verdana';
+    font-size: 13px;
+    padding-right: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.plus_button {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    background-image: url('/assets/img/plus512_silver_filled.png');
+    background-size: 20px 20px;
+}
+
+.plus_button:hover {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    background-image: url('assets/img/plus512_orange_filled.png');
+    background-size: 20px 20px;
+}
+
+.minus_button {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    background-image: url('assets/img/minus512_green_filled.png');
+    background-size: 20px 20px;
+}
+
+.add_all_div {
+    float: right;
+    padding-right: 10px;
+}
+
+.header_div {
+    position: relative; 
+    width: 640px; 
+    height: 50px;
+    padding-bottom: 10px;
+    border-bottom: black 1px solid; 
+}

@@ -1,0 +1,36 @@
+<div class="hc_title">
+  Phenotype based Row Sorting
+</div>
+  <div class="hc_module_controls" style="width: 600px">
+    <div *ngFor="let p of params.phenotypes; let i = index" style="width: 600px">
+      <ng-container *ngIf="i==0; else followedby">
+        Sort by &nbsp;
+      </ng-container>
+      <ng-template #followedby>
+        followed by &nbsp;
+      </ng-template>
+      <select name="sortPhen" [ngModel]="params.phenotypes[i]" (ngModelChange)="setPhenotype($event,i)">
+        <option value='' [attr.selected]="params.phenotypes[i] == '' ? true : null">
+          -
+        </option>
+        <option *ngFor="let phen of phenotypes" 
+          [value]=phen [attr.selected]="phen == params.phenotypes[i] ? true : null">
+          {{phen}}
+        </option>
+      </select>
+      &nbsp;in&nbsp;
+      <select name="sortorder" class="order_select" [ngModel]="params.sort_orders[i]" (ngModelChange)="setSortOrder($event,i)">
+        <option value="true" [attr.selected]="params.sort_orders[i] ? true : null">
+          Ascending
+        </option>
+        <option value="false" [attr.selected]="!params.sort_orders[i] ? true : null">
+          Descending
+        </option>
+      </select>
+      &nbsp;order
+    </div>
+  </div>
+
+<div class="apply_changes_div" style="width: 600px">
+    <button type="button" (click)="saveChanges()">Save Changes</button>
+</div><br><br><br>

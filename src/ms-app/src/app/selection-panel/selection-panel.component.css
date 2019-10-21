@@ -1,0 +1,256 @@
+.big_container {
+    position: absolute; 
+    top: 5px; 
+    left: 0px; 
+    width: 280px;
+    background-color: rgb(56,62,68);
+    height: 100%;
+}
+
+.each_sub_container{
+    position: relative; 
+    top: 5px; 
+    left: 0px; 
+    width: 280px; 
+    height:210px;
+}
+
+.sub_container_selector {
+    position: relative; 
+    top: 2px; 
+    left: 3px; 
+    width: 268px;
+    height: 30px;
+}
+
+input[type=text], select {
+    width: 160px;
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    /*margin-top: 6px;
+    margin-bottom: 16px;
+    */
+    resize: vertical;
+    font-size: 12px;    
+}
+
+.apply_changes_button {
+    font-family: 'Poppins', sans-serif;
+    background-color: rgb(205,91,69);
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: bold;
+    color: white;
+    text-transform: uppercase;
+    border: 2px solid rgb(205,91,69);
+    border-radius: 20px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    width: 250px;
+    /*position: absolute;
+    right: 10px; */
+}
+
+
+button {
+    font-family: 'Poppins', sans-serif;
+    background-color: rgb(56,62,68);
+    padding: 5px 5px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+    text-transform: uppercase;
+    border: 2px solid white;
+    border-radius: 20px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    width: 80px;
+    margin: 10px;   
+}
+
+button:hover {
+    border-color: rgb(205,91,69);
+    color: rgb(205,91,69);
+    background-color: rgb(56,62,68);
+}
+
+.select_block {
+    text-align:left;
+    border-radius: 7px; 
+    border: 1px solid #CCCCCC; 
+    padding: 5px 16px; 
+    float: left;
+    /*display: inline-block;*/
+    background-color:#FDFDFD;
+    margin-left: 10px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    /*font-family: verdana;*/
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: normal;
+}
+
+.container_block {
+    height: 100px;
+    margin-top: 10px;
+    overflow-y: auto;
+    /*border: 1px solid #000000;*/
+}
+
+.select_item {
+    position: relative; 
+    top: 5px; 
+    left: 2px;
+    right: 5px; 
+    height: 40px; 
+    width: 268px; 
+    /*background-color:rgb(214, 212, 212); */
+    background-color:rgb(36, 41, 46);
+    line-height: 30px;
+    cursor: pointer;
+    /*border-bottom: 3px solid white;*/
+    border-bottom: 1px solid rgb(205,91,69);
+    /*font-family: verdana;*/
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    font-weight: bolder;
+    padding-top: 10px;
+    padding-left: 7px;
+    color: white;
+    letter-spacing: 2px;
+}
+
+.select_item_open {
+    position: relative; 
+    top: 5px; 
+    left: 2px; 
+    height: 40px; 
+    width: 268px; 
+    /*background-color:rgb(214, 212, 212);*/
+    background-color:rgb(36, 41, 46); 
+    line-height: 30px;
+    cursor: pointer;
+    /*border-bottom: 3px solid white; */
+    border-bottom: 1px solid rgb(205,91,69);
+    /*font-family: verdana;*/
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    font-weight: bolder;
+    color: rgb(205,91,69);
+    padding-left: 7px;
+    padding-top: 10px;
+    letter-spacing: 2px;
+}
+
+.apply_changes_div {
+    position: absolute; 
+    bottom: 40px; 
+    left: 0px; 
+    width: 280px; 
+    height: 90px; 
+    /*border-top: black 1px solid;*/ 
+    align-content: center;
+    text-align: center;
+    /*background-color: #F6F6F6;*/
+    background-color: rgb(56,62,68);
+}
+
+.msg {
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: normal;
+    color: white;
+}
+
+.mark_change {
+    position: relative;
+    top: 6px;
+    border-radius: 50%;
+    width: 8px;
+    height: 8px;
+    position: relative;
+    float: left;
+    background-color: rgb(194, 25, 3);
+    border: rgb(214, 212, 212) 5px solid; 
+    margin-left: 2px;
+    margin-right: 1px;
+}
+
+.select_block2 {
+    text-align:left;
+    float: left;
+    /*background-color:#FDFDFD;*/
+    background-color: rgb(36, 41, 46);
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    font-weight: normal;
+    height: 18px;
+    width: 92%;
+    overflow-y: hidden;
+    padding: 4px;
+    /*border-bottom: 1px solid white;*/
+}
+
+.select_block2_text {
+    width:75%; 
+    overflow-y: hidden;
+    float: left;
+    height: 100%;
+    line-height: 18px;
+    overflow-x: hidden;
+}
+
+.select_block2:hover {
+    color:rgb(149,219,154);
+    /*border-bottom: 1px solid black;*/
+}
+
+.remove_div {
+    position: relative;
+    margin-top: 3px;
+    font-size: 12px;
+    float: right;
+    color: rgb(194, 25, 3);
+    cursor: pointer;
+}
+
+.minus_button {
+    width: 18px;
+    height: 18px;
+    float: right;
+    cursor: pointer;
+    background-image: url('assets/img/minus512_green_filled.png');
+    background-size: 18px 18px;
+}
+
+.feature_list_message_block {
+    position: absolute;
+    top:150px;
+    left:25px;
+    width:75%; 
+    height: 250px;
+    line-height: 25px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 18px;
+    font-weight: normal;
+    color: white;
+}
+
+.close_list_button_block {
+    position: absolute;
+    top:400px;
+    left: 0px; 
+    width: 280px; 
+    height: 90px; 
+    align-content: center;
+    text-align: center;
+}

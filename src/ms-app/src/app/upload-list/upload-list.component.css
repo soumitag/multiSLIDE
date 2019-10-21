@@ -1,0 +1,88 @@
+label {
+    width: 100%;
+    padding: 2px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+    resize: vertical;
+    /*color: #95DB9A;*/
+    color: black;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    padding-right: 10px;
+}
+
+.upload_list_title {
+    text-align:left;
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    font-weight: normal;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    line-height: 25px;
+    width: 500px; 
+    border-bottom: 1px black solid;
+}
+
+input[type=text], select {
+    width: 250px;
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-top: 6px;
+    margin-bottom: 6px;
+    resize: vertical;
+    font-size: 14px;    
+}
+
+input[type=file] {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    cursor: pointer;
+    font-family:  'Poppins', sans-serif;
+    font-size: 14px;  
+}
+
+.errorMsg {
+    /*margin-left: 1%; */
+    color: rgb(179, 34, 34);
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    text-align: left; 
+    float: right;
+    width: 200px;
+    padding-left: 20px;  
+    padding-top: 5px;  
+}
+
+.apply_changes_div {
+    position: relative; 
+    top: 30px; 
+    width: 500px; 
+    padding-top: 18px;
+    border-top: black 1px solid; 
+    align-content: center;
+    text-align: center;
+}
+
+
+button {
+    background-color: #F8F8F8;
+    padding: 5px 16px;
+    font-size: 11px;
+    color: #505050;
+    text-transform: uppercase;
+    border: 1px solid #505050;
+    border-radius: 10px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    font-family: 'Poppins', sans-serif;
+}
+
+button:hover {
+    border-color: rgb(255,99,23);
+    color: rgb(255,99,0);
+    background-color: #fbfbfb;
+}

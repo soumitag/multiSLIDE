@@ -1,0 +1,74 @@
+SubjectID	BRCA_subtype
+TCGA-C8-A12T	HER2-enriched
+TCGA-A2-A0D2	Basal-like
+TCGA-C8-A12U	Luminal B
+TCGA-AR-A1AS	Luminal A
+TCGA-A2-A0EV	Luminal A
+TCGA-AN-A0AM	Luminal B
+TCGA-D8-A142	Basal-like
+TCGA-AO-A0JL	Basal-like
+TCGA-BH-A0BV	Luminal A
+TCGA-A2-A0T6	Luminal A
+TCGA-E2-A158	Basal-like
+TCGA-E2-A15A	Luminal B
+TCGA-A8-A079	Luminal B
+TCGA-A2-A0YF	Luminal A
+TCGA-BH-A0DD	Luminal B
+TCGA-BH-A0E9	Luminal A
+TCGA-A2-A0YG	Luminal B
+TCGA-BH-A18N	Luminal A
+TCGA-A2-A0YM	Basal-like
+TCGA-BH-A0C7	Luminal B
+TCGA-A2-A0SX	Basal-like
+TCGA-AN-A0AL	Basal-like
+TCGA-A7-A0CE	Basal-like
+TCGA-A2-A0YC	Luminal A
+TCGA-A7-A0CJ	Luminal B
+TCGA-AO-A12F	Basal-like
+TCGA-A8-A06Z	Luminal B
+TCGA-A2-A0CM	Basal-like
+TCGA-A8-A09G	HER2-enriched
+TCGA-C8-A134	Basal-like
+TCGA-C8-A12L	HER2-enriched
+TCGA-A2-A0EX	Luminal A
+TCGA-AN-A0FL	Basal-like
+TCGA-BH-A0DG	Luminal A
+TCGA-AO-A0JC	Luminal B
+TCGA-A8-A08Z	Luminal A
+TCGA-AR-A0TX	HER2-enriched
+TCGA-AO-A0JE	HER2-enriched
+TCGA-AN-A0AJ	Luminal B
+TCGA-AO-A0JM	Luminal B
+TCGA-C8-A12V	Basal-like
+TCGA-AN-A04A	Luminal A
+TCGA-BH-A0AV	Basal-like
+TCGA-AO-A12E	Luminal A
+TCGA-A8-A06N	Luminal B
+TCGA-AR-A0TR	Luminal A
+TCGA-AO-A03O	Luminal B
+TCGA-AR-A0TT	Luminal B
+TCGA-AR-A0TV	Luminal B
+TCGA-C8-A12Z	HER2-enriched
+TCGA-AO-A0JJ	Luminal A
+TCGA-AR-A0U4	Basal-like
+TCGA-AR-A1AP	Luminal A
+TCGA-AN-A0FK	Luminal B
+TCGA-AO-A0J6	Basal-like
+TCGA-AR-A1AW	Luminal A
+TCGA-AR-A1AV	Luminal B
+TCGA-C8-A135	HER2-enriched
+TCGA-AO-A0J9	Luminal A
+TCGA-BH-A18U	Luminal B
+TCGA-A2-A0EQ	HER2-enriched
+TCGA-A7-A13F	Luminal B
+TCGA-BH-A0E1	Luminal A
+TCGA-BH-A0C1	Luminal A
+TCGA-A2-A0EY	Luminal B
+TCGA-C8-A138	HER2-enriched
+TCGA-E2-A154	Luminal A
+TCGA-A8-A076	HER2-enriched
+TCGA-AO-A126	Luminal A
+TCGA-BH-A18Q	Basal-like
+TCGA-C8-A130	HER2-enriched
+TCGA-A2-A0T3	Luminal B
+TCGA-A2-A0YD	Luminal A

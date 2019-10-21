@@ -1,0 +1,72 @@
+<ng-container *ngIf="data; else loading">
+  <div style="position: relative; top: 20px; left: 0px; width: 640px; height: 680px; overflow-y: scroll;">
+    <div class="header_div">
+      {{neighbor_search_type_display_name}} of {{query_display_tag}}<br>
+      Found {{data.neighbor_count}} neighbors, of which {{data.neighbors_in_dataset}} are in the datasets.
+      <div class="add_all_div">
+          <button type="button" (click)="selectAll()">{{all_button_text}}</button>
+      </div>
+    </div>
+    <div *ngFor="let neighbor of data.neighbor_display_tag; let n = index" 
+      [ngClass]="{'search_result_td_selected': results_selection_ind[n], 'search_result_td': !results_selection_ind[n]}">
+      {{neighbor}}
+      <div>
+        <ng-container *ngIf="data.neighbor_in_dataset_ind[n]; else not_in_dataset">
+          <div *ngIf="results_selection_ind[n];then add else remove"></div>
+          <ng-template #add>
+            <div class="minus_button" (click)="toggleResult(n)"></div>
+          </ng-template>
+          <ng-template #remove>
+            <div class="plus_button" (click)="toggleResult(n)"></div>
+          </ng-template>
+        </ng-container>
+        <ng-template #not_in_dataset>(Not in Dataset)</ng-template>
+      </div>
+    </div>
+  </div>
+
+  <div class="apply_changes_div">
+    <button type="button" (click)="saveChanges()">Done</button>
+  </div>
+
+</ng-container>
+<ng-template #loading>Searching...</ng-template>
+
+
+<!--
+<form #searchForm='ngForm' name="searchForm">
+  <div style="position: relative; top: 5px; left: 5px; width: 268px; height: 150px; border: 1px solid black; overflow-y: scroll;">
+    <div *ngFor="let result of selected_results" id="datasets_div" class="select_block">
+      {{result}}
+    </div>
+  </div>
+  <div style="position: relative; top: 10px; left: 5px; width: 268px; padding-top: 10px; padding-bottom: 10px; border-bottom: 1px solid black">
+    <select name="queryType" [(ngModel)]="queryType">
+      <option value="tf">TF Targets</option>
+      <option value="mRNA">miRNA Targets</option>
+      <option value="ppi">Protein-Protein Interactions</option>
+    </select>
+
+    <select name="searchType" [(ngModel)]="searchType">
+      <option value="exact"> &#61; </option>
+      <option value="contains"> &cong; </option>
+    </select>
+    <br>
+    <div style="height: 5px"></div>
+    <input type="text" name="searchText" [(ngModel)]="searchText" size="18" />
+
+    <button type="button" (click)="doSearch()">Search</button>
+  </div>
+
+  <div style="position: relative; top: 20px; left: 0px; width: 268px; height: 450px; overflow-y: scroll;">
+    <table width="100%">
+      <tr *ngFor="let result of data; let i = index">
+        <td (click)="addResult(i)">
+          {{result.group_name}}
+        </td>
+      </tr>
+    </table>
+  </div>
+
+</form>
+-->

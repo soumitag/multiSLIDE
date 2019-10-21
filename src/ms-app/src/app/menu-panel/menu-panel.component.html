@@ -1,0 +1,39 @@
+<div style="position: absolute;top: 5px; left:300px; width: 1000px; height:35px">
+  <div class="menu_item">Save
+    <div class="sub_menu" style="left: 0px;">
+      <div class="sub_menu_item" (click)="openSaveViz()">Save Visualizations</div>
+      <div class="sub_menu_item" (click)="saveWorkspace()">Save Workspace</div>
+    </div>
+  </div>
+  <div class="menu_item">View
+    <div class="sub_menu" style="left: 90px;">
+      <div class="sub_menu_item">Show Cluster Labels</div>
+      <!--<div class="sub_menu_item">Show Dendrogram</div>-->
+      <!--<div class="sub_menu_item">Activity Log</div>-->
+      <div class="sub_menu_item" (click)="toggleSelectionPanel()">Show / Hide Selection Panel</div>
+      <div class="sub_menu_item">Reset to Default Settings</div>
+    </div>
+  </div>
+  <div class="menu_item">Create
+    <div class="sub_menu" style="left: 185px">
+      <div class="sub_menu_item" (click)="openCreateListDialog()">Empty Feature List</div>   
+      <div class="sub_menu_item" (click)="openUploadListDialog()">Feature List From File</div>      
+      <!--<div class="sub_menu_item">Sub-Analysis</div>-->
+    </div>
+  </div>
+  <!--<div class="menu_item" (click)="openClusteringDialog()">Clustering</div>-->
+  <div class="menu_item" (click)="showHomePage()">Home</div>
+  <div class="menu_item">Help
+      <div class="sub_menu" style="left: 396px;">
+        <div class="sub_menu_item">Go To Demo</div>
+        <div class="sub_menu_item">Show Manual</div>
+        <div class="sub_menu_item">About</div>
+      </div>
+  </div>
+  <div class="menu_item" (click)="closeAnalysis()">Close</div>
+</div>
+<!--
+<div style="position: absolute; left: 1600px; top: 6px">
+  <button type="button" (click)="closeAnalysis()">Close</button>
+</div>
+-->

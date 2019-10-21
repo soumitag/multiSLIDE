@@ -1,0 +1,6 @@
+tests/DataParserTester.class
+tests/NetworkSearchTests.class
+tests/ClinicalInfoTester.class
+tests/GTFTestStub.class
+tests/SearchTests.class
+tests/CreateAnalysisTest.class

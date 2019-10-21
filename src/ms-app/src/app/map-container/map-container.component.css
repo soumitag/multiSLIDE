@@ -1,0 +1,178 @@
+/*
+button {
+    background-color: #F8F8F8;
+    padding: 5px 16px;
+    font-size: 11px;
+    color: #505050;
+    text-transform: uppercase;
+    border: 1px solid #505050;
+    border-radius: 10px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    font-family: 'Verdana';
+}
+
+button:hover {
+    border-color: rgb(255,99,23);
+    color: rgb(255,99,0);
+    background-color: #fbfbfb;
+}
+*/
+
+.align-radio-group {
+    display: flex;
+    flex-direction: row;
+}
+
+  .align-radio-buttonx {
+    margin-top: 5px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+  
+.align-radio-button {
+    margin: 5px;
+}
+
+.edit_button {
+    width: 22px;
+    height: 22px;
+    float: right;
+    cursor: pointer;
+    background-image: url('assets/img/icons8-pencil-drawing-96_grey.png');
+    background-color: white;
+    background-size: 22px 22px;
+    padding-left: 20px;
+    background-repeat: no-repeat;
+    border-width: 0px;
+}
+
+.edit_button:hover {
+    background-image: url('assets/img/icons8-pencil-drawing-96_orange.png');
+}
+
+.settings_button {
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+    background-image: url('assets/img/settings_gear.png');
+    background-color: white;
+    background-size: 25px 25px;
+    background-repeat: no-repeat;
+    border-width: 0px;
+    padding-top: 5px;
+}
+
+.settings_button:hover {
+    background-image: url('assets/img/settings_gear_deep_orange2.png');
+}
+
+.save_button {
+    width: 22px;
+    height: 22px;
+    float: right;
+    cursor: pointer;
+    background-image: url('assets/img/icons8-save-90_grey.png');
+    background-color: white;
+    background-size: 22px 22px;
+    padding-left: 20px;
+    margin-top: 3px;
+    background-repeat: no-repeat;
+    border-width: 0px;
+}
+
+.save_button:hover {
+    background-image: url('assets/img/icons8-save-90_orange.png');
+}
+
+.value_div {
+    float: right;
+    line-height: 2.0;
+    font-family: Verdana;
+    color: rgb(0, 0, 0);
+}
+
+.value_div:hover {
+    color: rgb(231, 29, 3);
+}
+
+label {
+    line-height: 2.0;
+    font-family: 'Poppins', sans-serif;
+}
+
+.control_ribbon {
+    position: absolute;
+    top: 45px; 
+    width: 1200px; 
+    height:60px; 
+    border:1px solid rgb(226, 223, 223); 
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-radius: 5px;
+    /*
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    */
+}
+
+.map_container_controls {
+    float: left; 
+    padding-left: 10px; 
+    padding-right: 10px; 
+    font-family: 'Poppins', sans-serif; 
+    font-size: 13px;
+    border-right: 1px dashed rgb(226, 223, 223); 
+    color: #000;
+    height: 60px;
+}
+
+.map_container_controls_end {
+    float: left; 
+    padding-left: 10px; 
+    padding-right: 10px; 
+    font-family: 'Poppins', sans-serif; 
+    font-size: 13px;
+    color: #000;
+    height: 60px;
+}
+
+.map_resolution_rect {
+    fill:rgb(200,200,200);
+    stroke-width:1;
+    stroke:rgb(0,0,0);
+    cursor: pointer;
+}
+
+.map_resolution_rect_selected {
+    fill:rgb(0,128,255);
+    stroke-width:1;
+    stroke:rgb(0,0,0);
+    cursor: pointer;
+}
+
+.grid_layout_rect {
+    fill:rgb(200,200,200);
+    stroke-width:1;
+    stroke:rgb(0,0,0);
+    cursor: pointer;
+}
+
+.grid_layout_rect_selected {
+    fill:rgb(0,128,255);
+    stroke-width:1;
+    stroke:rgb(0,0,0);
+    cursor: pointer;
+}
+
+.init_message {
+    position: absolute;
+    top: 230px; 
+    left:400px;
+    color: #888;
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    font-weight: 200;
+    text-align: left; 
+    height: 30px;
+    font-style: italic;
+}

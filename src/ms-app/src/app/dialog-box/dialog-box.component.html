@@ -1,0 +1,21 @@
+<div class="hc_title">Information</div>
+<div class="hc_module_controls">
+
+  <div class="message_div_container">
+    <div class="message_div" [ngClass]="{'message_div': state==0, 'message_div_failed':state==1 }">
+      {{message_txt}}
+      <br>
+      <br>
+      <img class='loading_gif' src='assets/img/loading_1.gif' alt='loading'>
+    </div>
+  </div>
+
+  <ng-container *ngIf="state>0">
+    <div class="apply_changes_div">
+      <button type="button" (click)="close()">Ok</button>
+    </div>
+  </ng-container>
+  <br>
+  <br>
+
+</div>

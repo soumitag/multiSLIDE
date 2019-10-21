@@ -1,0 +1,126 @@
+<div class="container">
+
+    <div class="main_content">
+
+      <div class="left_panel">
+        <div class="title_div">
+          multi-SLIDE
+        </div>
+        <div class="subtitle_div">
+          Multi-omics Systems Level Interactive Data Exploration
+        </div>
+      </div>
+
+      <div>
+        <div class="buttons_panel">
+          <div class="button_container">
+            <div class="button_text_disp_panel">
+              {{create_text}}
+            </div>
+            <div class="gapper">&nbsp;</div>
+            <button type="button" (click)="show_tab('creater')" (mouseenter)="showButtonText(0)" (mouseleave)="hideButtonText(0)">Create</button>
+          </div>
+
+          <div class="divider"></div><br><br>
+
+          <div class="button_container">
+              <div class="button_text_disp_panel">
+                {{load_text}}
+              </div>
+              <div class="gapper">&nbsp;</div>
+              <button type="button" (click)="show_tab('loader')" (mouseenter)="showButtonText(1)" (mouseleave)="hideButtonText(1)">Load</button>
+          </div>
+
+          <div class="divider"></div><br><br>
+
+          <div class="button_container">
+              <div class="button_text_disp_panel">
+                {{open_text}}
+              </div>
+              <div class="gapper">&nbsp;</div>
+              <button type="button" (click)="show_tab('opener')" (mouseenter)="showButtonText(2)" (mouseleave)="hideButtonText(2)">Open</button>
+          </div>
+          
+          <div class="divider"></div><br><br>
+
+          <div class="button_container">
+              <div class="button_text_disp_panel">
+                {{demo_text}}
+              </div>
+              <div class="gapper">&nbsp;</div>
+              <button type="button" [disabled]="buttonDisabled" (click)="show_tab('demo')" (mouseenter)="showButtonText(3)" (mouseleave)="hideButtonText(3)">Demo</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form_container">
+    <div class="form_content">
+    <form #homepageForm='ngForm' name="homepageForm">
+      
+      <ng-container *ngIf="response">
+        <div class="errorMsg" id="error_msg_table" *ngIf="response.status != 1">
+          {{response.detailed_reason}}
+        </div>
+      </ng-container>
+      
+      <div id="create_table" *ngIf="createrTouched">
+        <label for="analysis_name">Analysis Name</label><br>
+        <input #new_analysis_name type="text" name="analysis_name" [(ngModel)]="analysis_name" required>
+        <div class="divider"></div>
+        <button type="button" class="highlight_button" (click)="handleCreate()">Create</button>
+        <div class="errorMsg" *ngIf="submitTouched && analysis_name == null">
+          Experiment name is required.
+        </div>
+      </div>
+  
+      <div id="load_table" *ngIf="loaderTouched">
+        <label for="file_selector">Upload File</label><br>
+        <input #fileInput type="file" id="file_selector" name="file_selector" (change)="handleFileInput($event.target.files)" required>
+        <button type="button" class="highlight_button" (click)="handleUpload()">Upload</button>
+        <div class="errorMsg" *ngIf="uploadTouched && mslideFileToUpload == null">
+          &nbsp;.mslide File is required.
+        </div>
+      </div>
+  
+      <div id="open_table" *ngIf="openerTouched">
+        <label for="active_analyses">Active Analyses</label><br>
+      </div>
+
+      <div id="demo_table" *ngIf="demoTouched">
+        <table>
+            <tr>
+                <td class="demo_td" width="75%">TCGA Glioblastoma Cancer Data</td>
+                <td class="demo_td" width="25%">
+                  <button type="button" class="highlight_button" (click)="loadDemo(0)">Open</button>
+                </td>    
+            </tr>
+            <tr>
+                <td class="demo_td" width="75%">Time-series Data (Mol Systems Biology)</td>
+                <td class="demo_td" width="25%">
+                  <button type="button" class="highlight_button" (click)="loadDemo(1)">Open</button>
+                </td>    
+            </tr>
+            <tr>
+                <td class="demo_td" width="75%">TCGA Breast Cancer Data</td>
+                <td class="demo_td" width="25%">
+                  <button type="button" class="highlight_button" (click)="loadDemo(2)">Open</button>
+                </td>    
+            </tr>
+        </table>
+
+      </div>
+  
+  
+      <!--
+    <nav>
+      <a routerLink="/create_analysis" routerLinkActive="active">Create Analyses</a>
+    </nav>
+    <router-outlet></router-outlet>
+    -->
+  
+    </form>
+    </div>
+  </div>

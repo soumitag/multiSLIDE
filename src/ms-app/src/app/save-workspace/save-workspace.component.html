@@ -1,0 +1,11 @@
+<div class="hc_title">Save Workspace</div>
+<div class="hc_module_controls">
+  <div style="position: relative; top: 15px; left: 10px; height: 80px">
+    <label>{{message}}</label><br>
+  </div>
+  <div *ngIf="show_buttons" class="apply_changes_div">
+    <button type="button" (click)="cancel()">Cancel</button>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <button type="button" (click)="download()">Download</button>
+  </div><br><br><br>
+</div>

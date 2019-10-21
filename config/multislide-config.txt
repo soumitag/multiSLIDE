@@ -1,0 +1,10 @@
+#install-dir
+/Users/soumitaghosh/work/multiSLIDE/code/code_multislide_03_Nov_2018/multiSLIDE
+#java-dir
+/Library/Java/JavaVirtualMachines/jdk1.8.0_212.jdk/Contents/Home/bin
+#glassfish-dir
+/Applications/NetBeans/glassfish-4.1.1/glassfish/bin
+#mongodb-dir
+/usr/local/Cellar/mongodb-community/4.0.10/bin
+#python-dir
+/anaconda3/bin

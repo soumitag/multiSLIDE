@@ -1,0 +1,89 @@
+.menu_item {
+    float: left;
+    padding: 3px 20px;
+    font-size: 14px;
+    color: #505050;
+    text-transform: uppercase;
+    border-left: 1px solid rgb(221, 220, 220);
+    border-right: 1px solid rgb(221, 220, 220);
+    cursor: pointer;
+    letter-spacing: 2px;
+    font-family: 'Verdana';
+    font-weight: bolder;
+    margin-top: 5px;
+}
+
+.menu_item:hover {
+    border-left: 1px solid rgb(2231, 29, 3);
+    border-right: 1px solid rgb(231, 29, 3);
+    color: rgb(231, 29, 3);
+}
+
+.menu_item:hover .sub_menu {
+    display: block;
+}
+
+.menu {
+    margin-top: 5px;
+}
+
+.sub_menu {
+    background-color: rgb(247, 247, 247);
+    z-index: 1;
+    display: none;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    position: absolute; 
+    top: 28px;
+    border: rgb(199, 199, 199);
+    padding-top: 5px;
+    padding-bottom: 10px;
+}
+
+.sub_menu_item {
+    padding-left: 10px;
+    padding-right: 15px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    font-family: 'Verdana';
+    font-weight: normal;
+    font-size: 14px;
+    letter-spacing: normal;
+    text-transform: none;
+    color: #505050;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    border-bottom: 1px solid rgb(247, 247, 247);
+    border: #505050;
+}
+
+.sub_menu_item:hover {
+    background-color: rgb(223, 223, 223);
+    color: rgb(231, 29, 3);
+}
+
+button {
+    font-family: 'Poppins', sans-serif;
+    /*background-color: rgb(255,127,80);*/
+    background-color: rgb(255,255,255);
+    padding: 6.5px 20px;
+    font-size: 13px;
+    /*font-weight: bold;*/
+    color: rgb(126, 123, 123);
+    text-transform: uppercase;
+    border: 1px solid rgb(126, 123, 123);
+    border-radius: 20px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    width: 100px;
+}
+
+button:hover {
+    border-color: rgb(205,91,69);
+    color: rgb(205,91,69);
+    background-color: rgb(255,255,255);
+    /*font-weight: bold;*/
+}
+
+

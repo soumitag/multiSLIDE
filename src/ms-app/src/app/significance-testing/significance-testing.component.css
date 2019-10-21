@@ -1,0 +1,105 @@
+label {
+    width: 100%;
+    padding: 2px;
+    margin-top: 6px;
+    margin-bottom: 16px;
+    resize: vertical;
+    /*color: #95DB9A;*/
+    color: black;
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+}
+
+.apply_changes_div {
+    position: relative; 
+    top: 30px; 
+    width: 500px; 
+    padding-top: 18px;
+    border-top: black 1px solid; 
+    align-content: center;
+    text-align: center;
+}
+
+button {
+    background-color: #F8F8F8;
+    padding: 5px 16px;
+    font-size: 11px;
+    color: #505050;
+    text-transform: uppercase;
+    border: 1px solid #505050;
+    border-radius: 10px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    font-family: 'Verdana';
+}
+
+button:hover {
+    border-color: rgb(255,99,23);
+    color: rgb(255,99,0);
+    background-color: #fbfbfb;
+}
+
+.hc_title {
+    text-align:left;
+    font-family:'Poppins', sans-serif;
+    font-size: 20px;
+    font-weight: normal;
+    margin-top: 10px;
+    padding-bottom: 10px;
+    line-height: 25px;
+    width: 500px; 
+    border-bottom: 1px black solid;
+}
+
+.hc_module_controls {
+    text-align:left;
+    font-family:'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: normal;
+    margin-top: 10px;
+}
+
+option {
+    font-family:  'Poppins', sans-serif;
+}
+
+input[type=text], select {
+    width: 300px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-top: 6px;
+    margin-bottom: 16px;
+    resize: vertical;
+    font-size: 16px;    
+}
+
+input[type=number] {
+    width: 100px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-top: 6px;
+    margin-bottom: 16px;
+    resize: vertical;
+    font-size: 16px;    
+}
+
+input[type=checkbox], input[type=radio]  {
+    transform: scale(1.5);
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-top: 6px;
+    margin-bottom: 16px;
+    resize: vertical;
+    font-size: 16px;    
+}
+
+.divider_row {
+    height: 30px;
+    width:30px;     
+}

@@ -1,0 +1,215 @@
+.search_container {
+    position: relative; 
+    top: 5px; 
+    left: 5px; 
+    width: 268px; 
+    height: 150px; 
+    overflow-y: auto;
+}
+
+button {
+    background-color: #F8F8F8;
+    padding: 2px 16px;
+    display: inline-flex;
+    align-items: center;
+    font-size: 11px;
+    color: #505050;
+    text-transform: uppercase;
+    border: 1px solid #505050;
+    border-radius: 10px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    font-family: 'Verdana';
+}
+
+
+.plus_button {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    background-image: url('/assets/img/plus512_silver_filled.png');
+    background-size: 20px 20px;
+}
+
+.plus_button:hover {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    background-image: url('assets/img/plus512_orange_filled.png');
+    background-size: 20px 20px;
+}
+
+.minus_button {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    background-image: url('assets/img/minus512_green_filled.png');
+    background-size: 20px 20px;
+}
+
+
+button:hover {
+    border-color: rgb(255,99,23);
+    color: rgb(255,99,0);
+    background-color: #fbfbfb;
+}
+
+.select_block {
+    text-align:left;
+    border-radius: 7px; 
+    /*border: 1px solid #CCCCCC;*/ 
+    padding: 5px 5px; 
+    float: left;
+    /*display: inline-block;
+    background-color:#FDFDFD;*/
+    background-color: rgb(56,62,68);
+    color: white;
+    margin-left: 5px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: normal;
+}
+
+.search_panel_closed {
+    display: none;
+}
+
+.search_panel_open {
+    position: absolute; 
+    top: 0px; 
+    height: 660px;
+    left: 280px; 
+    width: 440px; 
+    padding-left: 10px; 
+    /*
+    padding-bottom: 10px; 
+    */
+    border: 1px solid black;
+    display: block;
+    box-shadow: 5px 5px 5px 5px rgba(0,0,0,0.6);
+    z-index: 1;
+    /*background-color: rgba(250, 250, 250, 1.0);*/
+    background-color: rgba(36, 41, 46, 1.0);
+}
+
+.search_results_container{
+    position: relative; 
+    top: 20px; 
+    left: 0px; 
+    width: 400px; 
+    height: 450px; 
+    overflow-y: auto;
+}
+
+.search_result_td {
+    color: white;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    padding-right: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.search_result_td_selected {
+    color: rgb(149,219,154);
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    padding-right: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.search_result_tr {
+    color: whitesmoke;
+}
+
+.search_result_add {
+    float: right;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+tr:nth-child(odd) {background-color: #f2f2f2c2}
+
+input[type=text] {
+    width: 400px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-top: 6px;
+    margin-bottom: 16px;
+    resize: vertical;
+    font-size: 16px;    
+}
+
+.search_button {
+    position: absolute;
+    top: 8px;
+    right: 2px;
+    background-image: url('assets/img/search-grey.png');
+    background-repeat: no-repeat;
+    background-size: 32px 32px;
+    width: 32px;
+    height: 32px;
+    line-height:0;
+    cursor:pointer;
+    border:0;
+}
+
+.addbutton {
+    font-family: 'Poppins', sans-serif;
+    background-color: rgb(205,91,69);
+    padding: 5px 10px;
+    padding-left: 30px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+    text-transform: uppercase;
+    border: 2px solid rgb(205,91,69);
+    border-radius: 20px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    width: 180px;    
+}
+
+.addbutton:hover {
+    background-color: rgb(56,62,68);
+}
+
+.close_button {
+    font-family: 'Poppins', sans-serif;
+    /*background-color: rgb(255,127,80);*/
+    background-color:rgb(36, 41, 46);
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: bold;
+    color: rgb(205,91,69);
+    text-transform: uppercase;
+    border: 2px solid rgb(36, 41, 46);
+    border-radius: 20px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    width: 100px;
+}
+
+.close_button:hover {
+    background-color: rgb(36, 41, 46);
+}
+
+.search_text_container {
+    position: relative; 
+    top: 10px; 
+    left: 5px; 
+    width: 400px; 
+    padding-top: 10px; 
+    padding-bottom: 10px; 
+    border-bottom: 1px solid rgb(205,91,69);
+    background: rgb(36,41,46);
+}
+
+

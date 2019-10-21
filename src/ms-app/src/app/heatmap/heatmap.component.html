@@ -1,0 +1,414 @@
+<ng-container *ngIf="data && layout; else loading">
+
+		<ng-container *ngIf="isTransposed==1; else default_view">
+
+				<svg [attr.width]="layout.svg_height" [attr.height]="layout.svg_width">
+		
+						<text [attr.x]="layout.plot_title_x" 
+							[attr.y]="layout.plot_title_y" 
+							font-size="20" 
+							text-anchor="middle" 
+							font-family="Verdana" 
+							class="heatmap_data_title">
+						{{data.title}}		  
+						</text>
+
+						<ng-container *ngFor="let plabel of global_data.phenotype_labels; let p = index">
+							<text [attr.y]="layout.phenotype_label_anchor_x[p]" 
+								[attr.x]="layout.phenotype_label_anchor_y" 
+								[style.font-size.px]="layout.phenotype_label_font_size" 
+								font-family="Verdana" 
+								text-anchor="start"
+								dominant-baseline="middle"
+								matTooltip="Click to Sort Samples by Phenotype"
+								class="phenotype_tag"
+								(click)="changeSortOrder(plabel)">
+								{{plabel}}
+							</text>
+						</ng-container>
+				
+						<ng-container *ngFor="let tag_color of global_data.gene_tag_colors; let g = index">
+							<rect [attr.y]="layout.column_left_x[0]" 
+								[attr.x]="layout.genetag_anchor_y[g]" 
+								[attr.height]="layout.gene_tag_background_width" 
+								[attr.width]="layout.gene_tag_height"
+								[style.fill]="'rgb(' + global_data.gene_tag_background_color[0] + ',' + global_data.gene_tag_background_color[1] + ',' + global_data.gene_tag_background_color[2] + ')'" 
+								[matTooltip]="global_data.gene_tag_names[g]" />
+						</ng-container>
+				
+						<ng-container *ngFor="let tags of global_data.gene_tags; let g = index">
+							<ng-container *ngFor="let tag of tags">
+								<rect [attr.y]="layout.column_left_x[g]" 
+								[attr.x]="layout.genetag_anchor_y[tag]" 
+								[attr.width]="layout.gene_tag_height" 
+								[attr.height]="layout.cell_width_height"
+								[style.fill]="'rgb(' + global_data.gene_tag_colors[tag][0] + ',' + global_data.gene_tag_colors[tag][1] + ',' + global_data.gene_tag_colors[tag][2] + ')'" />
+							</ng-container>
+						</ng-container>
+				
+						<ng-container *ngFor="let tag of global_data.gene_tags; let g = index">
+							<text [attr.y]="layout.column_header_text_anchor_x[g]" 
+								[attr.x]="layout.column_header_text_anchor_y" 
+								[style.font-size.px]="layout.column_label_font_size" 
+								text-anchor="start" 
+								dominant-baseline="middle"
+								font-family="Verdana" 
+								[matMenuTriggerFor]="genes_menu" [matMenuTriggerData]="{col_index: g}"
+								class="gene_tag">
+								{{global_data.column_headers[g]}}
+							</text>
+						</ng-container>
+				
+						<ng-container *ngFor="let row of data.cell_bin_indices; let i = index">
+							
+							<text [attr.y]="layout.row_name_text_anchor_x" 
+								[attr.x]="layout.row_name_text_anchor_y[i]" 
+								[style.font-size.px]="layout.row_label_font_size" 
+								font-family="Verdana" 
+								text-anchor="end"
+								[attr.transform]="'rotate(-90 ' + layout.row_name_text_anchor_y[i] + ' ' + layout.row_name_text_anchor_x + ')'"
+								class="sample_tag"
+								dominant-baseline="middle">
+								{{global_data.row_names[i]}}
+							</text>
+				
+							<ng-container *ngFor="let ptype of layout.phenotype_tag_anchor_x; let p = index">
+		
+								<circle [attr.cy]="ptype" 
+									[attr.cx]="layout.phenotype_tag_anchor_y[i]" 
+									[attr.r]="layout.cell_width_height/2.0-1" 
+									[style.fill]="'rgb(' + global_data.phenotypes[i][p][0] + ',' + global_data.phenotypes[i][p][1] + ',' + global_data.phenotypes[i][p][2] + ')'" />
+				
+							</ng-container>
+								
+								<ng-container *ngFor="let cell of row; let j = index">
+								
+										<rect [attr.y]="layout.column_left_x[j]" 
+											[attr.x]="layout.row_top_y[i]" 
+											[attr.width]="layout.cell_width_height" 
+											[attr.height]="layout.cell_width_height" 
+											stroke="black" stroke-width="0.1"
+											[style.fill]="'rgb(' + data.bin_colors[cell][0] + ',' + data.bin_colors[cell][1] + ',' + data.bin_colors[cell][2] + ')'"/>
+								
+								</ng-container>
+				
+						</ng-container>
+				
+						<ng-container *ngFor="let cbar_y of layout.colorbar_cell_y; let i = index; last as isLast">
+							<ng-container *ngIf="isLast; else nonLastColorbars">
+								<rect [attr.x]="layout.colorbar_cell_x" 
+									[attr.y]="cbar_y+10" 
+									[attr.width]="layout.colorbar_cell_width"
+									[attr.height]="layout.cell_width_height"
+									[style.fill]="'rgb(' + data.bin_colors[i][0] + ',' + data.bin_colors[i][1] + ',' + data.bin_colors[i][2] + ')'" />
+							</ng-container>
+							<ng-template #nonLastColorbars>
+								<rect [attr.x]="layout.colorbar_cell_x" [attr.y]="cbar_y" [attr.width]="layout.colorbar_cell_width"
+									[attr.height]="layout.colorbar_cell_height"
+									[style.fill]="'rgb(' + data.bin_colors[i][0] + ',' + data.bin_colors[i][1] + ',' + data.bin_colors[i][2] + ')'" />
+							</ng-template>
+						</ng-container>
+						
+						<ng-container *ngFor="let cbar_tick_y of layout.colorbar_tick_y; let i = index; last as isLast">
+							<line [attr.x1]="layout.colorbar_tick_x1_x2[0]" [attr.y1]="cbar_tick_y" [attr.x2]="layout.colorbar_tick_x1_x2[1]"
+								[attr.y2]="cbar_tick_y" style="stroke:rgb(0,0,0);stroke-width:1" />
+							<text [attr.x]="layout.colorbar_tick_text_x" [attr.y]="cbar_tick_y"
+								[style.font-size.px]="layout.column_label_font_size" text-anchor="start" dominant-baseline="middle"
+								font-family="Verdana">
+								{{data.colorbar_keys[i]}}
+							</text>
+						</ng-container>
+						
+						<line [attr.x1]="layout.colorbar_tick_x1_x2[0]" [attr.y1]="layout.missing_value_colorbar_tick_y"
+							[attr.x2]="layout.colorbar_tick_x1_x2[1]" [attr.y2]="layout.missing_value_colorbar_tick_y"
+							style="stroke:rgb(0,0,0);stroke-width:1" />
+						<text [attr.x]="layout.colorbar_tick_text_x" [attr.y]="layout.missing_value_colorbar_tick_y"
+							[style.font-size.px]="layout.column_label_font_size" text-anchor="start" dominant-baseline="middle"
+							font-family="Verdana">
+							<tspan [attr.x]="layout.colorbar_tick_text_x" dy="0">Missing</tspan>
+							<tspan [attr.x]="layout.colorbar_tick_text_x" dy="1.2em">Value</tspan>
+						</text>
+				
+						
+						<ng-container *ngFor="let search_tag_line of layout.search_tag_lines_xxy; let i=index;">
+							<rect [attr.y]="layout.search_tag_background_rects[i][0]" 
+								[attr.x]="layout.search_tag_background_rects[i][1]" 
+								[attr.height]="layout.search_tag_background_rects[i][2]" 
+								[attr.width]="layout.search_tag_background_rects[i][3]" 
+								[matMenuTriggerFor]="search_tag_menu" 
+								[matMenuTriggerData]="{search_tag_index: i}" 
+								matTooltip="Click to Remove" 
+								style="fill:rgb(240,240,240);opacity:1.0"/>
+							<line [attr.y1]="search_tag_line[0]" 
+								[attr.x1]="search_tag_line[2]" 
+								[attr.y2]="search_tag_line[1]" 
+								[attr.x2]="search_tag_line[2]" 
+								[attr.stroke]="'rgb(' + global_data.search_tag_stroke_colors[global_data.search_tag_color_indices[i]][0] + ',' + global_data.search_tag_stroke_colors[global_data.search_tag_color_indices[i]][1] + ',' + global_data.search_tag_stroke_colors[global_data.search_tag_color_indices[i]][2] + ')'"
+								stroke-width="1" />
+								<ng-container *ngFor="let position of global_data.search_tag_positions[i]; let j = index">
+										<circle [attr.cy]="layout.column_left_x[0]+(position+0.5)*layout.cell_width_height" 
+												[attr.cx]="search_tag_line[2]" 
+												[attr.r]="layout.search_tag_radius-1" 
+												[style.fill]="'rgb(' + global_data.search_tag_colors[global_data.search_tag_color_indices[i]][0] + ',' + global_data.search_tag_colors[global_data.search_tag_color_indices[i]][1] + ',' + global_data.search_tag_colors[global_data.search_tag_color_indices[i]][2] + ')'"
+												[attr.stroke]="'rgb(' + global_data.search_tag_stroke_colors[global_data.search_tag_color_indices[i]][0] + ',' + global_data.search_tag_stroke_colors[global_data.search_tag_color_indices[i]][1] + ',' + global_data.search_tag_stroke_colors[global_data.search_tag_color_indices[i]][2] + ')'" 
+												stroke-width="1" />
+										<ng-container *ngIf="global_data.is_search_query[i][j] == 1">
+											<circle [attr.cy]="layout.column_left_x[0]+(position+0.5)*layout.cell_width_height" 
+													[attr.cx]="search_tag_line[2]" 
+													[attr.r]="(layout.search_tag_radius-1)/2.5" 
+													fill="rgb(255,255,255)" />
+										</ng-container>
+								</ng-container>
+							<circle *ngIf="data.search_tag_origin_map_ind[i]" 
+								[attr.cy]="layout.search_tag_background_rects[i][0] + layout.search_tag_background_rects[i][2] + 10.0"
+								[attr.cx]="search_tag_line[2]-1" 
+								fill="rgb(0,0,0)"
+								[attr.r]="layout.search_tag_radius-1"/>
+		
+						</ng-container>
+					
+					</svg>
+
+				<div class="settings_button" 
+					[style.left.px]="layout.colorbar_cell_x" 
+					matTooltip="Set heatmap parameters" 
+					(click)="openSettingsDialog()">
+				</div>
+
+		</ng-container>
+
+		<ng-template #default_view>
+			<svg [attr.width]="layout.svg_width" [attr.height]="layout.svg_height">
+		
+				<text [attr.x]="layout.plot_title_x" 
+					[attr.y]="layout.plot_title_y" 
+					font-size="20" 
+					text-anchor="middle" 
+					font-family="Verdana" 
+					class="heatmap_data_title">
+				{{data.title}}		  
+				</text>
+				
+				<ng-container *ngFor="let plabel of global_data.phenotype_labels; let p = index">
+					<text [attr.x]="layout.phenotype_label_anchor_x[p]" 
+						[attr.y]="layout.phenotype_label_anchor_y" 
+						[style.font-size.px]="layout.phenotype_label_font_size" 
+						font-family="Verdana" 
+						text-anchor="start"
+						[attr.transform]="'rotate(-90 ' + layout.phenotype_label_anchor_x[p] + ' ' + layout.phenotype_label_anchor_y + ')'"
+						matTooltip="Click to Sort Samples by Phenotype"
+						class="phenotype_tag"
+						(click)="changeSortOrder(plabel)">
+						{{plabel}}
+					</text>
+				</ng-container>
+		
+				<ng-container *ngFor="let tag_color of global_data.gene_tag_colors; let g = index">
+					<rect [attr.x]="layout.column_left_x[0]" 
+						[attr.y]="layout.genetag_anchor_y[g]" 
+						[attr.width]="layout.gene_tag_background_width" 
+						[attr.height]="layout.gene_tag_height"
+						[style.fill]="'rgb(' + global_data.gene_tag_background_color[0] + ',' + global_data.gene_tag_background_color[1] + ',' + global_data.gene_tag_background_color[2] + ')'" 
+						[matTooltip]="global_data.gene_tag_names[g]" />
+				</ng-container>
+		
+				<ng-container *ngFor="let tags of global_data.gene_tags; let g = index">
+					<ng-container *ngFor="let tag of tags">
+						<rect [attr.x]="layout.column_left_x[g]" 
+						[attr.y]="layout.genetag_anchor_y[tag]" 
+						[attr.width]="layout.cell_width_height" 
+						[attr.height]="layout.gene_tag_height"
+						[style.fill]="'rgb(' + global_data.gene_tag_colors[tag][0] + ',' + global_data.gene_tag_colors[tag][1] + ',' + global_data.gene_tag_colors[tag][2] + ')'" />
+					</ng-container>
+				</ng-container>
+		
+				<ng-container *ngFor="let tag of global_data.gene_tags; let g = index">
+					<text [attr.x]="layout.column_header_text_anchor_x[g]" 
+						[attr.y]="layout.column_header_text_anchor_y" 
+						[style.font-size.px]="layout.column_label_font_size" 
+						text-anchor="start" 
+						font-family="Verdana" 
+						[attr.transform]="'rotate(-90 ' + layout.column_header_text_anchor_x[g] + ' ' + layout.column_header_text_anchor_y + ')'"
+						[matMenuTriggerFor]="genes_menu" [matMenuTriggerData]="{col_index: g}"
+						class="gene_tag">
+						{{global_data.column_headers[g]}}
+					</text>
+				</ng-container>
+		
+				<ng-container *ngFor="let row of data.cell_bin_indices; let i = index">
+					
+					<text [attr.x]="layout.row_name_text_anchor_x" 
+						[attr.y]="layout.row_name_text_anchor_y[i]" 
+						[style.font-size.px]="layout.row_label_font_size" 
+						font-family="Verdana" 
+						text-anchor="start"
+						class="sample_tag"
+						dominant-baseline="middle">
+						{{global_data.row_names[i]}}
+					</text>
+		
+					<ng-container *ngFor="let ptype of layout.phenotype_tag_anchor_x; let p = index">
+
+						<circle [attr.cx]="ptype" 
+							[attr.cy]="layout.phenotype_tag_anchor_y[i]" 
+							[attr.r]="layout.cell_width_height/2.0-1" 
+							[style.fill]="'rgb(' + global_data.phenotypes[i][p][0] + ',' + global_data.phenotypes[i][p][1] + ',' + global_data.phenotypes[i][p][2] + ')'" />
+		
+					</ng-container>
+						
+						<ng-container *ngFor="let cell of row; let j = index">
+						
+								<rect [attr.x]="layout.column_left_x[j]" 
+									[attr.y]="layout.row_top_y[i]" 
+									[attr.width]="layout.cell_width_height" 
+									[attr.height]="layout.cell_width_height" 
+									stroke="black" stroke-width="0.1"
+									[style.fill]="'rgb(' + data.bin_colors[cell][0] + ',' + data.bin_colors[cell][1] + ',' + data.bin_colors[cell][2] + ')'"/>
+						
+						</ng-container>
+		
+				</ng-container>
+		
+				<ng-container *ngFor="let cbar_y of layout.colorbar_cell_y; let i = index; last as isLast">
+					<ng-container *ngIf="isLast; else nonLastColorbars"> 
+						<rect [attr.x]="layout.colorbar_cell_x" 
+								[attr.y]="cbar_y+10" 
+								[attr.width]="layout.colorbar_cell_width" 
+								[attr.height]="layout.cell_width_height" 
+								[style.fill]="'rgb(' + data.bin_colors[i][0] + ',' + data.bin_colors[i][1] + ',' + data.bin_colors[i][2] + ')'"/>
+					</ng-container>
+					<ng-template #nonLastColorbars> 
+							<rect [attr.x]="layout.colorbar_cell_x" 
+								[attr.y]="cbar_y" 
+									[attr.width]="layout.colorbar_cell_width" 
+									[attr.height]="layout.colorbar_cell_height" 
+									[style.fill]="'rgb(' + data.bin_colors[i][0] + ',' + data.bin_colors[i][1] + ',' + data.bin_colors[i][2] + ')'"/>
+					</ng-template>
+				</ng-container>
+		
+				<ng-container *ngFor="let cbar_tick_y of layout.colorbar_tick_y; let i = index; last as isLast">
+					<line [attr.x1]="layout.colorbar_tick_x1_x2[0]" 
+						[attr.y1]="cbar_tick_y" 
+						[attr.x2]="layout.colorbar_tick_x1_x2[1]" 
+						[attr.y2]="cbar_tick_y" 
+						style="stroke:rgb(0,0,0);stroke-width:1" />
+					<text [attr.x]="layout.colorbar_tick_text_x" 
+						[attr.y]="cbar_tick_y" 
+						[style.font-size.px]="layout.column_label_font_size" 
+						text-anchor="start" 
+						dominant-baseline="middle"
+						font-family="Verdana" >
+						{{data.colorbar_keys[i]}}
+					</text>
+				</ng-container>
+		
+				<line [attr.x1]="layout.colorbar_tick_x1_x2[0]" 
+					[attr.y1]="layout.missing_value_colorbar_tick_y" 
+					[attr.x2]="layout.colorbar_tick_x1_x2[1]" 
+					[attr.y2]="layout.missing_value_colorbar_tick_y" 
+					style="stroke:rgb(0,0,0);stroke-width:1" />
+				<text [attr.x]="layout.colorbar_tick_text_x" 
+					[attr.y]="layout.missing_value_colorbar_tick_y" 
+					[style.font-size.px]="layout.column_label_font_size" 
+					text-anchor="start" 
+					dominant-baseline="middle"
+					font-family="Verdana" >
+					<tspan [attr.x]="layout.colorbar_tick_text_x" dy="0">Missing</tspan>
+					<tspan [attr.x]="layout.colorbar_tick_text_x" dy="1.2em">Value</tspan>
+				</text>
+		
+				<ng-container *ngFor="let search_tag_line of layout.search_tag_lines_xxy; let i=index;">
+					<rect [attr.x]="layout.search_tag_background_rects[i][0]" 
+						[attr.y]="layout.search_tag_background_rects[i][1]" 
+						[attr.width]="layout.search_tag_background_rects[i][2]" 
+						[attr.height]="layout.search_tag_background_rects[i][3]" 
+						[matMenuTriggerFor]="search_tag_menu" 
+						[matMenuTriggerData]="{search_tag_index: i}" 
+						matTooltip="Click to Remove" 
+						style="fill:rgb(240,240,240);opacity:1.0"/>
+					<line [attr.x1]="search_tag_line[0]" 
+						[attr.y1]="search_tag_line[2]" 
+						[attr.x2]="search_tag_line[1]" 
+						[attr.y2]="search_tag_line[2]" 
+						[attr.stroke]="'rgb(' + global_data.search_tag_stroke_colors[global_data.search_tag_color_indices[i]][0] + ',' + global_data.search_tag_stroke_colors[global_data.search_tag_color_indices[i]][1] + ',' + global_data.search_tag_stroke_colors[global_data.search_tag_color_indices[i]][2] + ')'"
+						stroke-width="1" />
+						<ng-container *ngFor="let position of global_data.search_tag_positions[i]; let j = index">
+								<circle [attr.cx]="layout.column_left_x[0]+(position+0.5)*layout.cell_width_height" 
+										[attr.cy]="search_tag_line[2]" 
+										[attr.r]="layout.search_tag_radius-1" 
+										[style.fill]="'rgb(' + global_data.search_tag_colors[global_data.search_tag_color_indices[i]][0] + ',' + global_data.search_tag_colors[global_data.search_tag_color_indices[i]][1] + ',' + global_data.search_tag_colors[global_data.search_tag_color_indices[i]][2] + ')'"
+										[attr.stroke]="'rgb(' + global_data.search_tag_stroke_colors[global_data.search_tag_color_indices[i]][0] + ',' + global_data.search_tag_stroke_colors[global_data.search_tag_color_indices[i]][1] + ',' + global_data.search_tag_stroke_colors[global_data.search_tag_color_indices[i]][2] + ')'" 
+										stroke-width="1" />
+								<ng-container *ngIf="global_data.is_search_query[i][j] == 1">
+									<circle [attr.cx]="layout.column_left_x[0]+(position+0.5)*layout.cell_width_height" 
+											[attr.cy]="search_tag_line[2]" 
+											[attr.r]="(layout.search_tag_radius-1)/2.5" 
+											fill="rgb(255,255,255)" />
+								</ng-container>
+						</ng-container>
+					<circle *ngIf="data.search_tag_origin_map_ind[i]" 
+						[attr.cx]="layout.search_tag_background_rects[i][0] + layout.search_tag_background_rects[i][2] + 10.0"
+						[attr.cy]="search_tag_line[2]-1" 
+						fill="rgb(0,0,0)"
+						[attr.r]="layout.search_tag_radius-1"/>
+
+				</ng-container>
+		
+			</svg>
+
+
+			<div class="settings_button" 
+				[style.left.px]="layout.row_name_text_anchor_x+20" 
+				matTooltip="Set heatmap parameters" 
+				(click)="openSettingsDialog()">
+			</div>
+
+		</ng-template>
+	
+		
+	
+		<mat-menu #genes_menu="matMenu">
+			<ng-template matMenuContent let-col_index="col_index">
+				<button mat-menu-item [matMenuTriggerFor]="feature_list_menu" [matMenuTriggerData]="{col_id: col_index}">Add to List</button>
+				<button mat-menu-item [matMenuTriggerFor]="feature_group_menu" [matMenuTriggerData]="{col_id: col_index}">Add Gene Group to List</button>
+				<button mat-menu-item [matMenuTriggerFor]="neightbors_menu" [matMenuTriggerData]="{col_id: col_index}">Show Neighbors</button>
+				<!--<button mat-menu-item (click)="onContextMenuAction2(entrez)">Show Info</button>-->
+				<!--<button mat-menu-item (click)="onContextMenuAction2(entrez)">Hide From Current View</button>-->
+				<!--<button mat-menu-item (click)="onContextMenuAction2(entrez)">Show Aliases</button>-->
+			</ng-template>
+		</mat-menu>
+		
+		<mat-menu #feature_list_menu="matMenu">
+			<ng-template matMenuContent let-col_id="col_id">
+				<button mat-menu-item (click)="createListAndAdd(col_id,0)">New List</button>
+				<button mat-menu-item *ngFor="let featlist of feature_list_names" (click)="addToList(col_id,featlist,0)">
+					{{featlist}}
+				</button>
+			</ng-template>
+		</mat-menu>
+		
+		<mat-menu #feature_group_menu="matMenu">
+			<ng-template matMenuContent let-col_id="col_id">
+				<button mat-menu-item (click)="createListAndAdd(col_id,1)">New List</button>
+				<button mat-menu-item *ngFor="let featlist of feature_list_names" (click)="addToList(col_id,featlist,1)">
+					{{featlist}}
+				</button>
+			</ng-template>
+		</mat-menu>
+	
+		<mat-menu #neightbors_menu="matMenu">
+			<ng-template matMenuContent let-col_id="col_id">
+				<button mat-menu-item (click)="searchNeighbors(col_id, 0)">Protein-Protein Interaction</button>
+				<button mat-menu-item (click)="searchNeighbors(col_id, 1)">miRNA Targets</button>
+				<button mat-menu-item (click)="searchNeighbors(col_id, 2)">Transcription Factor Targets</button>
+			</ng-template>
+		</mat-menu>
+	
+		<mat-menu #search_tag_menu="matMenu">
+			<ng-template matMenuContent let-search_tag_index="search_tag_index">
+				<button mat-menu-item (click)="removeNetworkNeighbors(search_tag_index)">Remove</button>
+			</ng-template>
+		</mat-menu>
+	
+	</ng-container>
+	<ng-template #loading>Fetching Heatmap...</ng-template>

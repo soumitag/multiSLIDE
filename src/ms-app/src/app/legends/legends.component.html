@@ -1,0 +1,70 @@
+<div class="legend_heading">Legends</div>
+<ng-container *ngIf="data; else loading">
+    <div *ngFor="let legend_group of data.legend_groups; let l = index" class="legend">
+        {{data.legend_group_titles[l]}}
+        <ng-container *ngIf="data.legend_group_types[l]==2 || data.legend_group_types[l]==3">
+            <div *ngFor="let lg of legend_group" class="legend">
+                <label class="legend_group_heading">{{lg.title}}</label><br>
+                <div *ngFor="let names of lg.legend_names; let i = index" class="legend_inner">
+                    <svg width=15 height=15 style="position: relative; top: 2px">
+                        <rect x="0px" y="5px" width="15px" height="6px"
+                            [style.fill]="'rgb(' + lg.colors[i][0] + ',' + lg.colors[i][1] + ',' + lg.colors[i][2] + ')'">
+                        </rect>
+                    </svg>
+                    {{names}}
+                </div>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="data.legend_group_types[l]==1">
+            <div *ngFor="let lg of legend_group" class="legend">
+                <ng-container *ngIf="lg.subtype == 0; else categorical_phenotype">
+                    <label class="legend_group_heading">{{lg.title}}</label><br>
+                    <div class="legend_inner">
+                        <svg width=250 height=50 style="position: relative; top: 2px">
+                            <rect *ngFor="let color of lg.colors; let i = index"
+                                [attr.x]="10*i" 
+                                y="5px" width="10px" height="10px"
+                                [style.fill]="'rgb(' + color[0] + ',' + color[1] + ',' + color[2] + ')'">
+                            </rect>
+                            <text x="0px" y="30px" text-anchor="start" font-family="Verdana">
+                                {{lg.legend_names[0]}}
+                            </text>
+                            <text x="211px" y="30px" text-anchor="end" font-family="Verdana">
+                                {{lg.legend_names[1]}}
+                            </text>
+                        </svg>
+                    </div>
+                </ng-container>
+                <ng-template #categorical_phenotype>
+                    <label class="legend_group_heading">{{lg.title}}</label><br>
+                    <div *ngFor="let names of lg.legend_names; let i = index" class="legend_inner">
+                        <svg width=15 height=15 style="position: relative; top: 2px">
+                            <circle cx="7.5px" cy="7.5px" r="7.5px"
+                                [style.fill]="'rgb(' + lg.colors[i][0] + ',' + lg.colors[i][1] + ',' + lg.colors[i][2] + ')'">
+                            </circle>
+                        </svg>
+                        {{names}}
+                    </div>
+                </ng-template>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="data.legend_group_types[l]==4">
+            <div *ngFor="let lg of legend_group" class="legend">
+                <label class="legend_group_heading">{{lg.title}}</label><br>
+                <div *ngFor="let names of lg.legend_names; let i = index" class="legend_inner">
+                    <svg width=15 height=15 style="position: relative; top: 2px">
+                        <circle cx="7.5px" cy="7.5px" r="7.5px"
+                            [style.fill]="'rgb(' + lg.colors[i][0] + ',' + lg.colors[i][1] + ',' + lg.colors[i][2] + ')'"
+                            [style.stroke]="'rgb(' + lg.stroke_colors[i][0] + ',' + lg.stroke_colors[i][1] + ',' + lg.stroke_colors[i][2] + ')'"
+                            stroke-width="0">
+                        </circle>
+                        <circle *ngIf="i%2==0" cx="7.5px" cy="7.5px" r="2.6px" fill="rgb(255,255,255)">
+                        </circle>
+                    </svg>
+                    {{names}}
+                </div>
+            </div>
+        </ng-container>
+    </div>
+</ng-container>
+<ng-template #loading>Fetching Legend Information...</ng-template>

@@ -1,0 +1,32 @@
+  <div class="hc_title">Significance Testing Parameters</div>
+  <div class="hc_module_controls">
+      <div style="position: relative; top: 15px; left: 10px; height: 80px">
+        <label for="selectedDataset">Dataset</label><br>
+        <select name="selectedDataset" [(ngModel)]="significance_testing_params.dataset">
+          <option *ngFor="let dataset of dataset_names; let i = index" [value]="dataset"
+            [attr.selected]="dataset == significance_testing_params.dataset ? true : null">
+            {{dataset}}
+          </option>
+        </select>
+      </div>
+      <div style="position: relative; top: 15px; left: 10px; height: 80px">
+        <label for="selectedPhenotype">Phenotype</label><br>
+        <select name="selectedPhenotype" [(ngModel)]="significance_testing_params.phenotype">
+          <option *ngFor="let phenotype of phenotypes; let i = index" [value]="phenotype"
+            [attr.selected]="phenotype == significance_testing_params.phenotype ? true : null">
+            {{phenotype}}
+          </option>
+        </select>
+      </div>
+      <div style="position: relative; top: 15px; left: 10px; height: 80px">
+        <label for="significanceLevel">Significance Level</label><br>
+        <input type="number" name="significanceLevel" 
+          min="0.01" max="1" placeholder="0.05" step="0.01" size="4"
+          [(ngModel)]="significance_testing_params.significance_level"
+          [value]="significance_testing_params.significance_level">
+      </div>
+      <div class="apply_changes_div">
+        <button type="button" (click)="saveChanges()">Save Changes</button>
+      </div><br><br><br>
+  </div>
+  

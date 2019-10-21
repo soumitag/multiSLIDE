@@ -1,0 +1,20 @@
+<app-selection-panel *ngIf="showSelectionPanel"
+    [analysis_name]="analysis_name" 
+    [featureListName]="featureListNameInSelectionPanel" 
+    (featureListNameReset)="featureListNameReset($event)"
+    (notifyChanges)="notifyChangesToMapContainer($event)">
+</app-selection-panel>
+<app-menu-panel 
+    [analysis_name]="analysis_name" 
+    (onListChange)="onListChange()"
+    (notifySelectionPanelToggle)="notifyToggleToSelectionPanel()">
+</app-menu-panel>
+<app-map-container 
+    [analysis_name]="analysis_name" 
+    [load_count]="load_count" 
+    [list_change_count]="list_change_count" 
+    [containerDisplayOn]="containerDisplayOn"
+    [showSelectionPanel]="showSelectionPanel"
+    (notifyListVisualization)="notifyListVisualization($event)"
+    isForPrint="0">
+</app-map-container>
