@@ -12,6 +12,7 @@
 
 * [Online Version](http://137.132.97.109:56695/multislide/#/) 
 * [Installation Guide](Installation.md) 
-* [User Guide] 
+* How to use multiSLIDE
+	* Videos tutorials demonstrating multiSLIDE's functionalities are available [here](https://www.youtube.com/watch?v=AurU37gGxUI&list=PLh0_FmePh5yGFUpJZ9oYycdz8mgpxRdu1&index=1)
 
 

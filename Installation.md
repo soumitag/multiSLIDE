@@ -9,8 +9,7 @@ Below shows some of the typical Windows and MacOS systems configuration that **m
 
 ### Windows 
 
-*Still* | `renders` | **nicely**
-1 | 2 | 3
+* 
 
 
 
