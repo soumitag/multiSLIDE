@@ -2,17 +2,19 @@
 
 To install **multiSLIDE** on your local computer, please follow the steps below to install the software prerequisites manually: 
 
-## System Requirements
+## System Requirements  
 
 *	**multiSLIDE** requires a memory configuration of atleast 16 GB RAM to work well on large-scale datasets. 
-*	Any standard web browser can be used for data visualization
+*	Any standard web browser can be used for data visualization.
+
+## Installation of Software Prerequisites  
 
 ### Windows 
 
 * 
 
 
-### macOS
+### macOS 
 
 * **Java Development Kit (JDK)**
 
