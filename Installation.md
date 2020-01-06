@@ -1,6 +1,6 @@
 # multiSLIDE Installation Instructions  
 
-To install **multiSLIDE** on your local computer, please follow the steps below: 
+To install **multiSLIDE** on your local computer, please follow the steps below to install the software prerequisites manually: 
 
 ## System Requirements
 
