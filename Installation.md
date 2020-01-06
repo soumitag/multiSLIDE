@@ -18,7 +18,7 @@ Below shows some of the typical Windows and MacOS systems configuration that **m
 
 	*	**multiSLIDE** was developed and tested on JDK 8. However other versions of JDK can also be installed. 
 	*	JDK 8 is available [here](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) (before downloading the file you have to accept the license agreement).
-	
+
 		For macOS, **jdk-8u231-macosx-x64.dmg** is the JDK installer. 
 	*	Double-click the .dmg file and follow the instructions on screen to install the JDK.
 
@@ -30,6 +30,11 @@ Below shows some of the typical Windows and MacOS systems configuration that **m
 	*	Unzip and place the folder in your preferred installation directory.	
 
 * **MongoDB**
+
+	*	**mongo-community** can be installed with the package manager **Homebrew**.
+	*	To install Homebrew issue the following command at the _Terminal_:
+
+		<style>/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"</style>
 * **Python**
 
 
