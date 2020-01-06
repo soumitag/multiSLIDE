@@ -28,8 +28,27 @@ To install **multiSLIDE** on your local computer, please follow the steps below 
 	*	Download **glassfish-4.1.1.zip**.
 	*	Unzip and place the folder in your preferred installation directory.
 
-*	
+*	**MongoDB**
 
+	*	Download the **MongoDB** package from [here](https://www.mongodb.com/download-center/community).
+	*	**MongoDB** requires creating a specific directory that it uses as its repository. Create **data\db** directories in the same drive where **MongoDB** was installed.
+
+* **Python**
+	
+	*	Download Python 3.7 for Windows, 64-bit or 32-bit depending on system architecture from [here](https://www.anaconda.com/distribution/#windows).
+	*	Detailed installation instructions for Anaconda's implementation of Python are available [here](https://docs.anaconda.com/anaconda/install/windows/)
+
+		Note: Select the option ‘Add Anaconda to my PATH environment variable’ during installation 
+	*	**Numpy (Python Package)** _Anaconda’s implementation of Python has **Numpy** pre-installed, so no
+additional configuration steps are required here. For other implementations
+of Python Numpy may have to be installed separately._
+	*	**Scipy (Python Package)**
+		To install **Scipy** issue the following command at the _Command Prompt_:
+		<pre><code>conda install –c anaconda scipy</code></pre>
+	*	**fastcluster(Python Package)**
+		To install **fastcluster 1.1.25** issue the following command at the _Command Prompt_:
+		<pre><code>conda install -c conda-forge fastcluster</code></pre>
+	
 
 ### macOS 
 
