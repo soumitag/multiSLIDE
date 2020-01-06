@@ -36,11 +36,11 @@ Below shows some of the typical Windows and MacOS systems configuration that **m
 
 		<pre><code>/usr/bin/ruby -e "$(curl -fsSL 
 			https://raw.githubusercontent.com/Homebrew/install/master/install)" </code></pre>
-	*	<pre><code> mongo-community </code></pre> can be installed by issuing the following commands:
+	*	**mongo-community** can be installed by issuing the following commands:
 
-		 <pre><code> brew tap mongodb/brew
-					 brew install mongodb-community
-					 brew services start mongodb-community </code></pre>
+		<pre><code> brew tap mongodb/brew
+		brew install mongodb-community
+		brew services start mongodb-community </code></pre>
 
 * **Python**
 
