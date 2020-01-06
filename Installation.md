@@ -38,9 +38,12 @@ Below shows some of the typical Windows and MacOS systems configuration that **m
 			https://raw.githubusercontent.com/Homebrew/install/master/install)" </code></pre>
 	*	**mongo-community** can be installed by issuing the following commands:
 
-		<pre><code> brew tap mongodb/brew
+		<pre><code>brew tap mongodb/brew
 		brew install mongodb-community
 		brew services start mongodb-community </code></pre>
+	*	**MongoDB** requires creating a specific directory that it uses as its repository. Create the database directory **/data/db** in **/System/Volumes/Data**
+	*	Issue the following command to verify **mongod** is working correctly:
+		<pre><code>sudo mongod --dbpath /System/Volumes/Data/data/db </code></pre> 
 
 * **Python**
 
