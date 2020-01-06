@@ -15,6 +15,9 @@ Below shows some of the typical Windows and MacOS systems configuration that **m
 ### macOS
 
 * **Java Development Kit (JDK)**
+* **GlassFish Server**
+* **MongoDB**
+* **Python**
 
 
 
