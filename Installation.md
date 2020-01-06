@@ -46,6 +46,19 @@ Below shows some of the typical Windows and MacOS systems configuration that **m
 		<pre><code>sudo mongod --dbpath /System/Volumes/Data/data/db </code></pre> 
 
 * **Python**
+	
+	*	Download Python 3.7 for macOS from [here](https://www.anaconda.com/distribution/#macos).
+	*	Detailed installation instructions for Anaconda's implementation of Python are available [here](https://docs.anaconda.com/anaconda/install/mac-os/)
+	*	**Numpy (Python Package)** _Anaconda’s implementation of Python has **Numpy** pre-installed, so no
+additional configuration steps are required here. For other implementations
+of Python Numpy may have to be installed separately._
+	*	**Scipy (Python Package)**
+		To install **Scipy** issue the following command at the _Terminal_:
+		<pre><code>conda install –c anaconda scipy</code></pre>
+	*	**fastcluster(Python Package)**
+		To install **fastcluster 1.1.25** issue the following command at the _Terminal_:
+		<pre><code>conda install -c conda-forge fastcluster</code></pre>
+
 
 
 
