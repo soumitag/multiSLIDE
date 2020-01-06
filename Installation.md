@@ -34,7 +34,7 @@ Below shows some of the typical Windows and MacOS systems configuration that **m
 	*	**mongo-community** can be installed with the package manager **Homebrew**.
 	*	To install Homebrew issue the following command at the _Terminal_:
 
-		<pre><code>/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"</code></pre>
+		<pre><code>/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" </code></pre>
 * **Python**
 
 
