@@ -16,5 +16,5 @@
 	* Videos tutorials demonstrating **multiSLIDE**'s functionalities are available [here](https://www.youtube.com/watch?v=AurU37gGxUI&list=PLh0_FmePh5yGFUpJZ9oYycdz8mgpxRdu1&index=1) 
 
 
-[![HitCount](http://hits.dwyl.io/soumitag/multislide.svg)](http://hits.dwyl.io/soumitag/multislide)
+[![HitCount](http://hits.dwyl.io/soumitag/multiSLIDE.svg)](http://hits.dwyl.io/soumitag/multiSLIDE)
 
