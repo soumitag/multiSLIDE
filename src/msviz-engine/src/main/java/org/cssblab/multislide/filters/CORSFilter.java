@@ -50,6 +50,9 @@ public class CORSFilter implements Filter, Serializable {
         ((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Headers", "origin, content-type, accept, authorization");
         ((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Credentials", "true");
         ((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Methods","GET, OPTIONS, HEAD, PUT, POST");
+        ((HttpServletResponse) servletResponse).addHeader("X-XSS-Protection", "1; mode=block");
+        ((HttpServletResponse) servletResponse).addHeader("X-Frame-Options", "SAMEORIGIN");
+        ((HttpServletResponse) servletResponse).addHeader("X-Content-Type-Options", "nosniff");
  
         // For HTTP OPTIONS verb/method reply with ACCEPTED status code -- per CORS handshake
         /*

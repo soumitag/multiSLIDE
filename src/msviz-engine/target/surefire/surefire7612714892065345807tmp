@@ -1,0 +1,6 @@
+#surefire
+#Fri Mar 27 15:48:14 SGT 2020
+maven.ext.class.path=/Applications/NetBeans/NetBeans 8.2.app/Contents/Resources/NetBeans/java/maven-nblib/netbeans-eventspy.jar
+user.dir=/Users/soumitaghosh/Documents/GitHub/multiSLIDE/src/msviz-engine
+localRepository=/Users/soumitaghosh/.m2/repository
+basedir=/Users/soumitaghosh/Documents/GitHub/multiSLIDE/src/msviz-engine

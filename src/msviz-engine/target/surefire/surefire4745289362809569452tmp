@@ -1,6 +1,0 @@
-#surefire
-#Sun Sep 29 12:39:26 SGT 2019
-maven.ext.class.path=/Applications/NetBeans/NetBeans 8.2.app/Contents/Resources/NetBeans/java/maven-nblib/netbeans-eventspy.jar
-user.dir=/Users/abhikdatta/code/code_multislide_03_Nov_2018/multiSLIDE/src/msviz-engine
-localRepository=/Users/abhikdatta/.m2/repository
-basedir=/Users/abhikdatta/code/code_multislide_03_Nov_2018/multiSLIDE/src/msviz-engine
