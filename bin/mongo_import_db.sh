@@ -4,6 +4,9 @@ cd $1
 unzip -o '*.zip'
 ls -l
 
+# mongod --dbpath=/System/Volumes/Data/data/db
+$2 --dbpath=$3 &
+
 allfilenames=`ls ./*.json`
 
 for eachfile in $allfilenames;
@@ -19,3 +22,5 @@ do
    fi
 
 done
+
+$2 --dbpath=$3 --shutdown
