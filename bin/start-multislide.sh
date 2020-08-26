@@ -37,7 +37,7 @@ echo ${MULTISLIDE_GLASSFISH_HOME}
 # *********************************
 
 #$mongodb_dir/mongod&
-${MULTISLIDE_MONGODB_HOME}&
+${MULTISLIDE_MONGODB_HOME} --dbpath=${MULTISLIDE_MONGODB_DATA} &
 
 #"$glassfish_dir"/asadmin start-domain
 ${MULTISLIDE_GLASSFISH_HOME}/bin/asadmin start-domain
