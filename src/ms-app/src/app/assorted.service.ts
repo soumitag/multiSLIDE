@@ -1,6 +1,5 @@
 import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
-import { Http } from "@angular/http";
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { SelectionPanelData } from './selection-panel_data';
 import { SelectionPanelState } from './selection-state_data';
@@ -9,6 +8,8 @@ import "rxjs/Rx"
 import { forkJoin } from 'rxjs';
 import { ServerResponseData } from './server_response';
 import { LocalSettings } from './local-settings'
+import { EnrichmentAnalysisParams } from './enrichment_analysis_params'
+import { MappedData } from './mapped_data';
 
 @Injectable()
 export class AssortedService {
@@ -17,7 +18,74 @@ export class AssortedService {
 	private legendsUrl = LocalSettings.MSVIZ_ENGINE_URL + "/GetFigureLegends";
 	private networkNeighborsUrl = LocalSettings.MSVIZ_ENGINE_URL + "/NetworkNeighborServices";
 
-	constructor(private http: Http, private httpClient: HttpClient) { }
+	constructor(private httpClient: HttpClient) { }
+
+	getEnrichmentAnalysisFile(analysis_name:string, filename: string) {
+		return this.httpClient.get(this.baseUrl, {
+			params: {
+				'analysis_name': analysis_name,
+				'filename': filename,
+				'action': 'download_enrichment_analysis_results'
+			},
+			withCredentials: true,
+			responseType: 'blob'
+		})
+		.map(res => <Blob> res)
+		.catch(error => {
+			console.log(error);
+			return Observable.throw(error);
+		});
+
+	}
+
+	getFunctionalGroupsData(analysis_name: string): Observable<MappedData> {
+
+		return this.httpClient.get(this.baseUrl, {
+			params: {
+				'analysis_name': analysis_name,
+				'action': 'get_functional_grp_names'
+			},
+			withCredentials: true
+		})
+			.map(res => <MappedData>res)
+			.catch(error => {
+				console.log(error);
+				return Observable.throw(error);
+			});
+	}
+
+	getUserSpecifiedConnections(analysis_name: string): Observable<string[][]> {
+
+		return this.httpClient.get(this.baseUrl, {
+			params: {
+				'analysis_name': analysis_name,
+				'action': 'get_user_specified_connections'
+			},
+			withCredentials: true
+		})
+			.map(res => <string[][]>res)
+			.catch(error => {
+				console.log(error);
+				return Observable.throw(error);
+			});
+	}
+
+	removeUserSpecifiedConnections(analysis_name: string, filename: string): Observable<ServerResponseData> {
+
+		return this.httpClient.get(this.baseUrl, {
+			params: {
+				'action': 'delete_user_specified_connections',
+				'analysis_name': analysis_name,
+				'filename': filename
+			},
+			withCredentials: true
+		})
+			.map(res => <ServerResponseData>res)
+			.catch(error => {
+				console.log(error);
+				return Observable.throw(error);
+			});
+	}
 
 	getSelectionPanelDataAndState(analysis_name: string): Observable<any[]> {
 		let data = this.getSelectionPanelData(analysis_name);
@@ -144,5 +212,36 @@ export class AssortedService {
 			});
 
 	}
+
+	setEnrichmentAnalysisParams (
+		analysis_name: string,
+		enrichment_analysis_params: EnrichmentAnalysisParams
+		): Observable<MappedData> {
+
+		return this.httpClient.get(this.baseUrl, {
+			params: {
+				'analysis_name': analysis_name,
+				'action': 'set_enrichment_analysis_params',
+				'dataset': enrichment_analysis_params.dataset,
+				'phenotype': enrichment_analysis_params.phenotype,
+				'testtype': enrichment_analysis_params.testtype,
+				'use_pathways': enrichment_analysis_params.use_pathways.toString(),
+				'use_ontologies': enrichment_analysis_params.use_ontologies.toString(),
+				'significance_level_d': enrichment_analysis_params.significance_level_d.toString(),
+				'apply_fdr_d': enrichment_analysis_params.apply_fdr_d.toString(),
+				'fdr_threshold_d': enrichment_analysis_params.fdr_threshold_d.toString(),
+				'significance_level_e': enrichment_analysis_params.significance_level_e.toString(),
+				'apply_fdr_e': enrichment_analysis_params.apply_fdr_e.toString(),
+				'fdr_threshold_e': enrichment_analysis_params.fdr_threshold_e.toString()
+			},
+			withCredentials: true
+		})
+			.map(res => <MappedData>res)
+			.catch(error => {
+				console.log(error);
+				return Observable.throw(error);
+			});
+
+  }
 
 }

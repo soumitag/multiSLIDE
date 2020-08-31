@@ -7,8 +7,7 @@ package org.cssblab.multislide.structure;
 
 import com.google.gson.Gson;
 import java.io.Serializable;
-import org.cssblab.multislide.algorithms.clustering.BinaryTree;
-import org.cssblab.multislide.algorithms.clustering.HierarchicalClusterer;
+import java.util.HashMap;
 
 /**
  *
@@ -18,35 +17,75 @@ public class ClusteringParams implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
+    public static final int OPTIMAL_LEAF_ORDER = 0;
+    public static final int COUNT_SORT_ASCENDING_LEAF_ORDER = 1;
+    public static final int COUNT_SORT_DESCENDING_LEAF_ORDER = 2;
+    public static final int DISTANCE_SORT_ASCENDING_LEAF_ORDER = 3;
+    public static final int DISTANCE_SORT_DESCENDING_LEAF_ORDER = 4;
+    
+    public static final int AVERAGE_LINKAGE = 0;
+    public static final int COMPLETE_LINKAGE = 1;
+    public static final int MEDIAN_LINKAGE = 2;
+    public static final int CENTROID_LINKAGE = 3;
+    public static final int WARD_LINKAGE = 4;
+    public static final int WEIGHTED_LINKAGE = 5;
+    public static final int SINGLE_LINKAGE = 6;
+    
+    public static final int EUCLIDEAN_DISTANCE = 0;
+    public static final int CITYBLOCK_DISTANCE = 1;
+    public static final int COSINE_DISTANCE = 2;
+    public static final int CORRELATION_DISTANCE = 3;
+    public static final int CHEBYSHEV_DISTANCE = 4;
+    
+    public static final int TYPE_SAMPLE_CLUSTERING = 0;
+    public static final int TYPE_FEATURE_CLUSTERING = 1;
+    
     int type;
     boolean use_defaults;
     int linkage_function;
     int distance_function;
     int leaf_ordering;
     String dataset;
+    /*
+    boolean is_joint;
+    boolean use_aggregate;
+    String aggregate_func;
+    */
 
     public ClusteringParams(int type) throws MultiSlideException {
-        if (type != HierarchicalClusterer.TYPE_ROW_CLUSTERING && type != HierarchicalClusterer.TYPE_COL_CLUSTERING) {
+        if (type != TYPE_SAMPLE_CLUSTERING && type != TYPE_FEATURE_CLUSTERING) {
             throw new MultiSlideException("Illegal argument for type: " + type);
         }
         this.type = type;
         this.use_defaults = true;
+        /*
+        this.is_joint = true;
+        this.use_aggregate = false;
+        */
     }
     
     public ClusteringParams(int type, String dataset) throws MultiSlideException {
-        if (type != HierarchicalClusterer.TYPE_ROW_CLUSTERING && type != HierarchicalClusterer.TYPE_COL_CLUSTERING) {
+        if (type != TYPE_SAMPLE_CLUSTERING && type != TYPE_FEATURE_CLUSTERING) {
             throw new MultiSlideException("Illegal argument for type: " + type);
         }
         this.type = type;
         this.use_defaults = true;
-        this.linkage_function = HierarchicalClusterer.COMPLETE_LINKAGE;
-        this.distance_function = HierarchicalClusterer.EUCLIDEAN_DISTANCE;
-        this.leaf_ordering = BinaryTree.SMALLEST_CHILD_FIRST_LEAF_ORDER;
+        this.linkage_function = COMPLETE_LINKAGE;
+        this.distance_function = EUCLIDEAN_DISTANCE;
+        this.leaf_ordering = ClusteringParams.OPTIMAL_LEAF_ORDER;
         this.dataset = dataset;
+        /*
+        this.is_joint = true;
+        this.use_aggregate = false;
+        */
     }
     
-    public ClusteringParams(int type, int linkage_function, int distance_function, int leaf_ordering, String dataset) throws MultiSlideException {
-        if (type != HierarchicalClusterer.TYPE_ROW_CLUSTERING && type != HierarchicalClusterer.TYPE_COL_CLUSTERING) {
+    public ClusteringParams(
+            int type, int linkage_function, 
+            int distance_function, int leaf_ordering, 
+            String dataset
+    ) throws MultiSlideException {
+        if (type != TYPE_SAMPLE_CLUSTERING && type != TYPE_FEATURE_CLUSTERING) {
             throw new MultiSlideException("Illegal argument for type: " + type);
         }
         this.type = type;
@@ -55,6 +94,16 @@ public class ClusteringParams implements Serializable {
         this.distance_function = distance_function;
         this.leaf_ordering = leaf_ordering;
         this.dataset = dataset;
+        /*
+        if(type == HierarchicalClusterer.TYPE_ROW_CLUSTERING) {
+            this.is_joint = true;
+            this.use_aggregate = false;
+        } else {
+            this.is_joint = is_joint;
+            this.use_aggregate = use_aggregate;
+            this.aggregate_func = aggregate_func;
+        }
+        */
     }
     
     public int getType() {
@@ -67,7 +116,7 @@ public class ClusteringParams implements Serializable {
 
     public int getLinkageFunction() {
         if (this.use_defaults) {
-            return HierarchicalClusterer.COMPLETE_LINKAGE;
+            return COMPLETE_LINKAGE;
         } else {
             return linkage_function;
         }
@@ -75,24 +124,35 @@ public class ClusteringParams implements Serializable {
 
     public int getDistanceFunction() {
         if (this.use_defaults) {
-            return HierarchicalClusterer.EUCLIDEAN_DISTANCE;
+            return EUCLIDEAN_DISTANCE;
         } else {
             return distance_function;
+        }
+    }
+    
+    public String getTypeS() {
+        switch (this.type) {
+            case TYPE_SAMPLE_CLUSTERING:
+                return "sample";
+            case TYPE_FEATURE_CLUSTERING:
+                return "feature";
+            default:
+                return "unknown";
         }
     }
     
     public String getDistanceFunctionS () {
         int distance_function_code = this.getDistanceFunction();
         switch (distance_function_code) {
-            case HierarchicalClusterer.EUCLIDEAN_DISTANCE:
+            case EUCLIDEAN_DISTANCE:
                 return "euclidean";
-            case HierarchicalClusterer.CITYBLOCK_DISTANCE:
+            case CITYBLOCK_DISTANCE:
                 return "cityblock";
-            case HierarchicalClusterer.COSINE_DISTANCE:
+            case COSINE_DISTANCE:
                 return "cosine";
-            case HierarchicalClusterer.CORRELATION_DISTANCE:
+            case CORRELATION_DISTANCE:
                 return "correlation";
-            case HierarchicalClusterer.CHEBYSHEV_DISTANCE:
+            case CHEBYSHEV_DISTANCE:
                 return "chebyshev";
             default:
                 return "";
@@ -102,32 +162,56 @@ public class ClusteringParams implements Serializable {
     public String getLinkageFunctionS () {
         int linkage_function_code = this.getLinkageFunction();
         switch (linkage_function_code) {
-            case HierarchicalClusterer.SINGLE_LINKAGE:
+            case SINGLE_LINKAGE:
                 return "single";
-            case HierarchicalClusterer.COMPLETE_LINKAGE:
+            case COMPLETE_LINKAGE:
                 return "complete";
-            case HierarchicalClusterer.AVERAGE_LINKAGE:
+            case AVERAGE_LINKAGE:
                 return "average";
-            case HierarchicalClusterer.MEDIAN_LINKAGE:
+            case MEDIAN_LINKAGE:
                 return "median";
-            case HierarchicalClusterer.CENTROID_LINKAGE:
+            case CENTROID_LINKAGE:
                 return "centroid";
-            case HierarchicalClusterer.WARD_LINKAGE:
+            case WARD_LINKAGE:
                 return "ward";
-            case HierarchicalClusterer.WEIGHTED_LINKAGE:
+            case WEIGHTED_LINKAGE:
                 return "weighted";
             default:
                 return "";
         }
     }
     
-    public int getLeafOrdering() {
-        if (this.use_defaults) {
-            return BinaryTree.SMALLEST_CHILD_FIRST_LEAF_ORDER;
+    public String getLeafOrderingS() {
+        int leaf_ordering_code = this.getLeafOrdering();
+        switch (leaf_ordering_code) {
+            case ClusteringParams.OPTIMAL_LEAF_ORDER:
+                return "optimal";
+            case ClusteringParams.COUNT_SORT_ASCENDING_LEAF_ORDER:
+                return "count_sort_ascending";
+            case ClusteringParams.COUNT_SORT_DESCENDING_LEAF_ORDER:
+                return "count_sort_descending";
+            case ClusteringParams.DISTANCE_SORT_ASCENDING_LEAF_ORDER:
+                return "distance_sort_ascending";
+            case ClusteringParams.DISTANCE_SORT_DESCENDING_LEAF_ORDER:
+                return "distance_sort_descending";
+            default:
+                return null;
         }
-        return leaf_ordering;
     }
     
+    public int getLeafOrdering() {
+        if (this.use_defaults) {
+            return ClusteringParams.OPTIMAL_LEAF_ORDER;
+        } else {
+            return leaf_ordering;
+        }
+    }
+    
+    public void setLeafOrdering(int leaf_ordering) {
+        this.leaf_ordering = leaf_ordering;
+    }
+    
+    /*
     public final int getLeafOrderingCode(String leaf_ordering) throws MultiSlideException {
         if (leaf_ordering.equalsIgnoreCase("smallest_child_first")) {
             return BinaryTree.SMALLEST_CHILD_FIRST_LEAF_ORDER;
@@ -141,18 +225,19 @@ public class ClusteringParams implements Serializable {
             throw new MultiSlideException("Illegal argument for leaf ordering: " + leaf_ordering);
         }
     }
+    */
     
     public final int getDistanceFunctionCode(String distance_function) throws MultiSlideException {
         if (distance_function.equalsIgnoreCase("euclidean")) {
-            return HierarchicalClusterer.EUCLIDEAN_DISTANCE;
+            return EUCLIDEAN_DISTANCE;
         } else if (distance_function.equalsIgnoreCase("cityblock")) {
-            return HierarchicalClusterer.CITYBLOCK_DISTANCE;
+            return CITYBLOCK_DISTANCE;
         } else if (distance_function.equalsIgnoreCase("cosine")) {
-            return HierarchicalClusterer.COSINE_DISTANCE;
+            return COSINE_DISTANCE;
         } else if (distance_function.equalsIgnoreCase("correlation")) {
-            return HierarchicalClusterer.CORRELATION_DISTANCE;
+            return CORRELATION_DISTANCE;
         } else if (distance_function.equalsIgnoreCase("chebyshev")) {
-            return HierarchicalClusterer.CHEBYSHEV_DISTANCE;
+            return CHEBYSHEV_DISTANCE;
         } else {
             throw new MultiSlideException("Illegal argument for distance function: " + distance_function);
         }
@@ -160,19 +245,19 @@ public class ClusteringParams implements Serializable {
     
     public final int getLinkgeFunctionCode(String linkge_function) throws MultiSlideException {
         if (linkge_function.equalsIgnoreCase("single")) {
-            return HierarchicalClusterer.SINGLE_LINKAGE;
+            return SINGLE_LINKAGE;
         } else if (linkge_function.equalsIgnoreCase("complete")) {
-            return HierarchicalClusterer.COMPLETE_LINKAGE;
+            return COMPLETE_LINKAGE;
         } else if (linkge_function.equalsIgnoreCase("average")) {
-            return HierarchicalClusterer.AVERAGE_LINKAGE;
+            return AVERAGE_LINKAGE;
         } else if (linkge_function.equalsIgnoreCase("median")) {
-            return HierarchicalClusterer.MEDIAN_LINKAGE;
+            return MEDIAN_LINKAGE;
         } else if (linkge_function.equalsIgnoreCase("centroid")) {
-            return HierarchicalClusterer.CENTROID_LINKAGE;
+            return CENTROID_LINKAGE;
         } else if (linkge_function.equalsIgnoreCase("ward")) {
-            return HierarchicalClusterer.WARD_LINKAGE;
+            return WARD_LINKAGE;
         } else if (linkge_function.equalsIgnoreCase("weighted")) {
-            return HierarchicalClusterer.WEIGHTED_LINKAGE;
+            return WEIGHTED_LINKAGE;
         } else {
             throw new MultiSlideException("Illegal argument for linkage function: " + linkge_function);
         }
@@ -183,10 +268,20 @@ public class ClusteringParams implements Serializable {
     }
     
     public String getHashString() {
-        return linkage_function + "_" + distance_function;
+        return type + "_" + linkage_function + "_" + distance_function;
     }
     
     public String asJSON () {
         return new Gson().toJson(this);
+    }
+    
+    public HashMap <String, String> asMap() {
+        HashMap <String, String> map = new HashMap <> ();
+        map.put("clustering_on", this.getTypeS());
+        map.put("dataset_name", this.getDatasetName());
+        map.put("distance_function", this.getDistanceFunctionS());
+        map.put("linkage_function", this.getLinkageFunctionS());
+        map.put("leaf_ordering", this.getLeafOrderingS());
+        return map;
     }
 }

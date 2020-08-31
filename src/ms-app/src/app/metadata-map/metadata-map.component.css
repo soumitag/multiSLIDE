@@ -22,6 +22,17 @@ label {
     font-size: 16px;
 }
 
+.info_label {
+    width: 100%;
+    padding: 2px;
+    margin-top: 6px;
+    margin-bottom: 16px;
+    resize: vertical;
+    color:rgb(47,79,79);
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+}
+
 .metadata_map_controls {
     text-align:left;
     font-family:  'Poppins', sans-serif;
@@ -129,4 +140,28 @@ button:hover {
     cursor: pointer;
     background-image: url('assets/img/minus512_green_filled.png');
     background-size: 18px 18px;
+}
+
+.radio_group_control {
+    display: flex;
+    flex-direction: row;
+    margin: 15px 0;
+  }
+  
+.radio_button_control {
+    margin: 5px;
+}
+
+.help_button {
+    width: 22px;
+    height: 22px;
+    /*float: right; */
+    cursor: pointer;
+    background-image: url('assets/img/icons8-help-100.png');
+    background-color: white;
+    background-size: 22px 22px;
+    padding-left: 20px;
+    margin-top: 3px;
+    background-repeat: no-repeat;
+    border-width: 0px;
 }

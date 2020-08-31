@@ -4,7 +4,7 @@ import { HeatmapService } from '../heatmap.service'
 import { HeatmapLayout } from '../heatmap_layout';
 import { NewListComponent } from '../new-list/new-list.component'
 import { MapSettingsComponent } from '../map-settings/map-settings.component'
-import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material";
+import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
 import { ListService } from '../list.service';
 import { AssortedService } from '../assorted.service';
 import { ServerResponseData } from '../server_response'
@@ -21,13 +21,8 @@ import { GlobalHeatmapData } from '../global_heatmap_data';
 export class HeatmapComponent implements OnInit, OnChanges {
 
 	@Input() analysis_name: string;
-	@Input() layout: HeatmapLayout;
 	@Input() global_data: GlobalHeatmapData;
-	@Input() nSamples: number;
-	@Input() nEntrez: number;
 	@Input() datasetName: string;
-	@Input() sampleStartIndex: number;
-	@Input() entrezStartIndex: number;
 	@Input() mapResolution: string;
 	@Input() clinicalFilters: string[];
 	@Input() geneTags: string[];
@@ -35,30 +30,104 @@ export class HeatmapComponent implements OnInit, OnChanges {
 	@Input() feature_list_names: string[];
 	@Input() sample_list_names: string[];
 	@Input() load_count: number;
+	@Input() load_layout_count: number;
 	@Input() isTransposed: number;
+	@Input() isForPrint: number;
 
 	@Output() onSortOrderChange = new EventEmitter<string>();
 	@Output() onListChange = new EventEmitter<string>();
 	@Output() onNeighborsChange = new EventEmitter();
 
 	data: HeatmapData;	
-	//layout: HeatmapLayout;
+	layout: HeatmapLayout;
 	list_service_response: ServerResponseData;
 	add_neighbor_service_response: ServerResponseData;
 	mapconfig_server_response: ServerResponseData;
 	mapSettingsDialogRef: MatDialogRef<MapSettingsComponent>;
-	custom_gene_identifiers: string[];
+	//custom_gene_identifiers: string[];
 	col_order: number[];
+	nSamples: number;
+	nEntrez: number;
 	//isTransposed: boolean = true;
+
+	public hist = {
+		data: [
+
+			{
+				type: "bar",
+				name: "",
+				showlegend: false,
+				marker: {
+					color: []
+				}
+			},
+
+			{
+				type: "bar",
+				showlegend: false,
+				name: "",
+				marker: {
+					color: [],
+					line: {
+						color: 'gray',
+						width: 2
+					},
+
+				}
+			},
+
+		],
+		layout: {
+			barmode: 'overlay', width: 300, height: 300, title: '', bargap: 0.0,
+			xaxis: {
+				showgrid: true, mirror: true,
+				ticks: 'outside',
+				showline: true, nticks: 5
+			}, yaxis: {
+				showgrid: true, mirror: true,
+				ticks: 'outside',
+				showline: true, nticks: 5
+			},
+			margin: {
+				l: 40,
+				r: 2,
+				b: 40,
+				t: 2,
+				pad: 0
+			  }
+		},
+		config: {
+			'displayModeBar': false,
+			staticPlot: true
+		},
+	};
 
 	constructor(private heatmapService: HeatmapService,
 				private listService: ListService,
 				private assortedService: AssortedService,
-				private dialog: MatDialog) { }
+				private dialog: MatDialog) { 
+
+					/*
+					this.hist['layout']['width'] = 272
+					this.hist['layout']['height'] = 152
+
+					this.hist['data'][1]['x'] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+                	this.hist['data'][1]['y'] = [6, 10, 3, 6, 10, 3, 6, 10, 36, 10, 3]
+                	this.hist['data'][1]['marker']['color'] = ['rgb(0,0,195)', 'rgb(142,124,195)', 'rgb(142,124,195)', 'rgb(142,124,195)',
+                	'rgb(142,124,195)', 'rgb(142,124,195)', 'rgb(142,124,195)',
+					'rgb(142,124,195)', 'rgb(142,124,195)', 'rgb(142,12,195)', 'rgb(133,124,195)']
+				
+					this.hist['data'][0]['x'] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+					this.hist['data'][0]['y'] = [36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36]
+					this.hist['data'][0]['marker']['color'] = ['rgb(0,0,195)', 'rgb(142,124,195)', 'rgb(142,124,195)', 'rgb(142,124,195)',
+					'rgb(142,124,195)', 'rgb(142,124,195)', 'rgb(142,124,195)',
+					'rgb(142,124,195)', 'rgb(142,124,195)', 'rgb(142,12,195)', 'rgb(133,124,195)']
+					*/
+				}
 
 	ngOnInit() { 
 		this.getHeatmapData();
-		//this.getHeatmapLayout();
+		this.getHeatmapLayout();
 		console.log("Started.");
 		//console.log(this.data);
 	}
@@ -69,19 +138,9 @@ export class HeatmapComponent implements OnInit, OnChanges {
 			if (propName == "gene_mask") {
 				if(!changes['gene_mask'].isFirstChange()) {
 					this.data = null;			// nullify it so that "Loading..." message is displayed
+					this.layout = null;			// nullify it so that "Loading..." message is displayed
 					this.getHeatmapData();
-					console.log('ngOnChnages: ' + propName);
-				}
-			} else if (propName == "sampleStartIndex") {
-				if(!changes['sampleStartIndex'].isFirstChange()) {
-					this.data = null;			// nullify it so that "Loading..." message is displayed
-					this.getHeatmapData();
-					console.log('ngOnChnages: ' + propName);
-				}
-			} else if (propName == "entrezStartIndex") {
-				if(!changes['entrezStartIndex'].isFirstChange()) {
-					this.data = null;			// nullify it so that "Loading..." message is displayed
-					this.getHeatmapData();
+					this.getHeatmapLayout();
 					console.log('ngOnChnages: ' + propName);
 				}
 			} else if (propName == "mapResolution") {
@@ -96,14 +155,19 @@ export class HeatmapComponent implements OnInit, OnChanges {
 			}  else if (propName == "load_count") {
 				if(!changes['load_count'].isFirstChange()) {
 					this.data = null;			// nullify it so that "Loading..." message is displayed
-					//this.layout = null;			// nullify it so that "Loading..." message is displayed
+					this.layout = null;			// nullify it so that "Loading..." message is displayed
 					this.getHeatmapData();
+					this.getHeatmapLayout();
 					console.log('ngOnChnages: ' + propName);
-					//this.getHeatmapLayout();
+				}
+			} else if (propName == "load_layout_count") {
+				if(!changes['load_layout_count'].isFirstChange()) {
+					this.layout = null;			// nullify it so that "Loading..." message is displayed
+					this.getHeatmapLayout();
+					console.log('ngOnChnages: ' + propName);
 				}
 			}
 		}
-		
 	}
 
 	changeSortOrder(sortBy: string) {
@@ -121,19 +185,50 @@ export class HeatmapComponent implements OnInit, OnChanges {
 			.subscribe(data => this.data = data, () => console.log("observable complete"));
 		*/
 		this.heatmapService.getHeatmapData(	this.analysis_name,
-											this.datasetName,
-											this.sampleStartIndex,
-											this.entrezStartIndex)
-			.subscribe(data => this.data = data, () => console.log("observable complete"));
+											this.datasetName)
+			.subscribe(
+				data => this.setData(data), 
+				() => console.log("observable complete"));
 	}
 
-	/*
+	setData(data: HeatmapData) {
+		this.data = data;
+		this.nSamples = data.nSamples;
+		this.nEntrez = data.nEntrez;
+
+		var max_freq = Math.max.apply(null, data.hist_frequencies);
+		console.log(max_freq)
+
+		this.hist['data'][0]['marker']['color'] = [];
+		this.hist['data'][0]['x'] = [];
+		this.hist['data'][0]['y'] = [];
+		this.hist['data'][1]['marker']['color'] = [];
+		this.hist['data'][1]['x'] = [];
+		this.hist['data'][1]['y'] = [];
+		for (var i=0; i<data.bin_colors.length-1; i++) {
+			var cs = 'rgb(' + data.bin_colors[i][0] + ',' + data.bin_colors[i][1] + ',' + data.bin_colors[i][2] + ')';
+			this.hist['data'][0]['marker']['color'].push(cs);
+			this.hist['data'][0]['x'].push(data.hist_x_values[i]);
+			this.hist['data'][0]['y'].push(max_freq);
+			this.hist['data'][1]['marker']['color'].push(cs);
+			this.hist['data'][1]['x'].push(data.hist_x_values[i]);
+			this.hist['data'][1]['y'].push(data.hist_frequencies[i]);
+		}
+
+		console.log(this.isForPrint);
+	}
+	
 	getHeatmapLayout(): void {
 		this.heatmapService.getHeatmapLayout(this.analysis_name, 
 											 this.datasetName)
-			.subscribe(data => this.layout = data, () => console.log("observable complete"));
+			.subscribe(data => this.setLayout(data), () => console.log("observable complete"));
 	}
-	*/
+
+	setLayout(data: HeatmapLayout) {
+		this.layout = data;
+		this.hist['layout']['width'] = data.hist_width;
+		this.hist['layout']['height'] = data.hist_height;
+	}
 
 	onContextMenuAction1(item: string) {
 		alert('Click on Action 1 for entrez = ' + item);
@@ -148,10 +243,10 @@ export class HeatmapComponent implements OnInit, OnChanges {
 		var list_data = "";
 		if (add_type_ind == 0) {
 			add_type = "single_feature";
-			list_data = this.global_data.entrez[col_index];
+			list_data = this.data.entrez[col_index];
 		} else if (add_type_ind == 1) {
 			add_type = "feature_group";
-			list_data = this.global_data.gene_group_keys[this.global_data.gene_tags[col_index][0]];
+			list_data = this.global_data.gene_group_keys[this.data.gene_tags[col_index][0]];
 		} else {
 			alert('Bad param: add_type');
 			return;
@@ -170,10 +265,10 @@ export class HeatmapComponent implements OnInit, OnChanges {
 		var list_data = "";
 		if (add_type_ind == 0) {
 			add_type = "single_feature";
-			list_data = this.global_data.entrez[col_index];
+			list_data = this.data.entrez[col_index];
 		} else if (add_type_ind == 1) {
 			add_type = "feature_group";
-			list_data = this.global_data.gene_group_keys[this.global_data.gene_tags[col_index][0]];
+			list_data = this.global_data.gene_group_keys[this.data.gene_tags[col_index][0]];
 		} else {
 			alert('Bad param: add_type');
 			return;
@@ -217,8 +312,7 @@ export class HeatmapComponent implements OnInit, OnChanges {
 		};
 		dialogConfig.data = {
 			analysis_name: this.analysis_name,
-			datasetName: this.datasetName,
-			custom_gene_identifiers: this.custom_gene_identifiers
+			datasetName: this.datasetName
 		};
 		this.mapSettingsDialogRef = this.dialog.open(MapSettingsComponent, dialogConfig);
 
@@ -231,15 +325,15 @@ export class HeatmapComponent implements OnInit, OnChanges {
 			this.heatmapService.resetMap(this.analysis_name,
 						this.datasetName,
 						new_map_config)
-			.subscribe(data => this.handleServerResponse_MapConfigUpdate(data, new_map_config), () => console.log("observable complete"));
+			.subscribe(data => this.handleServerResponse_MapConfigUpdate(data), () => console.log("observable complete"));
 		}
 	}
 	
-	handleServerResponse_MapConfigUpdate(response: ServerResponseData, new_map_config: MapConfig) {
+	handleServerResponse_MapConfigUpdate(response: ServerResponseData) {
 		this.mapconfig_server_response = response;
 		if (this.mapconfig_server_response.status == 1) {
-			//this.layout = null;			// nullify it so that "Loading..." message is displayed
-			//this.getHeatmapLayout();
+			this.layout = null;			// nullify it so that "Loading..." message is displayed
+			this.getHeatmapLayout();
 			this.data = null;			// nullify it so that "Loading..." message is displayed
 			this.getHeatmapData();
 		} else {
@@ -248,8 +342,8 @@ export class HeatmapComponent implements OnInit, OnChanges {
 	}
 
 	searchNeighbors(col_index: number, search_type_code: number) {
-		var entrez = this.global_data.entrez[col_index];
-		var display_tag = this.global_data.column_headers[col_index];
+		var entrez = this.data.entrez[col_index];
+		var display_tag = this.data.column_headers[col_index];
 		var search_type = '';
 		if (search_type_code == 0) {
 			search_type = 'ppi_entrez';

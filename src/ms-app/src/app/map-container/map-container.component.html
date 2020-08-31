@@ -1,96 +1,40 @@
 <ng-container *ngIf="config && layout && lists && containerDisplayOn; else ready_state">
 
+  <!--Control Ribbon-->
   <ng-container *ngIf="isForPrint==0">
-
-    <div class="control_ribbon" style="position: absolute; top: 45px; width: 510px;" [style.left]="panel_left + 'px'">
-
-      <div class="map_container_controls">
-        <label>Scroll By</label><br>
-        <input type="number" min="1" max="999" name="scrollBy" size="3" [(ngModel)]="config.scrollBy"
-          [value]="config.scrollBy">
-      </div>
-
-      <div class="map_container_controls">
-        <div style="float: left; height: 65px; position: relative; top: 22px;">
-          <img src="assets/img/controller_left.png" height="20" width="20" alt="left" (click)="load_view(1,-1)" />
-        </div>
-        <div style="float: left; height: 65px; position: relative; top: 6px;">
-          <img src="assets/img/controller_up.png" height="20" width="20" alt="up" (click)="load_view(0,-1)" /><br>
-          <div style="height: 8px"></div>
-          <img src="assets/img/controller_down.png" height="20" width="20" alt="down" (click)="load_view(0,1)" />
-        </div>
-        <div style="float: left; height: 65px; position: relative; top: 22px;">
-          <img src="assets/img/controller_right.png" height="20" width="20" alt="right" (click)="load_view(1,1)" /><br>
-        </div>
-      </div>
-
-      <div class="map_container_controls">
-        <label>
-          Samples {{config.current_sample_start + 1}} to {{config.current_sample_start+config.rowsPerPageDisplayed}} of
-          {{config.available_rows}} <br>
-          Genes {{config.current_feature_start + 1}} to {{config.current_feature_start+config.colsPerPageDisplayed}} of
-          {{config.available_cols}}
-        </label>
-      </div>
-
+    <div class="control_ribbon" style="position: absolute; top: 45px; width: 125px;" [style.left]="control_ribbon_left + 'px'">
       <div class="map_container_controls_end">
-        <ng-container *ngIf="isRowsPerPageEditable; else staticRowsPerPage">
-          <label for="nSamples">Samples</label>&nbsp;
-          <div class="value_div">
-            <input type="number" min="1" max="999" name="nSamples" size="3"
-              [(ngModel)]="config.userSpecifiedRowsPerPage" [value]="config.userSpecifiedRowsPerPage">
-            &nbsp; <button class="save_button" (click)="toggleRowsPerPage(0)"></button>
-          </div>
-        </ng-container>
-        <ng-template #staticRowsPerPage>
-          <label for="nSamples">Samples</label>&nbsp;
-          <div class="value_div">
-            &nbsp; {{config.userSpecifiedRowsPerPage}} &nbsp; <button class="edit_button"
-              (click)="toggleRowsPerPage(1)"></button>
-          </div>
-        </ng-template>
-        <br>
-        <ng-container *ngIf="isColsPerPageEditable; else staticColsPerPage">
-          <label for="nEntrez">Genes</label>&nbsp;
-          <div class="value_div">
-            <input type="number" min="1" max="999" name="nEntrez" size="3" [(ngModel)]="config.userSpecifiedColsPerPage"
-              [value]="config.userSpecifiedColsPerPage">
-            &nbsp; <button class="save_button" (click)="toggleColsPerPage(0)"></button>
-          </div>
-        </ng-container>
-        <ng-template #staticColsPerPage>
-          <label for="nEntrez">Genes</label>&nbsp;
-          <div class="value_div">
-            &nbsp; {{config.userSpecifiedColsPerPage}} &nbsp; <button class="edit_button"
-              (click)="toggleColsPerPage(1)"></button>
-          </div>
-        </ng-template>
+        <div class="data_div">
+        <div style="width: 80px;"><label> Datasets</label></div>
+        <div>
+          <button class="settings_button" (click)="openDatasetSelectionPanel(0)"></button>
+        </div>
+        </div>
+        <div class="data_div">
+        <div style="width: 80px;"><label> Phenotypes</label></div>
+        <div>
+        <button class="settings_button" (click)="openDatasetSelectionPanel(1)"></button>
       </div>
-
+      </div>
+      </div>
     </div>
 
-    <div class="control_ribbon" style="position: absolute; top: 45px; width: 590px;"
-      [style.left]="panel_left + 520 + 'px'">
-
-      <!--
-      <div class="map_container_controls">
-          <label for="rowClustering">Cluster Samples</label><br>
-          <mat-slide-toggle
-            class=""
-            color = "primary"
-            [(ngModel)]="config.isRowClusteringOn"
-            [disabled]="" 
-            (click)="toggleRowClustering()"
-          >
-          </mat-slide-toggle>
-          &nbsp;
-          <button class="settings_button" (click)="openSignificanceTestingPanel()"></button>
+    <div class="control_ribbon" style="position: absolute; top: 45px; width: 210px;"
+      [style.left]="control_ribbon_left + 135 + 'px'">
+      <div class="map_container_controls_end">
+        <label for="syncViz">Synchronize Heatmap Features</label><br>Off&nbsp;
+        <mat-slide-toggle class="" color="primary" [(ngModel)]="config.isDatasetLinkingOn" [disabled]=""
+          (change)="toggleDatasetLinking()" ></mat-slide-toggle>&nbsp;
+        <button class="settings_button" (click)="openDatasetLinkingPanel()"></button>
       </div>
-      -->
+    </div>
+
+    <div class="control_ribbon" style="position: absolute; top: 45px; width: 600px;"
+      [style.left]="control_ribbon_left + 135 + 220 + 'px'">
 
       <div class="map_container_controls">
         <label for="rowOrdering">Order Samples By</label><br>
-        <div style="padding-top: 5px;">
+        <div>
           <select name="rowOrdering" [ngModel]="config.sampleOrderingScheme"
             (ngModelChange)="setSampleOrderingScheme($event)">
             <option *ngFor="let sos of sample_ordering_schemes; let i = index" [value]="i"
@@ -105,7 +49,7 @@
 
       <div class="map_container_controls">
         <label for="colOrdering">Order Genes By</label><br>
-        <div style="padding-top: 5px;">
+        <div>
           <select name="colOrdering" [ngModel]="config.columnOrderingScheme"
             (ngModelChange)="setColumnOrderingScheme($event)">
             <option *ngFor="let cos of column_ordering_schemes; let i = index" [value]="i"
@@ -119,16 +63,16 @@
       </div>
 
       <div class="map_container_controls_end">
-        <label for="geneFiltering">Show Only Significant</label><br>Genes&nbsp;
+        <label for="geneFiltering">Show Only Significant Genes</label><br>Off&nbsp;
         <mat-slide-toggle class="" color="primary" [(ngModel)]="config.isGeneFilteringOn" [disabled]=""
-          (click)="toggleGeneFiltering()"></mat-slide-toggle>&nbsp;
+          (change)="toggleGeneFiltering()"></mat-slide-toggle>&nbsp;
         <button class="settings_button" (click)="openSignificanceTestingPanel()"></button>
       </div>
 
     </div>
 
-    <div class="control_ribbon" style="position: absolute; top: 45px; width: 640px"
-      [style.left]="panel_left + 520 + 600 + 'px'">
+    <div class="control_ribbon" style="position: absolute; top: 45px; width: 550px"
+      [style.left]="control_ribbon_left + 135 + 220 + 610 + 'px'">
       <div class="map_container_controls">
         <label>Display Genes Along</label><br>
         <mat-radio-group class="align-radio-group">
@@ -154,40 +98,6 @@
           <rect x="78" y="8" height="6" width="6"
             [ngClass]="{'map_resolution_rect': config.mapResolution!='XS', 'map_resolution_rect_selected': config.mapResolution=='XS'}"
             (click)="setMapResolution('XS')"></rect>
-        </svg>
-      </div>
-
-      <div class="map_container_controls">
-        <label>Layout</label> <br>
-        <svg width="40" height="26" (click)="setGridLayout(2)">
-          <rect x="2" y="2" height="10" width="10"
-            [ngClass]="{'grid_layout_rect': config.gridLayout<=0, 'grid_layout_rect_selected': config.gridLayout>0}">
-          </rect>
-          <rect x="16" y="2" height="10" width="10"
-            [ngClass]="{'grid_layout_rect': config.gridLayout<=0, 'grid_layout_rect_selected': config.gridLayout>0}">
-          </rect>
-          <rect x="16" y="16" height="10" width="10"
-            [ngClass]="{'grid_layout_rect': config.gridLayout<=0, 'grid_layout_rect_selected': config.gridLayout>0}">
-          </rect>
-          <rect x="2" y="16" height="10" width="10"
-            [ngClass]="{'grid_layout_rect': config.gridLayout<=0, 'grid_layout_rect_selected': config.gridLayout>0}">
-          </rect>
-        </svg>
-        <svg width="40" height="26" (click)="setGridLayout(-1)">
-          <rect x="2" y="2" height="24" width="10"
-            [ngClass]="{'grid_layout_rect': config.gridLayout!=-1, 'grid_layout_rect_selected': config.gridLayout==-1}">
-          </rect>
-          <rect x="16" y="2" height="24" width="10"
-            [ngClass]="{'grid_layout_rect': config.gridLayout!=-1, 'grid_layout_rect_selected': config.gridLayout==-1}">
-          </rect>
-        </svg>
-        <svg width="30" height="26" (click)="setGridLayout(-2)">
-          <rect x="2" y="2" height="10" width="24"
-            [ngClass]="{'grid_layout_rect': config.gridLayout!=-2, 'grid_layout_rect_selected': config.gridLayout==-2}">
-          </rect>
-          <rect x="2" y="16" height="10" width="24"
-            [ngClass]="{'grid_layout_rect': config.gridLayout!=-2, 'grid_layout_rect_selected': config.gridLayout==-2}">
-          </rect>
         </svg>
       </div>
 
@@ -227,81 +137,50 @@
         </ng-template>
       </div>
 
-
     </div>
-
 
   </ng-container>
+  <!--Control Ribbon-->
 
-  <div style="position: absolute; top: 125px; border:1px solid black" [style.left]="panel_left + 'px'">
-    <div *ngFor="let i of N" style="position: absolute; border:1px solid black" [style.top]="layout.map_tops[i] + 'px'"
-      [style.left]="layout.map_lefts[i] + 'px'" [style.height]="layout.map_height + 'px'"
-      [style.width]="layout.map_width + 'px'">
-      <app-heatmap [analysis_name]="analysis_name" [layout]="heatmap_layout" [global_data]="common_heatmap_data"
-        [nSamples]="config.rowsPerPageDisplayed" [nEntrez]="config.colsPerPageDisplayed"
-        [datasetName]="layout.dataset_names[i]" [sampleStartIndex]="config.current_sample_start"
-        [entrezStartIndex]="config.current_feature_start" [mapResolution]="config.mapResolution"
+  <!--Heatmaps and Linkages-->
+  <div style="position: absolute; border:0px solid black" [style.left]="'10px'" [style.top]="(1-isForPrint)*125 + 'px'">
+
+    <!--Heatmaps-->
+    <div *ngFor="let i of N" style="position: absolute; border:0px solid black" [style.top]="layout.map_tops[i] + 'px'"
+      [style.left]="heatmap_panel_left + layout.map_lefts[i] + 'px'" [style.height]="layout.map_heights[i] + 'px'"
+      [style.width]="layout.map_widths[i] + 'px'">
+      <app-heatmap [analysis_name]="analysis_name" [global_data]="common_heatmap_data"
+        [datasetName]="layout.dataset_names[i]" [mapResolution]="config.mapResolution"
         [clinicalFilters]="clinicalFilters" [geneTags]="geneTags" [sortBy]="config.sortBy"
         [feature_list_names]="feature_list_names" [sample_list_names]="sample_list_names" 
-        [load_count]="load_count" [isTransposed]="config.mapOrientation" 
+        [load_count]="load_count" [load_layout_count]="load_layout_count" [isTransposed]="config.mapOrientation" [isForPrint]="isForPrint"
         (onSortOrderChange)="childSortOrderChanged($event)" (onNeighborsChange)="neighborsChanged($event)"
         (onListChange)="childListChanged($event)">
       </app-heatmap>
     </div>
-  </div>
+    <!--Heatmaps-->
 
-  <!--
-  <div *ngIf="config.mapOrientation==0; else transposed_view" style="position: absolute; top: 125px; border:1px solid black" [style.left]="panel_left + 'px'">
-    <div *ngFor="let i of N" style="position: absolute; border:1px solid black" [style.top]="layout.map_tops[i] + 'px'"
-      [style.left]="layout.map_lefts[i] + 'px'" [style.height]="layout.map_height + 'px'"
-      [style.width]="layout.map_width + 'px'">
-      <app-heatmap [analysis_name]="analysis_name" [layout]="heatmap_layout" [global_data]="common_heatmap_data"
-        [nSamples]="config.rowsPerPageDisplayed" [nEntrez]="config.colsPerPageDisplayed"
-        [datasetName]="layout.dataset_names[i]" [sampleStartIndex]="config.current_sample_start"
-        [entrezStartIndex]="config.current_feature_start" [mapResolution]="config.mapResolution"
-        [clinicalFilters]="clinicalFilters" [geneTags]="geneTags" [sortBy]="config.sortBy"
-        [feature_list_names]="feature_list_names" [sample_list_names]="sample_list_names" 
-        [load_count]="load_count" [isTransposed]="config.mapOrientation" 
-        (onSortOrderChange)="childSortOrderChanged($event)" (onNeighborsChange)="neighborsChanged($event)"
-        (onListChange)="childListChanged($event)">
-      </app-heatmap>
+    <!--Linkages-->
+    <div *ngFor="let i of N_minus_one" style="position: absolute; border:0px solid black" [style.top]="layout.map_links_tops[i] + 'px'"
+      [style.left]="heatmap_panel_left + layout.map_links_lefts[i] + 'px'" [style.height]="layout.map_links_heights[i] + 'px'"
+      [style.width]="layout.map_links_widths[i] + 'px'">
+      <app-map-links [analysis_name]="analysis_name"
+        [datase_name_1]="layout.dataset_names[i]" [datase_name_2]="layout.dataset_names[i+1]" 
+        [height]="layout.map_links_heights[i]" [width]="layout.map_links_widths[i]"
+        [load_count]="load_count" [load_layout_count]="load_layout_count" [isTransposed]="config.mapOrientation">
+      </app-map-links>
     </div>
+    <!--Linkages-->
+
   </div>
-
-  <ng-template #transposed_view>
-    <div style="position: absolute; top: 125px; border:1px solid black" [style.left]="panel_left + 'px'">
-      <div *ngFor="let i of N" style="position: absolute; border:1px solid black" [style.top]="layout.map_tops[i] + 'px'"
-        [style.left]="layout.map_lefts[i] + 'px'" [style.width]="layout.map_height + 'px'"
-        [style.height]="layout.map_width + 'px'">
-        <app-heatmap [analysis_name]="analysis_name" [layout]="heatmap_layout" [global_data]="common_heatmap_data"
-          [nSamples]="config.rowsPerPageDisplayed" [nEntrez]="config.colsPerPageDisplayed"
-          [datasetName]="layout.dataset_names[i]" [sampleStartIndex]="config.current_sample_start"
-          [entrezStartIndex]="config.current_feature_start" [mapResolution]="config.mapResolution"
-          [clinicalFilters]="clinicalFilters" [geneTags]="geneTags" [sortBy]="config.sortBy"
-          [feature_list_names]="feature_list_names" [sample_list_names]="sample_list_names" 
-          [load_count]="load_count" [isTransposed]="config.mapOrientation" 
-          (onSortOrderChange)="childSortOrderChanged($event)" (onNeighborsChange)="neighborsChanged($event)"
-          (onListChange)="childListChanged($event)">
-        </app-heatmap>
-      </div>
-    </div>
-  </ng-template>
-  -->
-
-  <div style="position: absolute; top: 125px; width: 250px; border: 1px solid black;"
-    [style.left]="panel_left + layout.legend_left_x + 'px'">
+  <!--Heatmaps and Linkages-->
+  
+  <!--Legends Panel-->
+  <div style="position: absolute; width: 250px; border: 1px solid rgb(128, 128, 128);"
+    [style.left]="heatmap_panel_left + layout.legend_left_x + 'px'" [style.top]="180-(isForPrint*100) + 'px'">
     <app-legends [analysis_name]="analysis_name" [load_count]="load_count"></app-legends>
   </div>
-
-
-  <ng-container *ngIf="isForPrint==0">
-    <div style="position: absolute; top: 125px; width: 350px; border: 1px solid black;"
-      [style.left]="panel_left + 265 + layout.legend_left_x + 'px'">
-      <app-list-panel [analysis_name]="analysis_name" [lists]="lists" (onListChange)="childListChanged($event)"
-        (visualizeListChange)="visualizeList($event)">
-      </app-list-panel>
-    </div>
-  </ng-container>
+  <!--Legends Panel-->
 
 </ng-container>
 

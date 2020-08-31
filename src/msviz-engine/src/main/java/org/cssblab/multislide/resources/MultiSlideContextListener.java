@@ -5,11 +5,10 @@
  */
 package org.cssblab.multislide.resources;
 
-import org.cssblab.multislide.utils.SessionManager;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -20,14 +19,19 @@ import org.apache.logging.log4j.LogManager;
 
 import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.spark.sql.SparkSession;
 import org.cssblab.multislide.graphics.ColorPalette;
 import org.cssblab.multislide.graphics.PyColorMaps;
+import org.cssblab.multislide.structure.AnalysisContainer;
+import org.cssblab.multislide.utils.Utils;
 /**
  *
  * @author soumitag
  */
 @WebListener("application context listener")
 public class MultiSlideContextListener implements ServletContextListener {
+
+    public static int N_SPARK_PARTITIONS = 1;
 
     /**
      * Initialize log4j when the application is being started
@@ -37,26 +41,29 @@ public class MultiSlideContextListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent event) {
         
         // set install path
+        Map <String, String> env = System.getenv();
+        String install_path = env.get("MULTISLIDE_HOME");
+        
         ServletContext context = event.getServletContext();
+        /*
         String install_path = context.getInitParameter("install-path");
         context.setAttribute("install_path", install_path);
+        */
         
         // initialize log4
-        //String log4jConfigFile = context.getInitParameter("log4j-config-location");
-        //String fullPath = context.getRealPath("") + File.separator + log4jConfigFile;
         String fullPath = install_path + File.separator + "config" + File.separator + "log4j_config.xml";
         try {
             ConfigurationSource source = new ConfigurationSource (new FileInputStream (fullPath));
             Configurator.initialize(null, source);
         } catch (Exception e) {
-            System.out.println("Failed to initialize logging service.");
+            Utils.log_exception(e,"Failed to initialize logging service.");
         }
         
         Logger logger = LogManager.getRootLogger();
         //context.setAttribute("logger", logger);
         
-        logger.trace("TRACE: Logger Ready.");
-        logger.error("ERROR: Logger Ready.");
+        logger.trace("Logger Ready.");
+        logger.error("Logger Ready.");
         
         //set colormaps
         PyColorMaps colormaps = new PyColorMaps(install_path + File.separator + "db" + File.separator + "py_colormaps");
@@ -71,11 +78,37 @@ public class MultiSlideContextListener implements ServletContextListener {
         ColorPalette gene_group_color_palette = new ColorPalette(install_path + File.separator + "db" + File.separator + "gene_group_color_palette.txt");
         context.setAttribute("gene_group_color_palette", gene_group_color_palette);
         
-        HashMap <Integer, String> identifier_name_map = createIdentifierNameMap();
+        HashMap <Integer, String> identifier_name_map = AnalysisContainer.createIdentifierNameMap();
         context.setAttribute("identifier_name_map", identifier_name_map);
         
-        HashMap <String, Integer> identifier_index_map = createIdentifierIndexMap();
+        HashMap <String, Integer> identifier_index_map = AnalysisContainer.createIdentifierIndexMap();
         context.setAttribute("identifier_index_map", identifier_index_map);
+        
+        //get analytics_server_address from pyslide_queue_manager
+        context.setAttribute("analytics_server_address", "http://127.0.0.1:5000");
+        
+        /*
+        Start spark session
+        */
+        
+        //System.setProperty("hadoop.home.dir", "C:\\hadoop");
+        
+        SparkSession spark = SparkSession.builder()
+                                         .appName("MultiSLIDE")
+                                         .config("key", "value")
+                                         .master("local[*]")
+                                         .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+                                         .config("spark.executor.memory", "4g")
+                                         .config("spark.kryo.unsafe", "true")
+                                         .config("spark.broadcast.compress", "false")
+                                         .config("spark.default.parallelism", N_SPARK_PARTITIONS + "")
+                                         .config("spark.sql.shuffle.partitions", N_SPARK_PARTITIONS + "")
+                                         .config("spark.sql.inMemoryColumnarStorage.compressed","false")
+                                         .config("spark.sql.warehouse.dir", install_path + File.separator + "temp")
+                                         .getOrCreate();
+        //this.spark_session.conf().set("spark.executor.memory", "10g");
+        spark.sparkContext().setLogLevel("OFF");
+        context.setAttribute("spark", spark);
     }
     
     @Override
@@ -83,29 +116,4 @@ public class MultiSlideContextListener implements ServletContextListener {
         // do nothing
     }
     
-    private HashMap <Integer, String> createIdentifierNameMap() {
-        HashMap <Integer, String> identifier_name_map = new HashMap <> ();
-        identifier_name_map.put(0, "entrez_2021158607524066");
-        identifier_name_map.put(1, "genesymbol_2021158607524066");
-        identifier_name_map.put(2, "refseq_2021158607524066");
-        identifier_name_map.put(3, "ensembl_gene_id_2021158607524066");
-        identifier_name_map.put(4, "ensembl_transcript_id_2021158607524066");
-        identifier_name_map.put(5, "ensembl_protein_id_2021158607524066");
-        identifier_name_map.put(6, "uniprot_id_2021158607524066");
-        identifier_name_map.put(7, "mirna_id_2021158607524066");
-        return identifier_name_map;
-    }
-    
-    private HashMap <String, Integer> createIdentifierIndexMap() {
-        HashMap <String, Integer> identifier_index_map  = new HashMap <> ();
-        identifier_index_map.put("entrez_2021158607524066", 0);
-        identifier_index_map.put("genesymbol_2021158607524066", 1);
-        identifier_index_map.put("refseq_2021158607524066", 2);
-        identifier_index_map.put("ensembl_gene_id_2021158607524066", 3);
-        identifier_index_map.put("ensembl_transcript_id_2021158607524066", 4);
-        identifier_index_map.put("ensembl_protein_id_2021158607524066", 5);
-        identifier_index_map.put("uniprot_id_2021158607524066", 6);
-        identifier_index_map.put("mirna_id_2021158607524066", 7);
-        return identifier_index_map;
-    }
 }

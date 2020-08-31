@@ -55,8 +55,8 @@ public class MultiSlideConfig {
             return nameValuePairs;
             
         } catch (Exception e) {
-            System.out.println("Error reading config file:");
-            System.out.println(e);
+            Utils.log_info("Error reading config file:");
+            Utils.log_exception(e, "");
             return null;
         }
     }

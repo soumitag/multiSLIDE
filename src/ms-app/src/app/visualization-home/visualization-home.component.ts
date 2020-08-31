@@ -21,13 +21,23 @@ export class VisualizationHomeComponent implements OnInit {
   constructor(private activatedRoute: ActivatedRoute) { }
 
   ngOnInit() {
+    let is_load_analysis = false;
     this.activatedRoute.queryParams.subscribe(params => {
       this.analysis_name = params['analysis_name'];
       for (let key in params) {
+        if (key == 'source') {
+          if (params['source'] == 'load_analysis') {
+            is_load_analysis = true;
+          }
+        }
         console.log(key + ": " + params[key]);
       }
     });
-    this.containerDisplayOn = false;
+    if (is_load_analysis) {
+      this.containerDisplayOn = true;
+    } else {
+      this.containerDisplayOn = false;
+    }
   }
 
   notifyChangesToMapContainer() {
@@ -37,6 +47,10 @@ export class VisualizationHomeComponent implements OnInit {
 
   onListChange() {
     this.list_change_count++;
+  }
+
+  onConnectionChange() {
+    this.load_count++;
   }
 
   notifyToggleToSelectionPanel(){

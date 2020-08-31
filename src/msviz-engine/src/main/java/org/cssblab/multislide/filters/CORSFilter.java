@@ -12,6 +12,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.cssblab.multislide.utils.Utils;
  
 /**
  * Servlet Filter implementation class CORSFilter
@@ -42,11 +43,12 @@ public class CORSFilter implements Filter, Serializable {
             throws IOException, ServletException {
  
         HttpServletRequest request = (HttpServletRequest) servletRequest;
-        System.out.println("CORSFilter HTTP Request: " + request.getMethod());
+        Utils.log_info("CORSFilter HTTP Request: " + request.getMethod());
  
         // Authorize (allow) all domains to consume the content
         ((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Origin", "http://localhost:4200");
-        //((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Origin", "*");
+        //////((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Origin", "*");
+        //((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Origin", "http://137.132.97.109:56695/multislide");
         ((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Headers", "origin, content-type, accept, authorization");
         ((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Credentials", "true");
         ((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Methods","GET, OPTIONS, HEAD, PUT, POST");

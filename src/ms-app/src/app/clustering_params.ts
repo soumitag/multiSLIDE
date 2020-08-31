@@ -1,5 +1,13 @@
 export class ClusteringParams {
-    type: number;
+    /*
+    is_joint: boolean;
+    use_aggregate: boolean;
+    aggregate_func: string;
+    */
+    /*
+    has_multiple_data_levels: boolean;
+    */
+    type: number; /* row or column clustering */
     dataset: string;
     use_defaults: boolean;
     linkage_function: number;

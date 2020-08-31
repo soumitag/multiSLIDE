@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { ClusteringService } from './clustering.service';
+/*import { ClusteringService } from './clustering.service';*/
 
 describe('ClusteringService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

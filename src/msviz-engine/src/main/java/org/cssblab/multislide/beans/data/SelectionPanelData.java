@@ -21,7 +21,7 @@ public class SelectionPanelData implements Serializable {
     public String[] dataset_names;
     
     public SelectionPanelData(AnalysisContainer analysis) {
-        this.phenotypes = analysis.data.clinical_info.getPhenotypes();
+        this.phenotypes = analysis.data.clinical_info.getPhenotypeNames();
         this.dataset_names = analysis.data.dataset_names;
     }
     

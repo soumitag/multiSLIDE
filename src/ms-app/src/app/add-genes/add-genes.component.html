@@ -1,0 +1,33 @@
+<ng-container *ngIf="data && state; else loading">
+  <mat-tab-group [selectedIndex]="selected.value" (selectedIndexChange)="selected.setValue($event)">
+    <mat-tab *ngFor="let tab of tabs; let index = index" [label]="tab">
+      <ng-container *ngIf="tab==='Search'">
+        <app-search-tab 
+          [analysis_name]="analysis_name" 
+          [current_search_results]="state.current_search_results" 
+          [selected_searches]="state.selected_searches" 
+          matTooltip = "Info about Search" 
+          (notify_changes_applied)="onChangesApplied($event)">
+        </app-search-tab>
+      </ng-container>
+      <ng-container *ngIf="tab==='Enrichment Analysis'">
+        <app-enrichment-analysis [analysis_name]="analysis_name"
+          [enrichment_analysis_params]="state.enrichment_analysis_params" 
+          [data]="data"
+          [enrichment_analysis_results]="state.selected_enriched_groups"
+          [selected_pathways]="" 
+          (notify_changes_applied)="onChangesApplied($event)">
+        </app-enrichment-analysis>
+      </ng-container>
+      <ng-container *ngIf="tab==='Upload'">
+        <app-upload-search-tab [analysis_name]="analysis_name"
+          [uploaded_filename]="state.uploaded_filename" 
+          [functional_groups_in_file]="state.functional_groups_in_file" 
+          [selected_functional_groups]="state.selected_functional_groups" 
+          (notify_changes_applied)="onChangesApplied($event)">
+        </app-upload-search-tab>
+      </ng-container>
+    </mat-tab>
+  </mat-tab-group>
+</ng-container>
+<ng-template #loading>Fetching Data From Server...</ng-template>

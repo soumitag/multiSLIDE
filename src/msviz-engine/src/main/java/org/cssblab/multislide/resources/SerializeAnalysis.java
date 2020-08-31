@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +19,7 @@ import org.cssblab.multislide.datahandling.DataParsingException;
 import org.cssblab.multislide.datahandling.RequestParam;
 import org.cssblab.multislide.structure.AnalysisContainer;
 import org.cssblab.multislide.structure.Serializer;
+import org.cssblab.multislide.utils.Utils;
 
 /**
  *
@@ -65,10 +67,15 @@ public class SerializeAnalysis extends HttpServlet {
             
             if (action.equalsIgnoreCase("generate")) {
                 
-                String filename = analysis_name + ".mslide";
+                // get base path for analysis
+                ServletContext context = request.getServletContext();
+                String installPath = (String) context.getAttribute("install_path");
+                String session_id = session.getId();
+                
+                String session_folder_path = installPath + File.separator + "temp" + File.separator + session_id;
                 String analysis_filepath = analysis.base_path + File.separator  + "data";
                 Serializer serializer = new Serializer();
-                serializer.serializeAnalysis(analysis, analysis_filepath);
+                String filename = serializer.serializeAnalysis(analysis, analysis_filepath, session_folder_path, Serializer.TYPE_JSON);
                 returnMessage(new ServerResponse(1, filename, ""), response);
                 
             } else if (action.equalsIgnoreCase("download")) {
@@ -101,10 +108,10 @@ public class SerializeAnalysis extends HttpServlet {
             }
 
         } catch (DataParsingException dpe) {
-            System.out.println(dpe);
+            Utils.log_exception(dpe, "Data parsing exception");
             returnMessage(new ServerResponse(0, "Data parsing exception", dpe.getMessage()), response);
         } catch (Exception e) {
-            System.out.println(e);
+            Utils.log_exception(e, "");
             returnMessage(new ServerResponse(0, "Data parsing exception", e.getMessage()), response);
         }
     }

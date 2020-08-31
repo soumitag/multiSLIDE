@@ -7,37 +7,101 @@ package org.cssblab.multislide.structure;
 
 import com.google.gson.Gson;
 import java.io.Serializable;
+import java.util.ArrayList;
+import org.cssblab.multislide.beans.data.DatasetSpecs;
+import org.cssblab.multislide.structure.data.Data;
+import org.cssblab.multislide.utils.CollectionUtils;
 
 /**
  *
- * @author abhikdatta
+ * @author Soumita Ghosh and Abhik Datta
  */
 public class MapConfig implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
-    public String[] custom_gene_identifiers;
-    public double data_min;
-    public double data_max;
-
-    public String columnLabel;
-    public String binningRange;
-    public int nColors;
-    public String colorScheme;
-    public double binningRangeStart;
-    public double binningRangeEnd;
+    public static final transient String AGGREGATE_FUNC_MIN = "Minimum";
+    public static final transient String AGGREGATE_FUNC_MEAN = "Mean";
+    public static final transient String AGGREGATE_FUNC_MAX = "Maximum";
+    //public static final transient String AGGREGATE_FUNC_MEDIAN = "Median";
     
-    public MapConfig() {
-        this.custom_gene_identifiers = new String[0];
+    private double data_min;
+    private double data_max;
+
+    //public String columnLabel;
+    private String binningRange;
+    private int nColors;
+    private String colorScheme;
+    private double binningRangeStart;
+    private double binningRangeEnd;
+    
+    /*
+    New parameters
+    */
+    private String[] available_feature_identifiers;
+    
+    /*
+    has_linker is true if this dataset has a linler column
+    */
+    public boolean has_linker;
+    
+    /*
+    User selected column identifier(s) from the list of available column identifiers
+    */
+    public String[] selected_feature_identifiers;
+    
+    /*
+    if true, data will be aggregated by linker column
+    can only be true if has_linker is true
+    */
+    public boolean show_aggregated;
+    
+    /*
+    only used when show_aggregated is true
+    */
+    public String aggregate_function;
+    
+    
+    public MapConfig(String dataset_name, AnalysisContainer analysis) {
         
+        DatasetSpecs specs = analysis.data.datasets.get(dataset_name).specs;
+        
+        /*
+        Set linker: used to choose display options
+        */
+        this.has_linker = specs.has_linker;
+        
+        /*
+        linker and other identifier columns (if any)
+        */
+        this.available_feature_identifiers = CollectionUtils.asArray(specs.getLinkerAndIdentifierColumnNames());
+        
+        /*
+        set default feature label
+        */
+        if (specs.has_linker) {
+            if (specs.has_additional_identifiers) {
+                this.selected_feature_identifiers = new String[]{specs.getLinkerColname(), specs.identifier_metadata_columns[0]};
+            } else {
+                this.selected_feature_identifiers = new String[]{specs.getLinkerColname()};
+            }
+        } else {
+            this.selected_feature_identifiers = new String[]{specs.identifier_metadata_columns[0]};
+        }
+        
+        /*
+        by default coarse view is shown
+        */
+        show_aggregated = false;
+        aggregate_function = MapConfig.AGGREGATE_FUNC_MEAN;
     }
     
-    public String[] getCustomGeneIdentifiers() {
-        return custom_gene_identifiers;
+    public String[] getAvailableFeatureIdentifiers() {
+        return available_feature_identifiers;
     }
 
-    public void setCustomGeneIdentifiers(String[] custom_gene_identifiers) {
-        this.custom_gene_identifiers = custom_gene_identifiers;
+    public void setAvailableFeatureIdentifiers(String[] custom_gene_identifiers) {
+        this.available_feature_identifiers = custom_gene_identifiers;
     }
 
     public double getDataMin() {
@@ -56,12 +120,12 @@ public class MapConfig implements Serializable {
         this.data_max = Math.round(data_max * 100.0)/100.0;
     }
     
-    public String getColumnLabel() {
-        return columnLabel;
+    public String[] getSelectedFeatureIdentifiers() {
+        return selected_feature_identifiers;
     }
 
-    public void setColumnLabel(String columnLabel) {
-        this.columnLabel = columnLabel;
+    public void setSelectedFeatureIdentifiers(String[] selected_feature_identifiers) {
+        this.selected_feature_identifiers = selected_feature_identifiers;
     }
 
     public String getBinningRange() {
@@ -103,8 +167,26 @@ public class MapConfig implements Serializable {
     public void setBinningRangeEnd(double binningRangeEnd) {
         this.binningRangeEnd = binningRangeEnd;
     }
+
+    public void setShowAggregated(boolean show_aggregated) {
+        this.show_aggregated = show_aggregated;
+    }
     
+    public boolean showAggregated() {
+        return this.show_aggregated;
+    }
+    
+    public void setAggregateFunction(String aggregate_function) {
+        this.aggregate_function = aggregate_function;
+    }
+    
+    public String getAggregateFunction() {
+        return this.aggregate_function;
+    }
+
     public String mapConfigAsJSON () {
         return new Gson().toJson(this);
     }
+    
+    
 }

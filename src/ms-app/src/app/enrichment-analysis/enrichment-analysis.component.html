@@ -1,0 +1,133 @@
+<ng-container *ngIf="fetching_view==0; else loading">
+<ng-container *ngIf="results_view==1 && enrichment_analysis_results; else form_view">
+  <div style="width: 900px;">
+  <div style="position: relative; top: 15px; left: 10px; height: 800px; width: 450px; display:inline-block;">
+    <div class="enrichment_results_container">
+      <div *ngFor="let result of enrichment_analysis_results; let i = index" class="enrichment_result_tr">
+        <!--<div (click)="toggleResult(i)"
+          [ngClass]="{'enrichment_result_td_selected': isPathSelected(i), 'enrichment_result_td': !isPathSelected(i)}"
+          [matTooltip]="'Path: [' + result.pathid + ']'">{{result.pathname}}</div>-->
+        <div>
+          <div *ngIf="is_selected[i];then add else remove"></div>
+          <ng-template #add>
+            <div class="enrichment_result_td_selected" [matTooltip]="'Path: [' + result.pathid + ']'">{{result.pathname}}</div>
+            <div class="minus_button" (click)="toggleResult(i)"></div>
+          </ng-template>
+          <ng-template #remove>
+            <div class="enrichment_result_td" [matTooltip]="'Path: [' + result.pathid + ']'">{{result.pathname}}</div>
+            <div class="plus_button" (click)="toggleResult(i)"></div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="position: relative; top: 30px; left: 10px; height: 800px; width: 450px; display:inline-block; float:right;">
+    <div class="enrichment_container">
+      <div *ngFor="let selected of selected_pathways" id="datasets_div" class="select_block"
+        [matTooltip]="'Path: [' + selected.path_id + ']'">
+        {{selected.path_name}}
+        <div class="minus_button" (click)="removeSelectedPathway(selected)"></div>
+      </div>
+    </div>
+  </div>
+  </div>
+  <div style="height: 80px;" class="apply_changes_div2">
+    <button type="button" (click)="results_view=0">Back</button>
+    &nbsp;&nbsp;
+    <button type="button" (click)="saveEnrichmentAnalysisFile()">Download</button>
+    &nbsp;&nbsp;
+    <button type="button" (click)="applyChanges()">Apply Changes</button>
+  </div>
+</ng-container>
+
+<ng-template #form_view>
+  <div class="hc_title">Differential Analysis</div>
+  <div class="hc_module_controls">
+    <div style="position: relative; top: 15px; left: 10px; height: 80px">
+      <label for="selectedDataset">Dataset</label><br>
+      <select name="selectedDataset" [(ngModel)]="enrichment_analysis_params.dataset">
+        <option *ngFor="let dataset of data.dataset_names; let i = index" [value]="dataset"
+          [attr.selected]="dataset == enrichment_analysis_params.dataset ? true : null">
+          {{dataset}}
+        </option>
+      </select>
+    </div>
+    <div style="position: relative; top: 15px; left: 10px; height: 80px">
+      <label for="selectedPhenotype">Phenotype</label><br>
+      <select name="selectedPhenotype" [(ngModel)]="enrichment_analysis_params.phenotype">
+        <option *ngFor="let phenotype of data.phenotypes; let i = index" [value]="phenotype"
+          [attr.selected]="phenotype == enrichment_analysis_params.phenotype ? true : null">
+          {{phenotype}}
+        </option>
+      </select>
+    </div>
+    <div style="position: relative; top: 15px; left: 10px; height: 80px">
+      <label for="selectedTesttype">Test Type</label><br>
+      <select name="selectedTesttype" [(ngModel)]="enrichment_analysis_params.testtype">
+        <option *ngFor="let testtype of testtypes; let i = index" [value]="testtype"
+          [attr.selected]="testtype == enrichment_analysis_params.testtype ? true : null">
+          {{testtype}}
+        </option>
+      </select>
+    </div>
+    <div style="position: relative; top: 15px; left: 10px; height: 80px">
+      <label for="significanceLevel">Significance Level</label><br>
+      <input type="number" name="significanceLevel" min="0.000000" max="1" placeholder="0.050000" step="0.010000"
+        size="8" [(ngModel)]="enrichment_analysis_params.significance_level_d"
+        [value]="enrichment_analysis_params.significance_level_d">
+    </div>
+
+    <div style="position: relative; top: 15px; left: 10px; height: 120px">
+      <div style="height: 30px">
+        <input type="checkbox" name="apply_fdr_d" [(ngModel)]="enrichment_analysis_params.apply_fdr_d"
+          [checked]="enrichment_analysis_params.apply_fdr_d">
+        <label for="applyfdr_d">Multiple Testing Correction</label><br>
+      </div>
+      <div style="height:80px">
+        <label for="applyfdr">False Discovery Rate</label><br>
+        <input type="number" name="fdr" min="1" max="100" placeholder="1" step="1" size="3"
+          [(ngModel)]="enrichment_analysis_params.fdr_threshold_d" [value]="enrichment_analysis_params.fdr_threshold_d">
+        <label for="fdr">% (Enter a number between 1-100)</label>
+      </div>
+    </div>
+    <div class="hc_title">Enrichment Analysis</div>
+    <div style="position: relative; top: 15px; left: 10px; height: 70px">
+      <div style="height: 15px;">
+        <label for="enrichPathway">Enrichment Type</label>
+      </div><br>
+      <input type="checkbox" value="" [(ngModel)]="enrichment_analysis_params.use_pathways"
+        [checked]="enrichment_analysis_params.use_pathways">
+      <label for="enrichPathway">Pathway</label>&nbsp;
+      <input type="checkbox" name="enrichGO" value="" [(ngModel)]="enrichment_analysis_params.use_ontologies"
+        [checked]="enrichment_analysis_params.use_ontologies">
+      <label for="enrichGO">Gene Ontology Terms</label><br>
+    </div>
+    <div style="position: relative; top: 15px; left: 10px; height: 80px">
+      <label for="significanceLevelEn">Significance Level</label><br>
+      <input type="number" name="significanceLevelEn" min="0.000001" max="1" placeholder="0.050000" step="0.010000"
+        size="8" [(ngModel)]="enrichment_analysis_params.significance_level_e"
+        [value]="enrichment_analysis_params.significance_level_e">
+    </div>
+
+    <div style="position: relative; top: 15px; left: 10px; height: 120px">
+      <div style="height: 30px">
+        <input type="checkbox" name="apply_fdr_e" [(ngModel)]="enrichment_analysis_params.apply_fdr_e"
+          [checked]="enrichment_analysis_params.apply_fdr_e">
+        <label for="applyfdr_e">Multiple Testing Correction</label>
+      </div>
+      <div style="height:80px">
+
+        <label for="fdr">False Discovery Rate</label><br>
+        <input [disabled]="!enrichment_analysis_params.apply_fdr_e" type="number" name="fdr" min="1" max="100"
+          placeholder="1" step="1" size="3" [(ngModel)]="enrichment_analysis_params.fdr_threshold_e"
+          [value]="enrichment_analysis_params.fdr_threshold_e">
+        <label for="fdr">% (Enter a number between 1-100)</label>
+      </div>
+    </div>
+    <div class="apply_changes_div">
+      <button type="button" (click)="saveChanges()">Test Enrichment</button>
+    </div><br><br><br>
+  </div>
+</ng-template>
+</ng-container>
+<ng-template #loading>Running Enrichment Analysis..</ng-template>

@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
-import { HttpModule } from '@angular/http';
+import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
@@ -25,7 +25,7 @@ import { SelectionPanelComponent } from './selection-panel/selection-panel.compo
 import { SearchService } from './search.service';
 import { AssortedService } from './assorted.service';
 import { AnalysisService } from './analysis.service';
-import { ClusteringService } from './clustering.service';
+/*import { ClusteringService } from './clustering.service'; */
 import { SignificanceTestingService } from './significance-testing.service';
 import { NetworkNeighborhoodComponent } from './network-neighborhood/network-neighborhood.component';
 import { LegendsComponent } from './legends/legends.component';
@@ -33,43 +33,40 @@ import { LegendsComponent } from './legends/legends.component';
 import { MenuPanelComponent } from './menu-panel/menu-panel.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import {
-  MatAutocompleteModule,
-  MatBadgeModule,
-  MatBottomSheetModule,
-  MatButtonModule,
-  MatButtonToggleModule,
-  MatCardModule,
-  MatCheckboxModule,
-  MatChipsModule,
-  MatDatepickerModule,
-  MatDialogModule,
-  MatDividerModule,
-  MatExpansionModule,
-  MatGridListModule,
-  MatIconModule,
-  MatInputModule,
-  MatListModule,
-  MatMenuModule,
-  MatNativeDateModule,
-  MatPaginatorModule,
-  MatProgressBarModule,
-  MatProgressSpinnerModule,
-  MatRadioModule,
-  MatRippleModule,
-  MatSelectModule,
-  MatSidenavModule,
-  MatSliderModule,
-  MatSlideToggleModule,
-  MatSnackBarModule,
-  MatSortModule,
-  MatStepperModule,
-  MatTableModule,
-  MatTabsModule,
-  MatToolbarModule,
-  MatTooltipModule,
-  MatTreeModule,
-} from '@angular/material';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatNativeDateModule, MatRippleModule } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSliderModule } from '@angular/material/slider';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSortModule } from '@angular/material/sort';
+import { MatStepperModule } from '@angular/material/stepper';
+import { MatTableModule } from '@angular/material/table';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatTreeModule } from '@angular/material/tree';
 import {CdkTableModule} from '@angular/cdk/table';
 import {CdkTreeModule} from '@angular/cdk/tree';
 import { HierarchicalClusteringComponent } from './hierarchical-clustering/hierarchical-clustering.component';
@@ -86,6 +83,19 @@ import { PhenotypeSortingComponent } from './phenotype-sorting/phenotype-sorting
 import { SaveWorkspaceComponent } from './save-workspace/save-workspace.component';
 import { CloseAnalysisComponent } from './close-analysis/close-analysis.component';
 import { DialogBoxComponent } from './dialog-box/dialog-box.component';
+import { EnrichmentAnalysisComponent } from './enrichment-analysis/enrichment-analysis.component';
+import { AddGenesComponent } from './add-genes/add-genes.component';
+import { SearchTabComponent } from './search-tab/search-tab.component';
+import { DatasetDialogComponent } from './dataset-dialog/dataset-dialog.component';
+import { UploadSearchTabComponent } from './upload-search-tab/upload-search-tab.component';
+import { HelpDialogComponent } from './help-dialog/help-dialog.component';
+import { DatasetLinkingComponent } from './dataset-linking/dataset-linking.component';
+import { MapLinksComponent } from './map-links/map-links.component';
+import * as PlotlyJS from 'plotly.js/dist/plotly.js';
+import { PlotlyModule } from 'angular-plotly.js';
+import { UploadConnectionComponent } from './upload-connection/upload-connection.component';
+
+PlotlyModule.plotlyjs = PlotlyJS;
 
 const appRoutes: Routes = [
   { path: '', component: HomepageComponent },
@@ -123,14 +133,22 @@ const appRoutes: Routes = [
     PhenotypeSortingComponent,
     SaveWorkspaceComponent,
     CloseAnalysisComponent,
-    DialogBoxComponent
+    DialogBoxComponent,
+    EnrichmentAnalysisComponent,
+    AddGenesComponent,
+    SearchTabComponent,
+    DatasetDialogComponent,
+    UploadSearchTabComponent,
+    HelpDialogComponent,
+    DatasetLinkingComponent,
+    MapLinksComponent,
+    UploadConnectionComponent
   ],
   imports: [
     RouterModule.forRoot(
       appRoutes,
       { enableTracing: true, useHash: true } // <-- debugging purposes only
     ), 
-	  HttpModule,
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
@@ -140,7 +158,10 @@ const appRoutes: Routes = [
     MatListModule,
     MatTooltipModule,
     MatSlideToggleModule,
-    MatRadioModule
+    MatRadioModule,
+    MatTabsModule,
+    CommonModule,
+    PlotlyModule
   ],
   providers: [
     HeatmapService, 
@@ -151,7 +172,7 @@ const appRoutes: Routes = [
     AssortedService,
     AnalysisService,
     ListService,
-    ClusteringService,
+    /* ClusteringService, */
     SignificanceTestingService
   ],
   bootstrap: [AppComponent],
@@ -206,7 +227,12 @@ const appRoutes: Routes = [
     PhenotypeSortingComponent,
     SaveWorkspaceComponent,
     CloseAnalysisComponent,
-    DialogBoxComponent
+    DialogBoxComponent,
+    EnrichmentAnalysisComponent,
+    AddGenesComponent,
+    DatasetDialogComponent,
+    HelpDialogComponent,
+    DatasetLinkingComponent
   ]
 })
 export class AppModule { }

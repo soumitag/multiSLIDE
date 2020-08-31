@@ -9,8 +9,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import org.cssblab.multislide.structure.MetaData;
 import org.cssblab.multislide.structure.MultiSlideException;
+import org.cssblab.multislide.structure.data.Data;
+import org.cssblab.multislide.utils.Utils;
 
 /**
  *
@@ -28,7 +29,7 @@ public final class SearchHandler implements Serializable {
     private SearchHandler() {}
 
     public static HashMap <String, ArrayList <SearchResultObject>> processSearchQuery (
-            String queryStr, Searcher searcher, MetaData metadata, boolean has_miRNA_data
+            String queryStr, Searcher searcher, Data data, boolean has_miRNA_data
     ) throws MultiSlideException {
         
         if(queryStr.contains(";")) {
@@ -36,7 +37,7 @@ public final class SearchHandler implements Serializable {
             HashMap <String, ArrayList <SearchResultObject>> search_results_map = new HashMap <String, ArrayList <SearchResultObject>> ();
             for(int i = 0; i < outer_list.length; i++){
                 String query = outer_list[i].trim().toLowerCase();
-                ArrayList <SearchResultObject> current_search_results = processQuery(query, searcher, metadata, has_miRNA_data);
+                ArrayList <SearchResultObject> current_search_results = processQuery(query, searcher, data, has_miRNA_data);
                 if (SearchHandler.queryHasKeyword(query)) {
                     search_results_map.put(query, current_search_results);
                 } else {
@@ -48,7 +49,7 @@ public final class SearchHandler implements Serializable {
         } else {
             HashMap <String, ArrayList <SearchResultObject>> search_results_map = new HashMap <String, ArrayList <SearchResultObject>> ();
             String query = queryStr.trim().toLowerCase();
-            ArrayList <SearchResultObject> current_search_results = processQuery(query, searcher, metadata, has_miRNA_data);
+            ArrayList <SearchResultObject> current_search_results = processQuery(query, searcher, data, has_miRNA_data);
             if (SearchHandler.queryHasKeyword(query)) {
                 search_results_map.put(query, current_search_results);
             } else {
@@ -59,11 +60,11 @@ public final class SearchHandler implements Serializable {
     }
     
     public static ArrayList <SearchResultObject> processQuery(
-            String query, Searcher searcher, MetaData metadata, boolean has_miRNA_data
+            String query, Searcher searcher, Data data, boolean has_miRNA_data
     ) throws MultiSlideException {
         
         if(query.contains("[") && query.contains("]")) {
-            return metadata.processMetaColQuery(query);
+            return data.processMetaColQuery(query);
         } else {
             return processDBQuery(query, searcher, has_miRNA_data);
         }
@@ -380,25 +381,23 @@ public final class SearchHandler implements Serializable {
 		try {
                     result_i = future.get();
 		} catch (InterruptedException | ExecutionException ee) {
-                    System.out.println("Execution Exception\n");
-                    System.out.println(ee);
-                    ee.printStackTrace();
+                    Utils.log_exception(ee, "Execution Exception\n");
                 }
 		collated_search_results.addAll(result_i);
             }
         } catch (Exception err) {
-            err.printStackTrace();
+            Utils.log_exception(err, "Execution Exception\n");
         }
         executor.shutdown();
         while (!executor.isTerminated()) {
             
         }
-        System.out.println("Finished all threads");
+        Utils.log_info("Finished all threads");
         return collated_search_results;
     }
     
     public static ArrayList <SearchResultObject> searchMultipleInAllDBs(String keyword, String search_type, String query, Searcher searcher) {
-        ArrayList <SearchResultObject> collated_search_results = new ArrayList <SearchResultObject> ();
+        ArrayList <SearchResultObject> collated_search_results = new ArrayList <> ();
         StringTokenizer st = new StringTokenizer(query, ",");
         while(st.hasMoreTokens()){
             ArrayList <SearchResultObject> result_i = null;
@@ -413,14 +412,14 @@ public final class SearchHandler implements Serializable {
     }
     
     public static HashMap<String, ArrayList<SearchResultObject>> makeSearchMap(ArrayList<SearchResultObject> current_search_results) {
-        HashMap<String, ArrayList<SearchResultObject>> search_results_map = new HashMap<String, ArrayList<SearchResultObject>>();
+        HashMap<String, ArrayList<SearchResultObject>> search_results_map = new HashMap <> ();
         for (int i = 0; i < current_search_results.size(); i++) {
             SearchResultObject sro = current_search_results.get(i);
             String query_key = sro.getQueryAsString();
             if (search_results_map.containsKey(query_key)) {
                 search_results_map.get(query_key).add(sro);
             } else {
-                ArrayList<SearchResultObject> temp = new ArrayList<SearchResultObject>();
+                ArrayList<SearchResultObject> temp = new ArrayList <> ();
                 temp.add(sro);
                 search_results_map.put(query_key, temp);
             }

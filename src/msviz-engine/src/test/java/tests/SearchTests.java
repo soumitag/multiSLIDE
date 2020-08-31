@@ -13,6 +13,7 @@ import org.cssblab.multislide.beans.data.ServerResponse;
 import org.cssblab.multislide.searcher.SearchHandler;
 import org.cssblab.multislide.searcher.SearchResultObject;
 import org.cssblab.multislide.searcher.Searcher;
+import org.cssblab.multislide.utils.Utils;
 
 /**
  *
@@ -35,24 +36,23 @@ public class SearchTests {
     public static void doSearch_Test(String query) {
         
         Searcher searcher = new Searcher("human");
-        HashMap <String, Boolean> entrezMaster = new HashMap <String, Boolean> ();
-
+        
         try {
             HashMap <String, ArrayList <SearchResultObject>> search_results_map = SearchHandler.processSearchQuery(query, searcher, null, false);
             
-            ArrayList <SearchResults> search_result_groups = SearchResults.compileSearchResults(search_results_map, entrezMaster, null);
+            ArrayList <SearchResults> search_result_groups = SearchResults.compileSearchResults(search_results_map, null);
         
             for(int i=0; i<search_result_groups.size(); i++) {
                 SearchResults srg = search_result_groups.get(i);
-                System.out.println(srg.getQuery());
+                Utils.log_info(srg.getQuery());
                 ArrayList <SearchResultSummary> summaries = srg.getSummaries();
                 for (int j=0; j<summaries.size(); j++) {
-                    System.out.println(summaries.get(j).html_display_tag_pre + "<" + summaries.get(j).html_display_tag_mid + ">" + summaries.get(j).html_display_tag_post);
+                    Utils.log_info(summaries.get(j).html_display_tag_pre + "<" + summaries.get(j).html_display_tag_mid + ">" + summaries.get(j).html_display_tag_post);
                 }
             }
             
         } catch (Exception e) {
-            System.out.println(e);
+            Utils.log_exception(e, "");
         }
         
     }

@@ -17,8 +17,14 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.StringTokenizer;
 import org.cssblab.multislide.datahandling.DataParsingException;
+import org.cssblab.multislide.structure.AnalysisContainer;
+import org.cssblab.multislide.structure.MultiSlideException;
 
 /**
  *
@@ -39,16 +45,14 @@ public class FileHandler {
                     list_data.add(line.trim().toLowerCase());
                 }
             } catch (Exception e) {
-                System.out.println("Error reading input data:");
-                System.out.println(e);
+                Utils.log_exception(e, "Error reading input data:");
             }
         } else {
             try {
                 br = new BufferedReader(new FileReader(filepath));
                 line = br.readLine();
             } catch (Exception e) {
-                System.out.println("Error reading input data:");
-                System.out.println(e);
+                Utils.log_exception(e, "Error reading input data:");
             }
             StringTokenizer st = new StringTokenizer(line, delimiter);
             while (st.hasMoreTokens()) {
@@ -214,6 +218,45 @@ public class FileHandler {
         
     }
     
+    public static List<List<String>> loadDelimListData (String inFile, String delim, boolean hasHeader) 
+    throws DataParsingException, IOException {
+             
+        BufferedReader br2 = null;
+        String line;
+        
+        List<List<String>> data = new ArrayList();
+        List<String> lineData;
+                
+        try {
+
+            br2 = new BufferedReader(new FileReader(inFile));
+            boolean isFirst = true;
+            
+            while ((line = br2.readLine()) != null) {
+
+                if (isFirst & hasHeader) {
+                    isFirst = false;
+                } else {
+                    if(!delim.equals("|")){
+                        lineData = CollectionUtils.asList(line.split(delim, -1));
+                    } else {
+                        lineData = CollectionUtils.asList(line.split("\\" + delim, -1));
+                    }
+                    data.add(lineData);
+                }
+            }
+            br2.close();
+            
+            return data;
+        
+        } finally {
+            if (br2 != null) {
+                br2.close();
+            }
+        }
+        
+    }
+    
     public static int[] getFileDimensions (String inFile, String delim) {
         
         boolean isFirst = true;
@@ -242,8 +285,7 @@ public class FileHandler {
             
         } catch (Exception e) {
             
-            System.out.println("Error reading input data:");
-            System.out.println(e);
+            Utils.log_exception(e, "Error reading input data:");
             return null;
             
         } finally {
@@ -252,8 +294,7 @@ public class FileHandler {
                     br.close();
                 }
             } catch(IOException ioe) {
-                System.out.println("Error reading input data:");
-                System.out.println(ioe);
+                Utils.log_exception(ioe, "Error reading input data");
                 return null;
             }
             
@@ -283,8 +324,7 @@ public class FileHandler {
             
         } catch (Exception e) {
             
-            System.out.println("Error reading input data:");
-            System.out.println(e);
+            Utils.log_exception(e, "Error reading input data:");
             return null;
             
         } finally {
@@ -293,8 +333,7 @@ public class FileHandler {
                     br.close();
                 }
             } catch(IOException ioe) {
-                System.out.println("Error reading input data:");
-                System.out.println(ioe);
+                Utils.log_exception(ioe, "Error reading input data:");
                 return null;
             }
         }
@@ -313,7 +352,16 @@ public class FileHandler {
         return doubleData;
     }
     
-    public static void saveDataMatrix (String filename, String delim, float[][] datacells) {
+    public static boolean makeDirectoryPath(String folderpath) throws MultiSlideException {
+        File folder = new File(folderpath);
+        try {
+            return folder.mkdirs();
+        } catch (Exception e) {
+            throw new MultiSlideException("Enrichment analysis could not create target directory in cache");
+        }
+    }
+    
+    public static void saveDataMatrix (String filename, String delim, float[][] datacells) throws MultiSlideException {
         try {
             int height = datacells.length;
             int width = datacells[0].length;
@@ -327,7 +375,27 @@ public class FileHandler {
             }
             writer.close();
         } catch (Exception e) {
-            System.out.println(e);
+            Utils.log_exception(e, "");
+            throw new MultiSlideException("Error in Filehandler.saveDataMatrix()");
+        }
+    }
+    
+    public static void saveDataMatrix (String filename, String delim, String[][] datacells) throws MultiSlideException {
+        try {
+            int height = datacells.length;
+            int width = datacells[0].length;
+            BufferedWriter writer = new BufferedWriter(new FileWriter(filename, false));
+            for (int i=0; i<height; i++) {
+                for (int j=0; j<width - 1; j++) {
+                    writer.append(datacells[i][j] + delim);
+                }
+                writer.append(datacells[i][width-1]);
+                writer.newLine();
+            }
+            writer.close();
+        } catch (Exception e) {
+            Utils.log_exception(e, "");
+            throw new MultiSlideException("Error in Filehandler.saveDataMatrix()");
         }
     }
     
@@ -345,7 +413,85 @@ public class FileHandler {
             }
             writer.close();
         } catch (Exception e) {
-            System.out.println(e);
+            Utils.log_exception(e, "");
         }
+    }
+    
+    public static HashMap <String, HashMap <List<String>, List<String>>> parseUserSpecifiedPathways(
+            String filename, String delim, HashMap <String, String> filename_map, AnalysisContainer analysis) 
+    throws DataParsingException, IOException {
+        
+        HashMap <String, HashMap <List<String>, List<String>>> r = new HashMap <> ();
+        
+        String line;
+        BufferedReader br = new BufferedReader(new FileReader(filename));
+        /*
+        get rid of the header
+        */
+        line = br.readLine();
+        
+        while ((line = br.readLine()) != null) {
+            String[] name_list = line.split("\t", -1);
+            String func_grp_name = name_list[0];
+            String fname = name_list[1].toLowerCase();
+            String colname = name_list[2];
+            
+            if(!filename_map.containsKey(name_list[1].toLowerCase())) {
+                String err_msg = "The given filename '" + fname + "' has no match. Available filenames are:";
+                int i = 1;
+                for (String f: filename_map.keySet()) {
+                    err_msg += " " + i + ")" + f;
+                    i++;
+                }
+                throw new DataParsingException(err_msg);
+            }
+            String dataset_name = filename_map.get(fname);
+            ArrayList <String> avail_cols = analysis.data.datasets.get(dataset_name).specs.getLinkerAndIdentifierColumnNames();
+            
+            if (!avail_cols.contains(colname)) {
+                throw new DataParsingException("File '" + fname + "' (" + dataset_name + ") does not have a metadata column by the name: '" + colname + "'");
+            }
+            
+            List <String> dataset_column_name_key = Arrays.asList(dataset_name, colname);
+            
+            if (r.containsKey(func_grp_name)) {
+                
+                HashMap <List<String>, List<String>> d = r.get(func_grp_name);
+                if (d.containsKey(dataset_column_name_key)) {
+                    d.get(dataset_column_name_key).add(name_list[3]);
+                } else {
+                    List <String> a = new ArrayList <> ();
+                    a.add(name_list[3]);
+                    d.put(dataset_column_name_key, a);
+                }
+                r.put(func_grp_name, d);
+                
+            } else {
+                
+                HashMap <List<String>, List<String>> d = new HashMap <> ();
+                List <String> a = new ArrayList <> ();
+                a.add(name_list[3]);
+                d.put(dataset_column_name_key, a);
+                r.put(func_grp_name, d);
+            }
+        }
+        
+        if (r.isEmpty()) {
+            throw new DataParsingException("Could not create pathway, as user specified pathway is empty.");
+        }
+        
+        return r;
+    }
+    
+    public static void savePropertiesFile (String filename, HashMap <String, String> data) 
+    throws IOException {
+        
+        String line = "";
+        BufferedWriter b = new BufferedWriter(new FileWriter(filename));
+        for (String key: data.keySet()) {
+            line += key + "=" + data.get(key) + "\n";
+        }
+        b.write(line);
+        b.close();
     }
 }

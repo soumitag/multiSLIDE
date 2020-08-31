@@ -10,8 +10,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -141,7 +139,7 @@ public class FeatureListServices extends HttpServlet {
                     list_data.add(data);
                     
                 } else if (add_type.equalsIgnoreCase("feature_group")) {
-                    list_data.addAll(analysis.data.fs_data.getGeneGroup(data));
+                    list_data.addAll(analysis.data.selected.getGeneGroup(data));
                 } else {
                     ServerResponse resp = new ServerResponse(0, "Add feature(s) FAILED.", "Bad value for 'add_type'.");
                     returnMessage(resp, response);
@@ -192,7 +190,7 @@ public class FeatureListServices extends HttpServlet {
                     returnMessage(new ServerResponse(1, "Added features to list '" + list_name + "'.", ""), response);
                     
                 } else if (add_type.equalsIgnoreCase("feature_group")) {
-                    list_data.addAll(analysis.data.fs_data.getGeneGroup(data));
+                    list_data.addAll(analysis.data.selected.getGeneGroup(data));
                     lists.addToFeatureList(list_name, list_data, data);
                     returnMessage(new ServerResponse(1, "Added features to list '" + list_name + "'.", ""), response);
                     

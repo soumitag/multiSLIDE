@@ -7,6 +7,50 @@
     overflow-y: auto;
 }
 
+.find_button {
+    border-radius: 4px;
+    background-color: #f4511e;
+    border: none;
+    color: #FFFFFF;
+    text-align: center;
+    font-size: 28px;
+    padding: 20px;
+    width: 200px;
+    transition: all 0.5s;
+    cursor: pointer;
+    margin: 5px;
+}
+
+.find_button span {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    transition: 0.5s;
+}
+  
+.find_button span:after {
+    content: '\00bb';
+    position: absolute;
+    opacity: 0;
+    top: 0;
+    right: -20px;
+    transition: 0.5s;
+}
+  
+.find_button:hover span {
+    padding-right: 25px;
+}
+  
+.find_button:hover span:after {
+    opacity: 1;
+    right: 0;
+}
+
+label {
+    color: rgb(255,99,23);
+    font-weight:bold;
+}
+
 button {
     background-color: #F8F8F8;
     padding: 2px 16px;

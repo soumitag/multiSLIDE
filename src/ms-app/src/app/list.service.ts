@@ -1,6 +1,5 @@
 import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
-import { Http } from "@angular/http";
 import { HttpClient } from '@angular/common/http';
 import { ListData } from './list_data';
 import { ServerResponseData } from './server_response'
@@ -13,7 +12,7 @@ export class ListService {
 
   private baseUrl = LocalSettings.MSVIZ_ENGINE_URL + "/FeatureListServices";  // web api URL
 
-  constructor(private http: Http, private httpClient: HttpClient) { }
+  constructor(private httpClient: HttpClient) { }
 
   getUserLists (analysis_name): Observable<ListData[]> {
 		console.log("loading feature lists...")

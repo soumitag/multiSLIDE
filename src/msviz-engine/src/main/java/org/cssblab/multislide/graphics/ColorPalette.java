@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.Serializable;
 import java.util.ArrayList;
+import org.cssblab.multislide.utils.Utils;
 
 /**
  *
@@ -36,7 +37,7 @@ public class ColorPalette implements Serializable {
                 palette.add(color);
             }
         } catch (Exception e) {
-            System.out.println(e);
+            Utils.log_exception(e, "");
         }
     }
     

@@ -1,10 +1,11 @@
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { Injectable } from '@angular/core';
-import { Http } from "@angular/http";
+/*import { HttpClient } from "@angular/common/http";*/
 import { HttpClient } from '@angular/common/http';
 import { HeatmapData } from './heatmap_data';
 import { HeatmapLayout } from './heatmap_layout';
+import { MapLinkLayout } from './map_link_layout';
 import { MapContainerLayout } from './map-container_layout';
 import { ServerResponseData } from './server_response'
 import { MapConfig } from './map-config_data';
@@ -18,7 +19,7 @@ export class HeatmapService {
 
 	private baseUrl = LocalSettings.MSVIZ_ENGINE_URL + "/GetHeatmap";  // web api URL
 	
-	constructor(private http: Http, private httpClient: HttpClient) { }
+	constructor(private httpClient: HttpClient) { }
 
 	/*
 	getHeatmapData(analysis_name: string, 
@@ -75,17 +76,13 @@ export class HeatmapService {
 	}
 	*/
 
-	getGlobalHeatmapData (analysis_name: string,
-						  sampleStartIndex: number, 
-						  entrezStartIndex: number): Observable<GlobalHeatmapData> {
+	getGlobalHeatmapData (analysis_name: string): Observable<GlobalHeatmapData> {
 		
 		console.log("getting data...")
 		return this.httpClient.get ( this.baseUrl, {
 		params: { 
 				'analysis_name': analysis_name,
-				'action': 'get_global_data',
-				'sample_start': sampleStartIndex.toString(),
-				'feature_start': entrezStartIndex.toString()
+				'action': 'get_global_data'
 				},
 		withCredentials: true
 		})
@@ -97,18 +94,14 @@ export class HeatmapService {
 	}
 
 	getHeatmapData(	analysis_name: string, 
-					datasetName: string,
-					sampleStartIndex: number, 
-					entrezStartIndex: number): Observable<HeatmapData> {
+					datasetName: string): Observable<HeatmapData> {
 					
 		console.log("getting data...")
 		return this.httpClient.get ( this.baseUrl, {
 			params: { 
 					'analysis_name': analysis_name,
 					'action': 'get_data',
-					'dataset_name': datasetName,
-					'sample_start': sampleStartIndex.toString(),
-					'feature_start': entrezStartIndex.toString()
+					'dataset_name': datasetName
 					},
 			withCredentials: true
 		})
@@ -119,11 +112,12 @@ export class HeatmapService {
 		});
 	}
 
-	getHeatmapLayout(analysis_name: string): Observable<HeatmapLayout> {
+	getHeatmapLayout(analysis_name: string, dataset_name: string): Observable<HeatmapLayout> {
 
 		return this.httpClient.get ( this.baseUrl, {
 			params: { 
 				'analysis_name': analysis_name,
+				'dataset_name': dataset_name,
 				'action': 'get_layout'
 			},
 			withCredentials: true
@@ -151,6 +145,26 @@ export class HeatmapService {
 			});
 	}
 
+	getMapLinkLayout(analysis_name: string,
+		dataset_name_1: string, dataset_name_2: string): Observable<MapLinkLayout> {
+
+		console.log("getting data...")
+		return this.httpClient.get(this.baseUrl, {
+			params: {
+				'analysis_name': analysis_name,
+				'action': 'get_link_layout',
+				'dataset_name_1': dataset_name_1,
+				'dataset_name_2': dataset_name_2
+			},
+			withCredentials: true
+		})
+			.map(res => <MapLinkLayout>res)
+			.catch(error => {
+				console.log(error);
+				return Observable.throw(error);
+			});
+	}
+
 	resetMap(analysis_name: string,
 			 dataset_name: string,
 			 mapConfig: MapConfig): Observable<ServerResponseData> {
@@ -160,12 +174,14 @@ export class HeatmapService {
 					'analysis_name': analysis_name,
 					'action': 'reset_heatmap',
 					'dataset_name': dataset_name,
-					'column_label': mapConfig.columnLabel,
 					'numColors': mapConfig.nColors.toString(),
 					'binning_range': mapConfig.binningRange,
 					'color_scheme': mapConfig.colorScheme,
 					'binning_range_start': mapConfig.binningRangeStart.toString(),
-					'binning_range_end': mapConfig.binningRangeEnd.toString()
+					'binning_range_end': mapConfig.binningRangeEnd.toString(),
+					'selected_feature_identifiers': mapConfig.selected_feature_identifiers.toString(),
+					'show_aggregated': mapConfig.show_aggregated.toString(),
+					'aggregate_function': mapConfig.aggregate_function
 				},
 				withCredentials: true
 			})

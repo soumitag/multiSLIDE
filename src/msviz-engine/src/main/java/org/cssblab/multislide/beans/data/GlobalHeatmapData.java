@@ -16,7 +16,7 @@ import org.cssblab.multislide.graphics.ColorPalette;
 
 import org.cssblab.multislide.graphics.Heatmap;
 import org.cssblab.multislide.structure.AnalysisContainer;
-import org.cssblab.multislide.structure.FilteredSortedData;
+import org.cssblab.multislide.structure.data.Selection;
 import org.cssblab.multislide.structure.GeneGroup;
 import org.cssblab.multislide.structure.GlobalMapConfig;
 import org.cssblab.multislide.structure.MultiSlideException;
@@ -27,12 +27,8 @@ public class GlobalHeatmapData implements Serializable {
     private static final long serialVersionUID = 1L;
     
     private transient final int nSamples;
-    private transient final int nEntrez;
 
-    public String entrez[];
-    public String column_headers[];
     public String row_names[];
-    public ArrayList <ArrayList <Integer>> gene_tags;
     public double gene_tag_colors[][];
     public double gene_tag_background_color[];
     public String gene_tag_names[];
@@ -46,12 +42,11 @@ public class GlobalHeatmapData implements Serializable {
     public int[] search_tag_color_indices;
     //public boolean[] search_tag_origin_map_ind;
     public String[] search_tag_ids;
-    public ArrayList <ArrayList <Integer>> search_tag_positions;
-    public ArrayList <ArrayList <Integer>> is_search_query;
+    
     
     public GlobalHeatmapData(
             GlobalMapConfig global_map_config,
-            FilteredSortedData fs_data, 
+            Selection selection, 
             String column_label, 
             AnalysisContainer analysis
     ) throws MultiSlideException {
@@ -75,35 +70,39 @@ public class GlobalHeatmapData implements Serializable {
         this.nEntrez = c_end - c_start;
         */
         
-        int r_start = global_map_config.getCurrentSampleStart();
-        this.nSamples = global_map_config.getRowsPerPageDisplayed();
+        //int r_start = global_map_config.getCurrentSampleStart();
+        this.nSamples = analysis.data.selected.getNumSamples();
         
-        int c_start = global_map_config.getCurrentFeatureStart();
-        this.nEntrez = global_map_config.getColsPerPageDisplayed();
+        //int c_start = global_map_config.getCurrentFeatureStart();
+        //this.nEntrez = analysis.data.selected.getNumFilteredFeatures(dataset_name, analysis.global_map_config);
         
-        int nGeneGroups = analysis.data.fs_data.getGeneGroups().size();
+        int nGeneGroups = selection.getGeneGroups().size();
         ArrayList <NetworkNeighbor> network_neighbors = analysis.data_selection_state.getNetworkNeighbors();
 
-        column_headers = new String[this.nEntrez];
-        entrez = new String[this.nEntrez];
+        //column_headers = new String[this.nEntrez];
+        //entrez = new String[this.nEntrez];
         row_names = new String[this.nSamples];
-        gene_tags = new ArrayList <ArrayList <Integer>> ();
+        //gene_tags = new ArrayList <ArrayList <Integer>> ();
         gene_tag_colors = new double[nGeneGroups][3];
+        /*
         phenotypes = new double[this.nSamples][fs_data.getNumSelectedPhenotype()][3];
         phenotype_labels = new String[fs_data.getNumSelectedPhenotype()];
+        */
+        String[] selected_phenotypes = analysis.data_selection_state.selected_phenotypes;
+        phenotypes = new double[this.nSamples][selected_phenotypes.length][3];
+        phenotype_labels = new String[selected_phenotypes.length];
+        
         gene_group_keys = new String[nGeneGroups];
         gene_tag_names = new String[nGeneGroups];
         //colorbar_keys = new String[5];
-        search_tag_positions = new ArrayList <ArrayList <Integer>> ();
-        is_search_query = new ArrayList <ArrayList <Integer>> ();
         
         //this.bin_colors = heatmap.hist.rgb;
         //int[][] bin_nos = data.getExpressionBinNos(dataset_name, analysis.global_map_config);
         
         Map.Entry <String,Heatmap> entry = analysis.heatmaps.entrySet().iterator().next();
         String dataset_name = entry.getKey();
-        this.row_names = fs_data.getRowNames(dataset_name, analysis.global_map_config);
-        this.column_headers = fs_data.getColumnHeaders(dataset_name, column_label, analysis.global_map_config);
+        this.row_names = selection.getSampleIDs(dataset_name, analysis.global_map_config);
+        //this.column_headers = selection.getFeatureIDs(dataset_name, column_label, analysis.global_map_config, analysis.heatmaps);
         
         /*
         int r_count = 0;
@@ -113,27 +112,29 @@ public class GlobalHeatmapData implements Serializable {
         */
         
         //int c_count = 0;
+        /*
         for (int c=0; c<nEntrez; c++) {
             //column_headers[c_count] = colheaders[c];
-            entrez[c] = fs_data.getEntrezAt(c_start+c);
-            ArrayList <GeneGroup> GGs = fs_data.getEntrezGroupMap().get(entrez[c]);
+            entrez[c] = selection.getEntrezAt(c_start+c);
+            ArrayList <GeneGroup> GGs = selection.getEntrezGroupMap().get(entrez[c]);
             ArrayList <Integer> t = new ArrayList <Integer> ();
             for (GeneGroup g : GGs) {
                 t.add(g.tag);
             }
             gene_tags.add(t);
         }
+        */
 
-        for (int p_count=0; p_count<fs_data.getNumSelectedPhenotype(); p_count++) {
-            phenotype_labels[p_count] = fs_data.getPhenotype(p_count);
-            String[] phenotype_values = fs_data.getPhenotypeValues(fs_data.getPhenotype(p_count), analysis.global_map_config);
+        for (int p_count=0; p_count<analysis.data_selection_state.selected_phenotypes.length; p_count++) {
+            phenotype_labels[p_count] = selected_phenotypes[p_count];
+            String[] phenotype_values = selection.getPhenotypeValues(selected_phenotypes[p_count], analysis.global_map_config);
             for (int r=0; r<nSamples; r++) {
-                phenotypes[r][p_count] = analysis.data.clinical_info.getPhenotypeColor(fs_data.getPhenotype(p_count), phenotype_values[r]);
+                phenotypes[r][p_count] = analysis.data.clinical_info.getPhenotypeColor(selected_phenotypes[p_count], phenotype_values[r]);
             }
         }
         
         int g = 0;
-        for (GeneGroup unique_gene_group : analysis.data.fs_data.getGeneGroups().values()) {
+        for (GeneGroup unique_gene_group : selection.getGeneGroups().values()) {
             gene_tag_colors[g] = unique_gene_group.color;
             gene_group_keys[g] = unique_gene_group.getID();
             gene_tag_names[g] = unique_gene_group.display_tag;
@@ -191,7 +192,9 @@ public class GlobalHeatmapData implements Serializable {
             search_tag_ids[i] = nn.getID();
         }
         
-        HashMap <String, ArrayList<Integer>> entrezSortPositionMap = fs_data.getEntrezSortPositionMap(analysis.global_map_config);
+        
+        /*
+        HashMap <String, ArrayList<Integer>> entrezSortPositionMap = selection.getEntrezSortPositionMap(analysis.global_map_config);
         
         for (int i=0; i<network_neighbors.size(); i++) {
             NetworkNeighbor nn = network_neighbors.get(i);
@@ -219,6 +222,7 @@ public class GlobalHeatmapData implements Serializable {
             this.search_tag_positions.add(search_tag_positions_i);
             this.is_search_query.add(is_search_query_i);
         }
+        */
 
     }
     

@@ -1,0 +1,47 @@
+<ng-container *ngIf="layout && is_ready; else loading">
+
+  <ng-container *ngIf="isTransposed==1; else default_view">
+    <svg [attr.width]="width" [attr.height]="height">
+      <ng-container *ngFor="let map of layout.mappings; let j = index">
+        <path [attr.d]="frill_paths_starts[j]" 
+              [attr.fill]='"rgb(" + this.frill_colors.get(frill_paths_starts[j])[0] + "," + this.frill_colors.get(frill_paths_starts[j])[1] + "," + this.frill_colors.get(frill_paths_starts[j])[2] + ")"' 
+              (click)="toggle_highlight_starts(map[0])"
+              style="cursor: pointer;"/>
+        <path [attr.d]="frill_paths_ends[j]" 
+              [attr.fill]='"rgb(" + this.frill_colors.get(frill_paths_ends[j])[0] + "," + this.frill_colors.get(frill_paths_ends[j])[1] + "," + this.frill_colors.get(frill_paths_ends[j])[2] + ")"' 
+              (click)="toggle_highlight_ends(map[1])"
+              style="cursor: pointer;"/>
+        <line [attr.x1]="layout.start+layout.cell_width_height"
+              [attr.y1]="layout.gene_centres_1[map[0]]"
+              [attr.x2]="layout.end-layout.cell_width_height"   
+              [attr.y2]="layout.gene_centres_2[map[1]]"
+              [style]='"stroke:rgb(" + layout.mapping_colors[j][0] + "," + layout.mapping_colors[j][1] + "," + layout.mapping_colors[j][2] + ");stroke-width:1"' />
+      </ng-container>
+    </svg>
+  </ng-container>
+
+
+  <ng-template #default_view>
+    <svg [attr.width]="width" [attr.height]="height">
+      <ng-container *ngFor="let map of layout.mappings; let j = index">
+        <path [attr.d]="frill_paths_starts[j]" 
+              [attr.fill]='"rgb(" + this.frill_colors.get(frill_paths_starts[j])[0] + "," + this.frill_colors.get(frill_paths_starts[j])[1] + "," + this.frill_colors.get(frill_paths_starts[j])[2] + ")"' 
+              (click)="toggle_highlight_starts(map[0])"
+              style="cursor: pointer;" />
+        <path [attr.d]="frill_paths_ends[j]" 
+              [attr.fill]='"rgb(" + this.frill_colors.get(frill_paths_ends[j])[0] + "," + this.frill_colors.get(frill_paths_ends[j])[1] + "," + this.frill_colors.get(frill_paths_ends[j])[2] + ")"' 
+              (click)="toggle_highlight_ends(map[1])"
+              style="cursor: pointer;"/>
+        <line [attr.x1]="layout.gene_centres_1[map[0]]" 
+              [attr.y1]="layout.start+layout.cell_width_height" 
+              [attr.x2]="layout.gene_centres_2[map[1]]"
+              [attr.y2]="layout.end-layout.cell_width_height" 
+              [style]='"stroke:rgb(" + layout.mapping_colors[j][0] + "," + layout.mapping_colors[j][1] + "," + layout.mapping_colors[j][2] + ");stroke-width:1"'/>
+      </ng-container>
+    </svg>
+  </ng-template>
+  
+
+</ng-container>
+
+<ng-template #loading>Fetching Links...</ng-template>

@@ -1,6 +1,7 @@
 export class SearchResultSummary {
   type: number;
   _id: string;
+  search_id: string;
   display_tag: string;
   html_display_tag_pre: string;
   html_display_tag_mid: string;

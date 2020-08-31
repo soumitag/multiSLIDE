@@ -39,7 +39,7 @@ public class NeighborhoodSearchResults implements Serializable {
             String identifier_type, 
             int identifier_index, 
             HashMap <String, ArrayList<String>> search_results,
-            HashMap <String, Boolean> entrezMaster
+            HashMap <String, Integer> entrezMaster
     ) {
         this.query_type = search_results.get("query_type").get(0);
         this.query_string = search_results.get("query_string").get(0);

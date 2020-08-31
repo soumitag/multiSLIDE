@@ -28,6 +28,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 //import structure.SearchResultContainer;
 import org.cssblab.multislide.searcher.GeneObject;
+import org.cssblab.multislide.utils.Utils;
 
 /**
  *
@@ -189,7 +190,7 @@ public class NetworkSearcher implements Serializable {
 
             }
         } catch (Exception e) {
-            System.out.println(e);
+            Utils.log_exception(e, "");
         }
 
         return all_targets;
@@ -232,7 +233,7 @@ public class NetworkSearcher implements Serializable {
             }
 
         } catch (Exception e) {
-            System.out.println(e);
+            Utils.log_exception(e, "");
         }
 
         return targets_arr;
@@ -262,7 +263,7 @@ public class NetworkSearcher implements Serializable {
             }
 
         } catch (Exception e) {
-            System.out.println(e);
+            Utils.log_exception(e, "");
         }
 
         return targets_arr;
@@ -290,7 +291,7 @@ public class NetworkSearcher implements Serializable {
                 mir_family = (String) match.get("mir_family");                    
             }
         } catch (Exception e) {
-            System.out.println(e);
+            Utils.log_exception(e, "");
         }
         
         return mir_family;

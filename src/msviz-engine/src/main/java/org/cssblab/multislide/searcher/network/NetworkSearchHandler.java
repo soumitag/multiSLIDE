@@ -19,6 +19,7 @@ import org.cssblab.multislide.searcher.network.NetworkSearcher;
 import org.cssblab.multislide.searcher.GeneObject;
 import org.cssblab.multislide.searcher.network.NetworkSearchResultObject;
 import org.cssblab.multislide.structure.MultiSlideException;
+import org.cssblab.multislide.utils.Utils;
 
 /**
  *
@@ -59,7 +60,7 @@ public class NetworkSearchHandler implements Serializable {
                 throw new MultiSlideException("Exception in NetworkSearchHandler.processQuery(): query must contain '='");
             }
         } catch (Exception e) {
-            System.out.println(e);
+            Utils.log_exception(e, "");
             throw new MultiSlideException("Exception in NetworkSearchHandler.processQuery()");
         }
     }

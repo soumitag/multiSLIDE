@@ -8,8 +8,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import org.cssblab.multislide.beans.data.SearchResultSummary;
-import org.cssblab.multislide.structure.Data;
-import org.cssblab.multislide.structure.FilteredSortedData;
+import org.cssblab.multislide.structure.MultiSlideException;
+import org.cssblab.multislide.structure.data.Data;
+//import org.cssblab.multislide.structure.FilteredSortedData;
 import org.cssblab.multislide.utils.Utils;
 
 /**
@@ -137,24 +138,23 @@ public class SearchResultObject implements Serializable {
     
     public static ArrayList <SearchResultObject> sortSearchResultObjects(
             ArrayList <SearchResultObject> search_results, 
-            HashMap <String, Boolean> entrezMaster, 
             Data data
-    ) {
+    ) throws MultiSlideException {
         for (int i=0; i<search_results.size(); i++) {
-            search_results.get(i).computeNumGeneIntersections(entrezMaster, data);
+            search_results.get(i).computeNumGeneIntersections(data);
             search_results.get(i).getOverlapScore();
         }
         Collections.sort(search_results, Collections.reverseOrder(new SearchResultObjectComparator()));
         return search_results;
     }
     
-    public void computeNumGeneIntersections(HashMap <String, Boolean> entrezMaster, Data data) {
+    public void computeNumGeneIntersections(Data data) throws MultiSlideException {
         
         if (this.type == SearchResultObject.TYPE_GENE) {
             GeneObject gene = (GeneObject)this.result;
             this.num_common_genes_in_dataset = new int[data.dataset_names.length];
             for (int i=0; i<data.dataset_names.length; i++) {
-                this.num_common_genes_in_dataset[i] = data.getEntrezCounts(i, gene.entrez_id);
+                this.num_common_genes_in_dataset[i] = (int)data.getEntrezCounts(data.dataset_names[i], gene.entrez_id);
             }
             /*
             this.num_common_genes = fs_data.getEntrezCounts("", gene.entrez_id);
@@ -169,7 +169,7 @@ public class SearchResultObject implements Serializable {
             this.num_common_genes_in_dataset = new int[data.dataset_names.length];
             for (int i=0; i<path.entrez_ids.size(); i++) {
                 for (int j=0; j<this.num_common_genes_in_dataset.length; j++) {
-                    this.num_common_genes_in_dataset[j] += data.getEntrezCounts(j, path.entrez_ids.get(i));
+                    this.num_common_genes_in_dataset[j] += (int)data.getEntrezCounts(data.dataset_names[j], path.entrez_ids.get(i));
                 }
             }
             /*
@@ -185,7 +185,7 @@ public class SearchResultObject implements Serializable {
             this.num_common_genes_in_dataset = new int[data.dataset_names.length];
             for (int i=0; i<go.entrez_ids.size(); i++) {
                 for (int j=0; j<this.num_common_genes_in_dataset.length; j++) {
-                    this.num_common_genes_in_dataset[j] += data.getEntrezCounts(j, go.entrez_ids.get(i));
+                    this.num_common_genes_in_dataset[j] += (int)data.getEntrezCounts(data.dataset_names[j], go.entrez_ids.get(i));
                 }
             }
             /*

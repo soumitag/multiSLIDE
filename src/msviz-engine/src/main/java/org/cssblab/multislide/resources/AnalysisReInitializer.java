@@ -7,20 +7,17 @@ package org.cssblab.multislide.resources;
 
 import com.google.gson.Gson;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.apache.commons.collections4.map.ListOrderedMap;
 import org.cssblab.multislide.algorithms.clustering.HierarchicalClusterer;
-import org.cssblab.multislide.beans.data.SearchResultSummary;
 import org.cssblab.multislide.beans.data.ServerResponse;
-import org.cssblab.multislide.beans.data.SignificanceTestingParams;
 import org.cssblab.multislide.datahandling.DataParser;
 import org.cssblab.multislide.datahandling.RequestParam;
 import org.cssblab.multislide.graphics.ColorPalette;
@@ -28,8 +25,10 @@ import org.cssblab.multislide.graphics.Heatmap;
 import org.cssblab.multislide.graphics.PyColorMaps;
 import org.cssblab.multislide.structure.AnalysisContainer;
 import org.cssblab.multislide.structure.ClusteringParams;
+import org.cssblab.multislide.structure.DataSelectionState;
 import org.cssblab.multislide.structure.GlobalMapConfig;
 import org.cssblab.multislide.structure.PhenotypeSortingParams;
+import org.cssblab.multislide.utils.Utils;
 
 /**
  *
@@ -73,45 +72,54 @@ public class AnalysisReInitializer extends HttpServlet {
             }
             
             parser.addParam("source", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_REQUIRED);
-            parser.addListParam("dataset_names", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_OPTIONAL, ",");
-            parser.addListParam("clinicalFilters", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_OPTIONAL, ",");
-            parser.addListParam("groupIDs", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_OPTIONAL, ",");
-            parser.addListParam("groupNames", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_OPTIONAL, ",");
-            parser.addListParam("groupTypes", RequestParam.DATA_TYPE_BYTE, RequestParam.PARAM_TYPE_OPTIONAL, ",", 
-                    new String[]{SearchResultSummary.TYPE_GENE_SUMMARY + "",SearchResultSummary.TYPE_PATH_SUMMARY + "",SearchResultSummary.TYPE_GO_SUMMARY + ""}
-            );
-            parser.addListParam("intersection_counts", RequestParam.DATA_TYPE_INT, RequestParam.PARAM_TYPE_OPTIONAL, ",");
-            parser.addParam("intersection_counts_per_dataset", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_OPTIONAL);
-            parser.addListParam("background_counts", RequestParam.DATA_TYPE_INT, RequestParam.PARAM_TYPE_OPTIONAL, ",");
+            parser.addListParam("ids", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_OPTIONAL, ",");
 
             if (!parser.parse()) {
                 returnMessage(new ServerResponse(0, "Bad param", parser.error_msg), response);
                 return;
             }
             
-            if (parser.getString("source").equals("init")) {
+            if (parser.getString("source").startsWith("init_")) {
                 
-                String[] selected_datasets = parser.getStringArray("dataset_names");
-                String[] selected_phenotypes = parser.getStringArray("clinicalFilters");
-                String[] group_ids = parser.getStringArray("groupIDs");
-                String[] group_names = parser.getStringArray("groupNames");
-                byte[] group_types = parser.getByteArray("groupTypes");
-                int[][] intersection_counts_per_dataset = parseIntersectionCounts(parser.getString("intersection_counts_per_dataset"));
-                int[] background_counts = parser.getIntArray("background_counts");
+                if (parser.getString("source").startsWith("init_search")) {
+                    String[] search_ids = parser.getStringArray("ids");
+                    analysis.data_selection_state.setSelectedSearchResults(analysis, search_ids);
+                    analysis.data_selection_state.add_genes_source_type = DataSelectionState.ADD_GENES_SOURCE_TYPE_SEARCH;
+                } else if (parser.getString("source").equals("init_upload")) {
+                    String[] functional_group_ids = parser.getStringArray("ids");
+                    analysis.data_selection_state.setSelectedUploadedFunctionalGroups(functional_group_ids);
+                    analysis.data_selection_state.add_genes_source_type = DataSelectionState.ADD_GENES_SOURCE_TYPE_UPLOAD;
+                }  else if (parser.getString("source").equals("init_enrichment")) {
+                    String[] functional_group_ids = parser.getStringArray("ids");
+                    analysis.data_selection_state.setSelectedEnrichedFunctionalGroups(functional_group_ids);
+                    analysis.data_selection_state.add_genes_source_type = DataSelectionState.ADD_GENES_SOURCE_TYPE_ENRICHMENT;
+                }
                 
-                analysis.data_selection_state.setDatasets(selected_datasets);
-                analysis.data_selection_state.setSelectedPhenotypes(selected_phenotypes);
-                analysis.data_selection_state.setSearchResults(group_ids, group_types, group_names, intersection_counts_per_dataset, background_counts);
                 analysis.data_selection_state.clearNetworkNeighbors();
-                analysis.setRowClusteringParams(new ClusteringParams(HierarchicalClusterer.TYPE_ROW_CLUSTERING, selected_datasets[0]));
-                analysis.setColClusteringParams(new ClusteringParams(HierarchicalClusterer.TYPE_COL_CLUSTERING, selected_datasets[0]));
-                analysis.global_map_config.resetSignificanceTestingParameters(selected_datasets, selected_phenotypes);
-                analysis.global_map_config.setPhenotypeSortingParams(new PhenotypeSortingParams(selected_phenotypes));
+                analysis.setRowClusteringParams(
+                        new ClusteringParams(
+                                ClusteringParams.TYPE_SAMPLE_CLUSTERING, 
+                                analysis.data_selection_state.selected_datasets[0]
+                        )
+                );
+                analysis.setColClusteringParams(
+                        new ClusteringParams(
+                                ClusteringParams.TYPE_FEATURE_CLUSTERING, 
+                                analysis.data_selection_state.selected_datasets[0]
+                        )
+                );
+                analysis.global_map_config.resetSignificanceTestingParameters(
+                        analysis.data_selection_state.selected_datasets, 
+                        analysis.data_selection_state.selected_phenotypes
+                );
+                analysis.global_map_config.setPhenotypeSortingParams(
+                        new PhenotypeSortingParams(analysis.data_selection_state.selected_phenotypes)
+                );
                 analysis.global_map_config.setGeneFilteringOn(false);
                 analysis.global_map_config.setColumnOrderingScheme(GlobalMapConfig.GENE_GROUP_COLUMN_ORDERING);
                 analysis.global_map_config.setSampleOrderingScheme(GlobalMapConfig.PHENOTYPE_SAMPLE_ORDERING);
-                analysis.global_map_config.setCurrentFeatureStart(0);
-                analysis.global_map_config.setCurrentSampleStart(0);
+                //analysis.global_map_config.setCurrentFeatureStart(0);
+                //analysis.global_map_config.setCurrentSampleStart(0);
                 
             } else if (parser.getString("source").equals("list")) {
                 
@@ -123,29 +131,29 @@ public class AnalysisReInitializer extends HttpServlet {
                 
                 analysis.data_selection_state.pushHistory();
                 
-                analysis.setRowClusteringParams(new ClusteringParams(HierarchicalClusterer.TYPE_ROW_CLUSTERING, analysis.data_selection_state.datasets[0]));
-                analysis.setColClusteringParams(new ClusteringParams(HierarchicalClusterer.TYPE_COL_CLUSTERING, analysis.data_selection_state.datasets[0]));
-                analysis.global_map_config.resetSignificanceTestingParameters(analysis.data_selection_state.datasets, analysis.data_selection_state.selectedPhenotypes);
-                analysis.global_map_config.setPhenotypeSortingParams(new PhenotypeSortingParams(analysis.data_selection_state.selectedPhenotypes));
+                analysis.setRowClusteringParams(new ClusteringParams(ClusteringParams.TYPE_SAMPLE_CLUSTERING, analysis.data_selection_state.selected_datasets[0]));
+                analysis.setColClusteringParams(new ClusteringParams(ClusteringParams.TYPE_FEATURE_CLUSTERING, analysis.data_selection_state.selected_datasets[0]));
+                analysis.global_map_config.resetSignificanceTestingParameters(analysis.data_selection_state.selected_datasets, analysis.data_selection_state.selected_phenotypes);
+                analysis.global_map_config.setPhenotypeSortingParams(new PhenotypeSortingParams(analysis.data_selection_state.selected_phenotypes));
                 analysis.global_map_config.setGeneFilteringOn(false);
                 analysis.global_map_config.setColumnOrderingScheme(GlobalMapConfig.GENE_GROUP_COLUMN_ORDERING);
                 analysis.global_map_config.setSampleOrderingScheme(GlobalMapConfig.PHENOTYPE_SAMPLE_ORDERING);
-                analysis.global_map_config.setCurrentFeatureStart(0);
-                analysis.global_map_config.setCurrentSampleStart(0);
+                //analysis.global_map_config.setCurrentFeatureStart(0);
+                //analysis.global_map_config.setCurrentSampleStart(0);
 
             } else if (parser.getString("source").equals("history")) {
                 
                 analysis.data_selection_state.popHistory();
                 
-                analysis.setRowClusteringParams(new ClusteringParams(HierarchicalClusterer.TYPE_ROW_CLUSTERING, analysis.data_selection_state.datasets[0]));
-                analysis.setColClusteringParams(new ClusteringParams(HierarchicalClusterer.TYPE_COL_CLUSTERING, analysis.data_selection_state.datasets[0]));
-                analysis.global_map_config.resetSignificanceTestingParameters(analysis.data_selection_state.datasets, analysis.data_selection_state.selectedPhenotypes);
-                analysis.global_map_config.setPhenotypeSortingParams(new PhenotypeSortingParams(analysis.data_selection_state.selectedPhenotypes));
+                analysis.setRowClusteringParams(new ClusteringParams(ClusteringParams.TYPE_SAMPLE_CLUSTERING, analysis.data_selection_state.selected_datasets[0]));
+                analysis.setColClusteringParams(new ClusteringParams(ClusteringParams.TYPE_FEATURE_CLUSTERING, analysis.data_selection_state.selected_datasets[0]));
+                analysis.global_map_config.resetSignificanceTestingParameters(analysis.data_selection_state.selected_datasets, analysis.data_selection_state.selected_phenotypes);
+                analysis.global_map_config.setPhenotypeSortingParams(new PhenotypeSortingParams(analysis.data_selection_state.selected_phenotypes));
                 analysis.global_map_config.setGeneFilteringOn(false);
                 analysis.global_map_config.setColumnOrderingScheme(GlobalMapConfig.GENE_GROUP_COLUMN_ORDERING);
                 analysis.global_map_config.setSampleOrderingScheme(GlobalMapConfig.PHENOTYPE_SAMPLE_ORDERING);
-                analysis.global_map_config.setCurrentFeatureStart(0);
-                analysis.global_map_config.setCurrentSampleStart(0);
+                //analysis.global_map_config.setCurrentFeatureStart(0);
+                //analysis.global_map_config.setCurrentSampleStart(0);
                 
             } else if (parser.getString("source").equals("savepoint")) {
                 
@@ -155,61 +163,72 @@ public class AnalysisReInitializer extends HttpServlet {
                 }
                 analysis.data_selection_state.loadState(savepoint_id);
                         
-                analysis.setRowClusteringParams(new ClusteringParams(HierarchicalClusterer.TYPE_ROW_CLUSTERING, analysis.data_selection_state.datasets[0]));
-                analysis.setColClusteringParams(new ClusteringParams(HierarchicalClusterer.TYPE_COL_CLUSTERING, analysis.data_selection_state.datasets[0]));
-                analysis.global_map_config.resetSignificanceTestingParameters(analysis.data_selection_state.datasets, analysis.data_selection_state.selectedPhenotypes);
-                analysis.global_map_config.setPhenotypeSortingParams(new PhenotypeSortingParams(analysis.data_selection_state.selectedPhenotypes));
+                analysis.setRowClusteringParams(new ClusteringParams(ClusteringParams.TYPE_SAMPLE_CLUSTERING, analysis.data_selection_state.selected_datasets[0]));
+                analysis.setColClusteringParams(new ClusteringParams(ClusteringParams.TYPE_FEATURE_CLUSTERING, analysis.data_selection_state.selected_datasets[0]));
+                analysis.global_map_config.resetSignificanceTestingParameters(analysis.data_selection_state.selected_datasets, analysis.data_selection_state.selected_phenotypes);
+                analysis.global_map_config.setPhenotypeSortingParams(new PhenotypeSortingParams(analysis.data_selection_state.selected_phenotypes));
                 analysis.global_map_config.setGeneFilteringOn(false);
                 analysis.global_map_config.setColumnOrderingScheme(GlobalMapConfig.GENE_GROUP_COLUMN_ORDERING);
                 analysis.global_map_config.setSampleOrderingScheme(GlobalMapConfig.PHENOTYPE_SAMPLE_ORDERING);
-                analysis.global_map_config.setCurrentFeatureStart(0);
-                analysis.global_map_config.setCurrentSampleStart(0);
+                //analysis.global_map_config.setCurrentFeatureStart(0);
+                //analysis.global_map_config.setCurrentSampleStart(0);
                 
             } else if (parser.getString("source").equals("demo")) {
                 
-                analysis.global_map_config.setCurrentFeatureStart(0);
-                analysis.global_map_config.setCurrentSampleStart(0);
+                //analysis.global_map_config.setCurrentFeatureStart(0);
+                //analysis.global_map_config.setCurrentSampleStart(0);
                 
             }
+            
+            analysis.global_map_config.setDefaultRowIdentifier(analysis.data.datasets.get(analysis.data.dataset_names[0]).specs);
             
             ServletContext context = request.getServletContext();
             ColorPalette gene_group_color_palette = (ColorPalette)context.getAttribute("gene_group_color_palette");
             analysis.clearCaches();
             
-            if (parser.getString("source").equals("init") || parser.getString("source").equals("reinit") || parser.getString("source").equals("history")) {
-                analysis.data.prepareDataForGroup(
+            if (parser.getString("source").equals("init_search") || 
+                parser.getString("source").equals("init_upload") || 
+                parser.getString("source").equals("init_enrichment") || 
+                parser.getString("source").equals("reinit") || 
+                parser.getString("source").equals("history")) {
+                analysis.data.createSelection(
                         analysis, 
-                        "genesymbol_2021158607524066",
                         gene_group_color_palette
                 );
             } else if (parser.getString("source").equals("list")) {
+                /*
                 analysis.data.prepareFeatureListDataForGroup(
                         parser.getString("feature_list"),
                         analysis, 
                         "genesymbol_2021158607524066",
                         gene_group_color_palette
                 );
+                */
             }
 
-            analysis.global_map_config.setAvailableRows(analysis.data.fs_data.nSamples);
-            analysis.global_map_config.setAvailableCols(analysis.data.fs_data.nFilteredGenes);
+            /*
+            analysis.global_map_config.setAvailableRows(analysis.data.selected.getNumSamples());
+            analysis.global_map_config.setAvailableCols(analysis.data.selected.getNumFeatures(analysis.global_map_config));
+            */
             //analysis.global_map_config.setGeneFilteringOn(false);
             
-            HashMap<String, Heatmap> heatmaps = new HashMap<String, Heatmap>();
-            for (int i = 0; i < analysis.data.nDatasets; i++) {
-                String dataset_name = analysis.data.dataset_names[i];
-                if (analysis.data_selection_state.isDatasetSelected(dataset_name)) {
-                    Heatmap heatmap;
-                    if (analysis.heatmaps.containsKey(dataset_name)) {
-                        Heatmap reference_heatmap = analysis.heatmaps.get(dataset_name);
-                        heatmap = new Heatmap(analysis.data.fs_data, analysis.data.dataset_names[i], reference_heatmap);
-                    } else {
-                        heatmap = new Heatmap(analysis.data.fs_data, analysis.data.dataset_names[i], 20, "data_bins", null, "SEISMIC", "genesymbol_2021158607524066", -1, 1);
-                    }
-                    heatmap.genColorData((PyColorMaps) context.getAttribute("colormaps"));
-                    heatmap.assignBinsToRows(analysis.global_map_config);
-                    heatmaps.put(analysis.data.dataset_names[i], heatmap);
+            Map<String, Heatmap> heatmaps = new ListOrderedMap <> ();
+            for (String dataset_name : analysis.data_selection_state.selected_datasets) {
+
+                Heatmap heatmap;
+                if (analysis.heatmaps.containsKey(dataset_name)) {
+                    Heatmap reference_heatmap = analysis.heatmaps.get(dataset_name);
+                    heatmap = new Heatmap(analysis.data.selected, dataset_name, reference_heatmap);
+                } else {
+                    heatmap = new Heatmap(
+                            analysis, dataset_name,
+                            analysis.data.datasets.get(dataset_name).specs,
+                            20, "data_bins", "SEISMIC", -1, 1);
                 }
+                heatmap.genColorData((PyColorMaps) context.getAttribute("colormaps"));
+                heatmap.assignBinsToRows(analysis.spark_session, analysis.data.selected);
+                heatmaps.put(dataset_name, heatmap);
+
             }
             analysis.heatmaps = heatmaps;
             
@@ -217,7 +236,7 @@ public class AnalysisReInitializer extends HttpServlet {
             return;
             
         } catch (Exception e) {
-            System.out.println(e);
+            Utils.log_exception(e, "");
             ServerResponse resp = new ServerResponse(0, "Error in AnalysisReInitializer.", e.getMessage());
             returnMessage(resp, response);
             return;

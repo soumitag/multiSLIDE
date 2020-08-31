@@ -8,8 +8,9 @@ package org.cssblab.multislide.resources;
 import com.google.gson.Gson;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -18,7 +19,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.spark.sql.SparkSession;
 import org.cssblab.multislide.algorithms.clustering.HierarchicalClusterer;
+import org.cssblab.multislide.algorithms.statistics.EnrichmentAnalysis;
 import org.cssblab.multislide.algorithms.statistics.SignificanceTester;
 import org.cssblab.multislide.beans.data.DatasetSpecs;
 import org.cssblab.multislide.beans.data.ServerResponse;
@@ -27,10 +30,11 @@ import org.cssblab.multislide.datahandling.RequestParam;
 import org.cssblab.multislide.graphics.ColorPalette;
 import org.cssblab.multislide.searcher.Searcher;
 import org.cssblab.multislide.structure.AnalysisContainer;
-import org.cssblab.multislide.structure.Data;
+import org.cssblab.multislide.structure.data.Data;
 import org.cssblab.multislide.graphics.PyColorMaps;
 import org.cssblab.multislide.utils.MultiSlideConfig;
 import org.cssblab.multislide.utils.SessionManager;
+import org.cssblab.multislide.utils.Utils;
 
 /**
  *
@@ -92,6 +96,7 @@ public class LoadDemo extends HttpServlet {
             
             // create session directory
             SessionManager.createSessionDir(installPath, session_id);
+            String uploadFolder = SessionManager.getSessionDir(installPath, request.getSession().getId());
             
             // log
             Logger logger = LogManager.getRootLogger();
@@ -100,82 +105,29 @@ public class LoadDemo extends HttpServlet {
             // create a new analysis
             AnalysisContainer analysis = new AnalysisContainer("demo_2021158607524066_" + parser.getString("demo_id"), "human");
             
-             // set base path for analysis
+            // set base path for analysis
             analysis.setBasePath(SessionManager.getBasePath(installPath, request.getSession().getId(), analysis.analysis_name));
             
             // create analysis directory
             SessionManager.createAnalysisDirs(analysis);
             
-            /*
-            String path = installPath + "/demo_data/";
-            String[] data_types = new String[]{"CNA", "DNA Methylation", "mRNA", "Protein"};
-            String[] data_filenames = new String[]{path + "formatted_data_CNA_2.txt", 
-                                                   path + "formatted_data_methylation_hm450_row_centered_2.txt",
-                                                   path + "formatted_data_RNA_Seq_v2_mRNA_median_Zscores_2.txt",
-                                                   path + "formatted_data_rppa_mapped_2.txt"};
-            Data database = new Data(path + "clinical_info_blca.txt", data_types, data_filenames);
-            */
+            // set analytics_server for analysis
+            analysis.setAnalyticsServer((String)context.getAttribute("analytics_server_address"));
             
-            HashMap <String, DatasetSpecs> specs = new HashMap <String, DatasetSpecs> ();
+            // add spark session
+            analysis.setSparkSession((SparkSession)context.getAttribute("spark"));
             
-            //DatasetSpecs spec_0 = new DatasetSpecs("demo_" + parser.getString("demo_id"), "clinical_info_blca.txt", "tab", "clinical-info", "");
-            //specs.put(spec_0.expanded_filename, spec_0);
-            
-            /*
-            DatasetSpecs spec_1 = new DatasetSpecs("demo_" + parser.getString("demo_id"), "formatted_data_CNA_2.txt", "tab", "CNA", "");
-            spec_1.setMetaDataColumns(new String[]{"ENTREZ","Hugo_Symbol","Entrez_Gene_Id"}, 
-                                      new String[]{"ENTREZ","Hugo_Symbol"}, 
-                                      new String[]{"entrez_2021158607524066","genesymbol_2021158607524066"});
-            specs.put(spec_1.expanded_filename, spec_1);
-            
-            DatasetSpecs spec_2 = new DatasetSpecs("demo_" + parser.getString("demo_id"), "formatted_data_methylation_hm450_row_centered_2.txt", "tab", "DNA Methylation", "");
-            spec_2.setMetaDataColumns(new String[]{"ENTREZ","Hugo_Symbol","Entrez_Gene_Id"}, 
-                                      new String[]{"ENTREZ","Hugo_Symbol"}, 
-                                      new String[]{"entrez_2021158607524066","genesymbol_2021158607524066"});
-            specs.put(spec_2.expanded_filename, spec_2);
-            
-            DatasetSpecs spec_3 = new DatasetSpecs("demo" + parser.getString("demo_id"), "formatted_data_RNA_Seq_v2_mRNA_median_Zscores_2.txt", "tab", "mRNA", "");
-            spec_3.setMetaDataColumns(new String[]{"ENTREZ","Hugo_Symbol","Entrez_Gene_Id"}, 
-                                      new String[]{"ENTREZ","Hugo_Symbol"}, 
-                                      new String[]{"entrez_2021158607524066","genesymbol_2021158607524066"});
-            specs.put(spec_3.expanded_filename, spec_3);
-            
-            DatasetSpecs spec_4 = new DatasetSpecs("demo" + parser.getString("demo_id"), "formatted_data_rppa_mapped_2.txt", "tab", "Protein", "");
-            spec_4.setMetaDataColumns(new String[]{"ENTREZ","GENE_ID","ENTREZ_ID"}, 
-                                      new String[]{"ENTREZ","GENE_ID"}, 
-                                      new String[]{"entrez_2021158607524066","genesymbol_2021158607524066"});
-            specs.put(spec_4.expanded_filename, spec_4);
-            */
-            
-            /*
-            DatasetSpecs spec_1 = new DatasetSpecs("demo_" + parser.getString("demo_id"), "formatted_data_CNA_2.txt", "tab", "CNA", "");
-            spec_1.setMetaDataColumns(new String[]{"ENTREZ","Hugo_Symbol","Entrez_Gene_Id"}, 
-                                      new String[]{"Hugo_Symbol"}, 
-                                      new String[]{"genesymbol_2021158607524066"});
-            specs.put(spec_1.expanded_filename, spec_1);
-            
-            DatasetSpecs spec_2 = new DatasetSpecs("demo_" + parser.getString("demo_id"), "formatted_data_methylation_hm450_row_centered_2.txt", "tab", "DNA Methylation", "");
-            spec_2.setMetaDataColumns(new String[]{"ENTREZ","Hugo_Symbol","Entrez_Gene_Id"}, 
-                                      new String[]{"Hugo_Symbol"}, 
-                                      new String[]{"genesymbol_2021158607524066"});
-            specs.put(spec_2.expanded_filename, spec_2);
-            
-            DatasetSpecs spec_3 = new DatasetSpecs("demo" + parser.getString("demo_id"), "formatted_data_RNA_Seq_v2_mRNA_median_Zscores_2.txt", "tab", "mRNA", "");
-            spec_3.setMetaDataColumns(new String[]{"ENTREZ","Hugo_Symbol","Entrez_Gene_Id"}, 
-                                      new String[]{"Hugo_Symbol"}, 
-                                      new String[]{"genesymbol_2021158607524066"});
-            specs.put(spec_3.expanded_filename, spec_3);
-            
-            DatasetSpecs spec_4 = new DatasetSpecs("demo" + parser.getString("demo_id"), "formatted_data_rppa_mapped_2.txt", "tab", "Protein", "");
-            spec_4.setMetaDataColumns(new String[]{"ENTREZ","GENE_ID","ENTREZ_ID"}, 
-                                      new String[]{"GENE_ID"}, 
-                                      new String[]{"genesymbol_2021158607524066"});
-            specs.put(spec_4.expanded_filename, spec_4);
-            */
+            //HashMap <String, DatasetSpecs> specs = new HashMap <String, DatasetSpecs> ();
+            List <DatasetSpecs> specs = new ArrayList <DatasetSpecs> ();
+
             if (demo_number == 2) {
                 
-                DatasetSpecs spec_0 = new DatasetSpecs("demo_2021158607524066_" + parser.getString("demo_id"), "BRCA_groupinfo_example_new.txt", "tab", "clinical-info", "");
-                specs.put(spec_0.expanded_filename, spec_0);
+                DatasetSpecs spec_0 = new DatasetSpecs(
+                        "demo_2021158607524066_" + parser.getString("demo_id"), 
+                        "BRCA_groupinfo_example_new.txt", 
+                        "tab", "clinical-info", uploadFolder);
+                //specs.put(spec_0.getExpandedFilename(), spec_0);
+                specs.add(spec_0);
 
                 /*
                 DatasetSpecs spec_1 = new DatasetSpecs("demo_" + parser.getString("demo_id"), "DNA_imputedDat_new.txt", "tab", "CNA", "");
@@ -185,45 +137,88 @@ public class LoadDemo extends HttpServlet {
                 specs.put(spec_1.expanded_filename, spec_1);
                 */
 
-                DatasetSpecs spec_2 = new DatasetSpecs("demo_2021158607524066_" + parser.getString("demo_id"), "PROT_imputedDat_rounded_73_filtered.txt", "tab", "Protein", "");
-                spec_2.setMetaDataColumns(new String[]{"genesym"},
-                        new String[]{"genesym"},
-                        new String[]{"genesymbol_2021158607524066"});
-                specs.put(spec_2.expanded_filename, spec_2);
+                
 
-                DatasetSpecs spec_3 = new DatasetSpecs("demo" + parser.getString("demo_id"), "mRNA_imputedDat_centered_rounded_73_filtered.txt", "tab", "mRNA", "");
-                spec_3.setMetaDataColumns(new String[]{"Genesym"},
-                        new String[]{"Genesym"},
-                        new String[]{"genesymbol_2021158607524066"});
-                specs.put(spec_3.expanded_filename, spec_3);
+                DatasetSpecs spec_2 = new DatasetSpecs(
+                        "demo" + parser.getString("demo_id"), 
+                        "mRNA_imputedDat_centered_rounded_73_filtered.txt", 
+                        "tab", "m_rna", uploadFolder
+                );
+                spec_2.update(new String[]{"Genesym"}, true, "Genesym", "genesymbol_2021158607524066", false, new String[]{});
+                //specs.put(spec_3.getExpandedFilename(), spec_3);
+                specs.add(spec_2);
+                
+                DatasetSpecs spec_3 = new DatasetSpecs(
+                        "demo_2021158607524066_" + parser.getString("demo_id"), 
+                        "PROT_imputedDat_rounded_73_filtered.txt", 
+                        "tab", "protein", uploadFolder
+                );
+                spec_3.update(
+                        new String[]{"genesym"}, true, "genesym", "genesymbol_2021158607524066", false, new String[]{}
+                );
+                //specs.put(spec_2.getExpandedFilename(), spec_2);
+                specs.add(spec_3);
+                
+                DatasetSpecs spec_4 = new DatasetSpecs(
+                        "demo" + parser.getString("demo_id"), 
+                        "CPTAC_Phosphoproteome_centered_selected_metadata.txt", 
+                        "tab", "phosphoproteome", uploadFolder
+                );
+                spec_4.update(new String[]{"unique_idenitifier", "variableSites", "sequence", "accession_number", "geneName"}, 
+                        true, "geneName", "genesymbol_2021158607524066", true, new String[]{"unique_idenitifier"});
+                //specs.put(spec_4.getExpandedFilename(), spec_4);
+                specs.add(spec_4);
                 
             } else if (demo_number == 1){
                 
-                DatasetSpecs spec_0 = new DatasetSpecs("demo_2021158607524066_" + parser.getString("demo_id"), "Sample_grouping.txt", "tab", "clinical-info", "");
-                specs.put(spec_0.expanded_filename, spec_0);
+                DatasetSpecs spec_0 = new DatasetSpecs(
+                        "demo_2021158607524066_" + parser.getString("demo_id"), 
+                        "Sample_grouping.txt", 
+                        "tab", "clinical-info", uploadFolder
+                );
+                //specs.put(spec_0.getExpandedFilename(), spec_0);
+                specs.add(spec_0);
 
-                DatasetSpecs spec_1 = new DatasetSpecs("demo_2021158607524066_" + parser.getString("demo_id"), "mRNA_baselined_removeB.txt", "tab", "mRNA", "");
-                spec_1.setMetaDataColumns(new String[]{"Ensembl", "GeneSymbol"},
-                        new String[]{"GeneSymbol"},
-                        new String[]{"genesymbol_2021158607524066"});
-                specs.put(spec_1.expanded_filename, spec_1);
+                DatasetSpecs spec_1 = new DatasetSpecs(
+                        "demo_2021158607524066_" + parser.getString("demo_id"), 
+                        "mRNA_baselined_removeB.txt", 
+                        "tab", "m_rna", uploadFolder
+                );
+                spec_1.update(
+                        new String[]{"Ensembl", "GeneSymbol"},
+                        true, "GeneSymbol", "genesymbol_2021158607524066", true, new String[]{"Ensembl"});
+                //specs.put(spec_1.getExpandedFilename(), spec_1);
+                specs.add(spec_1);
 
-                DatasetSpecs spec_2 = new DatasetSpecs("demo_2021158607524066_" + parser.getString("demo_id"), "protein_baselined_removeB.txt", "tab", "Protein", "");
-                spec_2.setMetaDataColumns(new String[]{"Ensembl", "GeneSymbol"},
-                        new String[]{"GeneSymbol"},
-                        new String[]{"genesymbol_2021158607524066"});
-                specs.put(spec_2.expanded_filename, spec_2);
+                DatasetSpecs spec_2 = new DatasetSpecs(
+                        "demo_2021158607524066_" + parser.getString("demo_id"), 
+                        "protein_baselined_removeB.txt", 
+                        "tab", "protein", uploadFolder
+                );
+                spec_2.update(
+                        new String[]{"Ensembl", "GeneSymbol"},
+                        true, "GeneSymbol", "genesymbol_2021158607524066", true, new String[]{"Ensembl"});
+                //specs.put(spec_2.getExpandedFilename(), spec_2);
+                specs.add(spec_2);
                 
             } else if (demo_number == 0) {
                 
-                DatasetSpecs spec_0 = new DatasetSpecs("demo_2021158607524066_" + parser.getString("demo_id"), "Classification_of_TCGA_IDH-WT_GBMs.txt", "tab", "clinical-info", "");
-                specs.put(spec_0.expanded_filename, spec_0);
+                DatasetSpecs spec_0 = new DatasetSpecs(
+                        "demo_2021158607524066_" + parser.getString("demo_id"), 
+                        "Classification_of_TCGA_IDH-WT_GBMs.txt", 
+                        "tab", "clinical-info", uploadFolder
+                );
+                //specs.put(spec_0.getExpandedFilename(), spec_0);
+                specs.add(spec_0);
 
-                DatasetSpecs spec_1 = new DatasetSpecs("demo_2021158607524066_" + parser.getString("demo_id"), "mRNA_microarray_U133A_366_IDH_WT_subtyping_row_centered_post_filter.txt", "tab", "mRNA", "");
-                spec_1.setMetaDataColumns(new String[]{"Gene"},
-                        new String[]{"Gene"},
-                        new String[]{"genesymbol_2021158607524066"});
-                specs.put(spec_1.expanded_filename, spec_1);
+                DatasetSpecs spec_1 = new DatasetSpecs(
+                        "demo_2021158607524066_" + parser.getString("demo_id"), 
+                        "mRNA_microarray_U133A_366_IDH_WT_subtyping_row_centered_post_filter.txt", 
+                        "tab", "m_rna", uploadFolder
+                );
+                spec_1.update(new String[]{"Gene"}, true, "Gene", "genesymbol_2021158607524066", false, new String[]{});
+                //specs.put(spec_1.getExpandedFilename(), spec_1);
+                specs.add(spec_1);
                 
             }
 
@@ -234,11 +229,18 @@ public class LoadDemo extends HttpServlet {
             Searcher searcher = new Searcher(analysis.species);
             analysis.setSearcher(searcher);
             
+            // create data
             ColorPalette categorical_palette = (ColorPalette)context.getAttribute("categorical_palatte");
             ColorPalette continuous_palette = (ColorPalette)context.getAttribute("continuous_palatte");
-            HashMap <String, Integer> identifier_index_map = (HashMap <String, Integer>)context.getAttribute("identifier_index_map");
-            Data database = new Data(analysis.base_path, specs, categorical_palette, continuous_palette, analysis.searcher, identifier_index_map);
+            //HashMap <String, Integer> identifier_index_map = (HashMap <String, Integer>)context.getAttribute("identifier_index_map");
+            Data database = new Data(
+                    analysis.spark_session, analysis.base_path, specs, 
+                    categorical_palette, continuous_palette, analysis.searcher);
             analysis.setDatabase(database);
+            
+            //initialize data_selection_state
+            analysis.data_selection_state.setDefaultDatasetAndPhenotypes(database.dataset_names, database.clinical_info.getPhenotypeNames());
+            analysis.global_map_config.setDefaultDatasetLinking(database.datasets);
             
             // load system configuration details
             HashMap <String, String> multislide_config = MultiSlideConfig.getMultiSlideConfig(installPath);
@@ -246,10 +248,17 @@ public class LoadDemo extends HttpServlet {
             // create clusterer and significance tester
             String py_module_path = multislide_config.get("py-module-path");
             String py_home = multislide_config.get("python-dir");
-            HierarchicalClusterer clusterer = new HierarchicalClusterer(analysis.base_path + File.separator + "data", py_module_path, py_home);
+            String cache_path = installPath + File.separator + "temp" + File.separator + "cache";
+            HierarchicalClusterer clusterer = new HierarchicalClusterer(cache_path, analysis.analytics_engine_comm);
             analysis.setClusterer(clusterer);
-            SignificanceTester significance_tester = new SignificanceTester(analysis.base_path + File.separator + "data",py_module_path, py_home);
+            
+            // create significance tester
+            SignificanceTester significance_tester = new SignificanceTester(cache_path, analysis.analytics_engine_comm);
             analysis.setSignificanceTester(significance_tester);
+            
+            // create enrichment analyzer
+            EnrichmentAnalysis enrichment_analyzer = new EnrichmentAnalysis(cache_path, analysis.analytics_engine_comm);
+            analysis.setEnrichmentAnalyzer(enrichment_analyzer);
             
             // Finally add analysis to session
             session.setAttribute(analysis.analysis_name, analysis);
@@ -259,11 +268,11 @@ public class LoadDemo extends HttpServlet {
             return;
             
         } catch (Exception e) {
-            System.out.println(e);
+            Utils.log_exception(e, "Failed in load demo");
             returnMessage(new ServerResponse(0, "Failed to load demo. Please contact administrator. Error:", e.getMessage()), response);
             return;
         }
-            
+        
     }
     
     protected void returnMessage(ServerResponse resp, HttpServletResponse response) throws IOException {

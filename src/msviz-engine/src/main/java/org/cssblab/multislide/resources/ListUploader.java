@@ -143,9 +143,7 @@ public class ListUploader extends HttpServlet {
                     filePath = uploadFolder + File.separator + analysis_name + File.separator + fileName;
                     File uploadedFile = new File(filePath);
                     item.write(uploadedFile);
-                    item.delete();
-
-                    
+                    item.delete();                    
                 }
 
             }
@@ -155,7 +153,8 @@ public class ListUploader extends HttpServlet {
                 ServerResponse resp = new ServerResponse(0, "Analysis not found", "Analysis name '" + analysis_name + "' does not exist");
                 returnMessage(resp, response);
             }
-            HashMap <String, Integer> identifier_index_map = (HashMap <String, Integer>)context.getAttribute("identifier_index_map");
+            //HashMap <String, Integer> identifier_index_map = (HashMap <String, Integer>)context.getAttribute("identifier_index_map");
+            HashMap <String, Integer> identifier_index_map = AnalysisContainer.createIdentifierIndexMap();
             identifier_index = identifier_index_map.get(identifier_type);
 
             Lists lists = analysis.lists;

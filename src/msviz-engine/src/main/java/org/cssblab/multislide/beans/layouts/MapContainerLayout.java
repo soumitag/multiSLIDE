@@ -7,6 +7,7 @@ package org.cssblab.multislide.beans.layouts;
 
 import java.io.Serializable;
 import com.google.gson.Gson;
+import java.util.ArrayList;
 import org.cssblab.multislide.structure.AnalysisContainer;
 import org.cssblab.multislide.structure.GlobalMapConfig;
 import org.cssblab.multislide.structure.MultiSlideException;
@@ -22,67 +23,96 @@ public class MapContainerLayout implements Serializable {
     public int nMaps;
     public double map_tops[];
     public double map_lefts[];
-    public double map_height;
-    public double map_width;
+    public double map_heights[];
+    public double map_widths[];
+    public double map_links_tops[];
+    public double map_links_lefts[];
+    public double map_links_heights[];
+    public double map_links_widths[];
     public double legend_left_x;
     public String dataset_names[];
     
-    private transient double gap_x;
-    private transient double gap_y;
-    private transient int n_maps_per_row;
+    private static final transient double GAP_X = 15;
+    private static final transient double GAP_Y = 5;
+    private static final transient double LEGEND_WIDTH = 250;
     
     public MapContainerLayout (int nMaps) {
         this.nMaps = nMaps;
-        this.gap_x = 15;
-        this.gap_y = 15;
     }
     
-    public void computeMapLayout (AnalysisContainer analysis, HeatmapLayout heatmapLayout, int gridLayout, int mapOrientation) 
+    public void computeMapLayout (
+            AnalysisContainer analysis, ArrayList <HeatmapLayout> heatmapLayouts, int gridLayout, String mapResolution, int mapOrientation) 
     throws MultiSlideException {
         
-        if (gridLayout < -2) {
-            this.n_maps_per_row = 1;
-        } else if (gridLayout == -2) {
-            this.n_maps_per_row = 1;
-        } else if (gridLayout == -1) {
-            this.n_maps_per_row = this.nMaps;
-        } else if (gridLayout > this.nMaps) {
-            this.n_maps_per_row = this.nMaps;
+        dataset_names = new String[nMaps];
+        map_tops = new double[nMaps];
+        map_lefts = new double[nMaps];
+        map_heights = new double[nMaps];
+        map_widths = new double[nMaps];
+        
+        map_links_tops = new double[nMaps-1];
+        map_links_lefts = new double[nMaps-1];
+        map_links_heights = new double[nMaps-1];
+        map_links_widths = new double[nMaps-1];
+        
+        legend_left_x = 10;
+        
+        double map_links_height;
+        if (mapResolution.equalsIgnoreCase("XS")) {
+            map_links_height = MapLinkLayout.MAP_LINKS_HEIGHT_XS;
+        } else if (mapResolution.equalsIgnoreCase("S")) {
+            map_links_height = MapLinkLayout.MAP_LINKS_HEIGHT_S;
+        } else if (mapResolution.equalsIgnoreCase("M")) {
+            map_links_height = MapLinkLayout.MAP_LINKS_HEIGHT_M;
+        } else if (mapResolution.equalsIgnoreCase("L")) {
+            map_links_height = MapLinkLayout.MAP_LINKS_HEIGHT_L;
+        } else if (mapResolution.equalsIgnoreCase("XL")) {
+            map_links_height = MapLinkLayout.MAP_LINKS_HEIGHT_XL;
         } else {
-            this.n_maps_per_row = gridLayout;
+            throw new MultiSlideException("Non standard map resolution: " + mapResolution);
         }
         
         if (mapOrientation == GlobalMapConfig.MAP_ORIENTATION_GENES_ALONG_X) {
-            this.map_height = heatmapLayout.svg_height;
-            this.map_width = heatmapLayout.svg_width;
-        } else if (mapOrientation == GlobalMapConfig.MAP_ORIENTATION_SAMPLES_ALONG_X) {
-            this.map_height = heatmapLayout.svg_width;
-            this.map_width = heatmapLayout.svg_height;
-        } else {
-            throw new MultiSlideException("Non standard map orientation: " + mapOrientation);
-        }
 
-        map_tops = new double[nMaps];
-        map_lefts = new double[nMaps];
-        int col_no = 0;
-        for (int i = 0; i < nMaps; i++) {
-            map_lefts[i] = (map_width + this.gap_x)*col_no;
-            col_no++;
-            if ((col_no%n_maps_per_row) == 0) {
-                col_no = 0;
+            double y_pos = 0;
+            for (int i = 0; i < nMaps; i++) {
+                map_lefts[i] = legend_left_x + LEGEND_WIDTH + MapContainerLayout.GAP_X;
+                dataset_names[i] = heatmapLayouts.get(i).name;
+                map_heights[i] = heatmapLayouts.get(i).svg_height;
+                map_widths[i] = heatmapLayouts.get(i).svg_width;
+                map_tops[i] = y_pos;
+                y_pos = y_pos + map_heights[i] + map_links_height;
+                
+                if (i < nMaps-1) {
+                    map_links_lefts[i] = legend_left_x + LEGEND_WIDTH + MapContainerLayout.GAP_X;
+                    map_links_heights[i] = map_links_height;
+                    map_links_tops[i] = map_tops[i] + map_heights[i];
+                    map_links_widths[i] = Math.max(map_widths[i], heatmapLayouts.get(i+1).svg_width);
+                }
             }
-        }
-        int row_no = -1;
-        for (int i = 0; i < nMaps; i++) {
-            if ((i%n_maps_per_row) == 0) {
-                row_no++;
+            
+        }  else if (mapOrientation == GlobalMapConfig.MAP_ORIENTATION_SAMPLES_ALONG_X) {
+
+            double x_pos = legend_left_x + LEGEND_WIDTH + MapContainerLayout.GAP_X;
+            for (int i = 0; i < nMaps; i++) {
+                map_tops[i] = MapContainerLayout.GAP_Y;
+                dataset_names[i] = heatmapLayouts.get(i).name;
+                map_heights[i] = heatmapLayouts.get(i).svg_width;
+                map_widths[i] = heatmapLayouts.get(i).svg_height;
+                map_lefts[i] = x_pos;
+                x_pos = x_pos + map_widths[i] + map_links_height;
+                
+                if (i < nMaps-1) {
+                    map_links_tops[i] = MapContainerLayout.GAP_Y;
+                    map_links_widths[i] = map_links_height;
+                    map_links_heights[i] = Math.max(map_heights[i], heatmapLayouts.get(i+1).svg_width);
+                    map_links_lefts[i] = map_lefts[i] + map_widths[i];
+                }
             }
-            map_tops[i] = (map_height + this.gap_y)*row_no;
         }
         
-        this.legend_left_x = (map_width + gap_x) * n_maps_per_row;
-
-        dataset_names = analysis.data.fs_data.getDatasetNames();
+        //legend_left_x = map_lefts[nMaps-1] + map_widths[nMaps-1] + GAP_X;
+        
     }
     
     public String mapContainerLayoutAsJSON () {

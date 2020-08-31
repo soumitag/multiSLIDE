@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Http } from "@angular/http";
 import { HttpClient } from '@angular/common/http';
 import { GlobalMapConfig } from './global-map-config_data';
 import { ServerResponseData } from './server_response';
@@ -19,7 +18,7 @@ export class GlobalMapConfigService {
 
   private globalMapConfigUrl = LocalSettings.MSVIZ_ENGINE_URL + "/GlobalMapConfigServices";
 
-  constructor(private http: Http, private httpClient: HttpClient) { }
+  constructor(private httpClient: HttpClient) { }
 
   /*
   setMapResolution (
@@ -136,7 +135,7 @@ export class GlobalMapConfigService {
     analysis_name: string, 
     action: string,
     param_value: string
-  ): Observable<MappedData> {
+  ): Observable<ServerResponseData> {
 
    return this.httpClient.get(this.globalMapConfigUrl, {
      params: {
@@ -146,7 +145,7 @@ export class GlobalMapConfigService {
      },
    withCredentials: true
    })
-   .map(res => <MappedData>res)
+   .map(res => <ServerResponseData>res)
    .catch(error => {
      console.log(error);
      return Observable.throw(error);
@@ -156,18 +155,21 @@ export class GlobalMapConfigService {
   updateGeneFilteringParams (
     analysis_name: string, 
     params: SignificanceTestingParams
-  ): Observable<MappedData> {
+  ): Observable<ServerResponseData> {
     return this.httpClient.get(this.globalMapConfigUrl, {
       params: {
         'analysis_name': analysis_name,
         'action': 'set_significance_testing_params',
         'dataset': params.dataset,
         'phenotype': params.phenotype,
-        'significance_level': params.significance_level.toString()
+        'significance_level': params.significance_level.toString(),
+        'testtype': params.testtype,
+        'apply_fdr': params.apply_fdr.toString(),
+        'fdr_threshold': params.fdr_threshold.toString()
       },
       withCredentials: true
     })
-      .map(res => <MappedData>res)
+      .map(res => <ServerResponseData>res)
       .catch(error => {
         console.log(error);
         return Observable.throw(error);
@@ -217,5 +219,63 @@ export class GlobalMapConfigService {
         return Observable.throw(error);
       });
   }
+
+  updateSelectedDatasets (
+    analysis_name: string, 
+    selected_datasets: string[]
+  ): Observable<ServerResponseData> {
+    return this.httpClient.get(this.globalMapConfigUrl, {
+      params: {
+        'analysis_name': analysis_name,
+        'action': 'set_selected_datasets', 
+        'selected_datasets': selected_datasets.toString()
+      },
+      withCredentials: true
+    })
+      .map(res => <ServerResponseData>res)
+      .catch(error => {
+        console.log(error);
+        return Observable.throw(error);
+      });
+  }
+
+  updateSelectedPhenotypes (
+    analysis_name: string,
+    selected_phenotypes: string[]
+  ): Observable<ServerResponseData> {
+    return this.httpClient.get(this.globalMapConfigUrl, {
+      params: {
+        'analysis_name': analysis_name,
+        'action': 'set_selected_phenotypes', 
+        'selected_phenotypes': selected_phenotypes.toString()
+      },
+      withCredentials: true
+    })
+      .map(res => <ServerResponseData>res)
+      .catch(error => {
+        console.log(error);
+        return Observable.throw(error);
+      });
+    }
+
+    updateDatasetLinkings (analysis_name: string, dataset_names: string[],
+      is_dataset_linked_arr: boolean[]
+    ): Observable<ServerResponseData> {
+      return this.httpClient.get(this.globalMapConfigUrl, {
+        params: {
+          'analysis_name': analysis_name,
+          'action': 'set_database_linkings', 
+          'dataset_names': dataset_names.toString(),
+          'is_dataset_linked_arr': is_dataset_linked_arr.toString()
+        },
+        withCredentials: true
+      })
+        .map(res => <ServerResponseData>res)
+        .catch(error => {
+          console.log(error);
+          return Observable.throw(error);
+        });
+
+    }
 
 }

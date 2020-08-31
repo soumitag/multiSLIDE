@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.cssblab.multislide.utils.Utils;
 
 
 public class Searcher implements Serializable {
@@ -279,7 +280,7 @@ public class Searcher implements Serializable {
                     //processSearchResultsHashMap(entrez_HM, "entrezMap");
                 }
             } catch(Exception e){
-                System.out.println( e.getClass().getName() + ": " + e.getMessage() );
+                Utils.log_exception(e, e.getClass().getName() + ": " + e.getMessage());
             }
             
         return search_results;        
@@ -531,8 +532,8 @@ public class Searcher implements Serializable {
             }
             
             
-        }catch(Exception e){
-            System.out.println( e.getClass().getName() + ": " + e.getMessage() );
+        } catch(Exception e) {
+            Utils.log_exception(e, e.getClass().getName() + ": " + e.getMessage());
         }
         
         //entrezList.add(entrez_ids);
@@ -586,8 +587,8 @@ public class Searcher implements Serializable {
                     path_infos.add(pathinfo);
                 }
             }
-        } catch(Exception e){
-            System.out.println( e.getClass().getName() + ": " + e.getMessage() );
+        } catch(Exception e) {
+            Utils.log_exception(e, e.getClass().getName() + ": " + e.getMessage());
         }
         
         return path_infos;
@@ -639,8 +640,8 @@ public class Searcher implements Serializable {
                     path_infos.add(pathinfo);
                 }
             }
-        } catch(Exception e){
-            System.out.println( e.getClass().getName() + ": " + e.getMessage() );
+        } catch(Exception e) {
+            Utils.log_exception(e, e.getClass().getName() + ": " + e.getMessage());
         }
         
         return path_infos;
@@ -701,8 +702,8 @@ public class Searcher implements Serializable {
                     go_infos.add(goinfo);
                 }
             }
-        } catch(Exception e){
-            System.out.println( e.getClass().getName() + ": " + e.getMessage() );
+        } catch(Exception e) {
+            Utils.log_exception(e, e.getClass().getName() + ": " + e.getMessage());
         }
         
         return go_infos;
@@ -753,8 +754,8 @@ public class Searcher implements Serializable {
                     go_infos.add(goinfo);
                 }
             }
-        } catch(Exception e){
-            System.out.println( e.getClass().getName() + ": " + e.getMessage() );
+        } catch(Exception e) {
+            Utils.log_exception(e, e.getClass().getName() + ": " + e.getMessage());
         }
         
         return go_infos;
@@ -774,8 +775,8 @@ public class Searcher implements Serializable {
                 go_s.add(go);
             }
             
-        }catch(Exception e) {
-            System.out.println( e.getClass().getName() + ": " + e.getMessage() );
+        } catch(Exception e) {
+            Utils.log_exception(e, e.getClass().getName() + ": " + e.getMessage());
         }
         
         return go_s;
@@ -795,8 +796,8 @@ public class Searcher implements Serializable {
                 PathwayObject path = new PathwayObject(match);
                 paths.add(path);
             }
-        }catch(Exception e) {
-            System.out.println( e.getClass().getName() + ": " + e.getMessage() );
+        } catch(Exception e) {
+            Utils.log_exception(e, e.getClass().getName() + ": " + e.getMessage());
         }
         
         return paths;
@@ -828,7 +829,7 @@ public class Searcher implements Serializable {
             
             
         } catch(Exception e) {
-            System.out.println( e.getClass().getName() + ": " + e.getMessage() );
+            Utils.log_exception(e, e.getClass().getName() + ": " + e.getMessage());
         }
         return genes;
     }
@@ -854,8 +855,8 @@ public class Searcher implements Serializable {
                 }
             }      
             
-        }catch(Exception e){
-            System.out.println( e.getClass().getName() + ": " + e.getMessage() );
+        } catch(Exception e) {
+            Utils.log_exception(e, e.getClass().getName() + ": " + e.getMessage());
         }
         return goinfo;
     }
@@ -881,8 +882,8 @@ public class Searcher implements Serializable {
                 }
             }      
             
-        }catch(Exception e){
-            System.out.println( e.getClass().getName() + ": " + e.getMessage() );
+        } catch(Exception e) {
+            Utils.log_exception(e, e.getClass().getName() + ": " + e.getMessage());
         }
         return pathinfo;
     }
@@ -918,8 +919,8 @@ public class Searcher implements Serializable {
                 }
                 
             }
-        } catch(Exception e){
-            System.out.println( e.getClass().getName() + ": " + e.getMessage() );
+        } catch(Exception e) {
+            Utils.log_exception(e, e.getClass().getName() + ": " + e.getMessage());
         }
         
         return db_values;        
@@ -948,8 +949,8 @@ public class Searcher implements Serializable {
                 }
             }
 
-        } catch(Exception e){
-            System.out.println( e.getClass().getName() + ": " + e.getMessage() );
+        } catch(Exception e) {
+            Utils.log_exception(e, e.getClass().getName() + ": " + e.getMessage());
         }
         
         return db_values;        
@@ -1005,8 +1006,8 @@ public class Searcher implements Serializable {
                 }
             }
             
-        } catch(Exception e){
-            System.out.println( e.getClass().getName() + ": " + e.getMessage() );
+        } catch(Exception e) {
+            Utils.log_exception(e, e.getClass().getName() + ": " + e.getMessage());
         }
         
         return db_entrezs;

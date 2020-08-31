@@ -95,7 +95,7 @@ public class GeneObject implements Serializable {
         aliases = new ArrayList <> ();
         List <BasicDBObject> aliases_list = (List <BasicDBObject>) aliases_match.get("aliases"); 
         for (int i=0; i<aliases_list.size(); i++) {
-            //System.out.println(aliases.get(i).get("alias"));
+            //Utils.log_info(aliases.get(i).get("alias"));
             aliases.add((String)aliases_list.get(i).get("alias"));
         }
     }

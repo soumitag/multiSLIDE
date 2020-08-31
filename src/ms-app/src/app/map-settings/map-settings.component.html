@@ -3,7 +3,7 @@
   <div class="map_controls_title">Settings for {{datasetName}} Heatmap</div>
   <div style="position:relative; top:10px; left:10px; width:500px;">
 
-    <form #settingsForm='ngForm' name="settingsForm">
+    <!--<form #settingsForm='ngForm' name="settingsForm">-->
       <!--
       <div class="map_settings_controls">
         <label class="map_control_labels" for="columnLabel">Column Label</label>
@@ -18,7 +18,38 @@
         </select>
       </div>
       -->
+      <div class="map_settings_controls">
+        <label class="map_control_labels" for="aggregator">Aggregate by Linker</label>
+        <mat-slide-toggle class="map_settings_control_items" color="primary" [(ngModel)]="show_aggregated" [disabled]="" >On</mat-slide-toggle>&nbsp;
+      </div>
 
+      <div class="map_settings_controls">
+        <label class="map_control_labels" for="aggregator_function">Aggregator Function</label>
+          <select class="map_settings_control_items" name="aggregator_function" [(ngModel)]="aggregate_function">
+            <option *ngFor="let func of aggregate_functions" [value]="func">
+              {{func}}
+            </option>
+          </select>
+      </div>
+
+      <div class="map_settings_controls">
+          <label class="map_control_labels" for="dataset_column_to_use">Feature Identifier(s)</label>
+          <select class="map_settings_control_items" name="dataset_column_to_use" [(ngModel)]="selected_feature_identifier">
+            <option *ngFor="let identifier of available_feature_identifiers" [value]="identifier">
+              {{identifier}}
+            </option>
+          </select>
+          &nbsp;&nbsp;
+          <button type="button" (click)="addFeatureCol()">Add</button>
+          <br>
+          <div style="position: relative; top: 10px; left: 5px; width: 150px; height: 100px; overflow-y: auto;">
+            <div *ngFor="let cols of new_map_config.selected_feature_identifiers" id="feature_cols_div" class="select_block2">
+              {{cols}}
+              <div class="minus_button" (click)="removeFeatureCol(cols)"></div>
+            </div>
+          </div>
+      </div>
+  
       <div class="map_settings_controls">
         <label class="map_control_labels" for="numColors">Number of Colors</label>
         <input class="map_settings_control_items" type="text" id="numColors" name="numColors" [(ngModel)]="numColorsStr" [value]="numColorsStr" maxlength="4" size="4" required>
@@ -131,7 +162,7 @@
           PLASMA <img class="colormap" src="assets/img/PLASMA.png" height="15px" width="255px"> <br>
       </div>
       -->
-    </form>
+    <!--</form>-->
   </div>
 
   <div class="apply_changes_div">

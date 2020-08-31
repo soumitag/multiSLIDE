@@ -7,6 +7,26 @@
     height: 100%;
 }
 
+.data_div {
+    display: flex;
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 40px;
+}
+.title_div {
+    position: absolute; 
+    top: 12px; 
+    left: 16px; 
+    height: 50px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 21px;
+    color: rgb(205,91,69);
+    width: 200px;
+    letter-spacing: 6px;
+    align-content: center;
+    text-align: center;
+}
+
 .each_sub_container{
     position: relative; 
     top: 5px; 
@@ -48,7 +68,7 @@ input[type=text], select {
     border-radius: 20px;
     cursor: pointer;
     letter-spacing: 2px;
-    width: 250px;
+    width: 200px;
     /*position: absolute;
     right: 10px; */
 }
@@ -73,7 +93,7 @@ button {
 button:hover {
     border-color: rgb(205,91,69);
     color: rgb(205,91,69);
-    background-color: rgb(56,62,68);
+    background-color: white;
 }
 
 .select_block {
@@ -147,15 +167,15 @@ button:hover {
 
 .apply_changes_div {
     position: absolute; 
-    bottom: 40px; 
+    top: 50px; 
     left: 0px; 
-    width: 280px; 
+    width: 220px; 
     height: 90px; 
     /*border-top: black 1px solid;*/ 
     align-content: center;
     text-align: center;
     /*background-color: #F6F6F6;*/
-    background-color: rgb(56,62,68);
+    background-color: white;
 }
 
 .msg {
@@ -253,4 +273,9 @@ button:hover {
     height: 90px; 
     align-content: center;
     text-align: center;
+}
+
+img {
+    width: 95%;
+    height: 95%;
 }

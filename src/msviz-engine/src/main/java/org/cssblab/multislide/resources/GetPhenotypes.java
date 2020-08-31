@@ -6,19 +6,32 @@
 package org.cssblab.multislide.resources;
 
 import com.google.gson.Gson;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.cssblab.multislide.beans.data.BipartiteLinkageGraph;
+import org.cssblab.multislide.beans.data.EnrichmentAnalysisResult;
+import org.cssblab.multislide.beans.data.FunctionalGroupContainer;
+import org.cssblab.multislide.beans.data.MappedData;
 import org.cssblab.multislide.beans.data.SelectionPanelData;
 import org.cssblab.multislide.beans.data.ServerResponse;
 import org.cssblab.multislide.datahandling.DataParser;
 import org.cssblab.multislide.datahandling.RequestParam;
 import org.cssblab.multislide.structure.AnalysisContainer;
 import org.cssblab.multislide.structure.DataSelectionState;
+import org.cssblab.multislide.structure.EnrichmentAnalysisParams;
+import org.cssblab.multislide.structure.MultiSlideException;
+import org.cssblab.multislide.utils.Utils;
 
 /**
  *
@@ -61,7 +74,16 @@ public class GetPhenotypes extends HttpServlet {
                 return;
             }
 
-            parser.addParam("action", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_REQUIRED, new String[]{"panel_data", "panel_state"});
+            parser.addParam("action", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_REQUIRED, 
+                    new String[]{ 
+                        "panel_data", 
+                        "panel_state", 
+                        "set_enrichment_analysis_params",
+                        "get_functional_grp_names",
+                        "download_enrichment_analysis_results",
+                        "get_user_specified_connections",
+                        "delete_user_specified_connections"
+                    });
             if (!parser.parse()) {
                 returnMessage(new ServerResponse(0, "Bad param", parser.error_msg), response);
                 return;
@@ -79,10 +101,120 @@ public class GetPhenotypes extends HttpServlet {
                 String json = state.asJSON();
                 sendData(response, json);
                 
+            } else if (parser.getString("action").equals("set_enrichment_analysis_params")) {
+                
+                parser.addParam("dataset", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_REQUIRED);
+                parser.addParam("phenotype", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_REQUIRED);
+                parser.addParam("testtype", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_REQUIRED);
+                parser.addParam("use_pathways", RequestParam.DATA_TYPE_BOOLEAN, RequestParam.PARAM_TYPE_REQUIRED);
+                parser.addParam("use_ontologies", RequestParam.DATA_TYPE_BOOLEAN, RequestParam.PARAM_TYPE_REQUIRED);
+                parser.addParam("significance_level_d", RequestParam.DATA_TYPE_DOUBLE, RequestParam.PARAM_TYPE_REQUIRED);
+                parser.addParam("apply_fdr_d", RequestParam.DATA_TYPE_BOOLEAN, RequestParam.PARAM_TYPE_REQUIRED);
+                parser.addParam("significance_level_e", RequestParam.DATA_TYPE_DOUBLE, RequestParam.PARAM_TYPE_REQUIRED);
+                parser.addParam("apply_fdr_e", RequestParam.DATA_TYPE_BOOLEAN, RequestParam.PARAM_TYPE_REQUIRED);
+                
+                if (!parser.parse()) { returnMessage(new ServerResponse(0, "Bad param", parser.error_msg), response); return; }
+                
+                double fdr_threshold_d = 1.0;
+                if (parser.getBool("apply_fdr_d")) {
+                    parser.addParam("fdr_threshold_d", RequestParam.DATA_TYPE_DOUBLE, RequestParam.PARAM_TYPE_REQUIRED);
+                    if (!parser.parse()) { returnMessage(new ServerResponse(0, "Bad param", parser.error_msg), response); return; }
+                    fdr_threshold_d = parser.getDouble("fdr_threshold_d");
+                }
+                
+                double fdr_threshold_e = 1.0;
+                if (parser.getBool("apply_fdr_e")) {
+                    parser.addParam("fdr_threshold_e", RequestParam.DATA_TYPE_DOUBLE, RequestParam.PARAM_TYPE_REQUIRED);
+                    if (!parser.parse()) { returnMessage(new ServerResponse(0, "Bad param", parser.error_msg), response); return; }
+                    fdr_threshold_e = parser.getDouble("fdr_threshold_e");
+                }
+                
+                analysis.data_selection_state.enrichment_analysis_params = new EnrichmentAnalysisParams(
+                    parser.getString("phenotype"), 
+                    parser.getString("dataset"), 
+                    parser.getDouble("significance_level_d"),
+                    parser.getString("testtype"), 
+                    parser.getBool("use_pathways"),
+                    parser.getBool("use_ontologies"),
+                    parser.getBool("apply_fdr_d"),
+                    fdr_threshold_d,
+                    parser.getDouble("significance_level_e"),
+                    parser.getBool("apply_fdr_e"),  
+                    fdr_threshold_e);
+                
+                //EnrichmentAnalysisResult[] results = EnrichmentAnalysisResult.loadFromFile("");
+                EnrichmentAnalysisResult[] results = analysis.enrichment_analyzer.doEnrichmentAnalysis(analysis, true);
+                analysis.data_selection_state.setCurrentEnrichmentAnalysisResults(Arrays.asList(results));
+                
+                MappedData md = new MappedData(1, "", "");
+                md.addNameValuePair("results", new Gson().toJson(results));
+                String json = md.asJSON();
+                sendData(response, json);
+                return;
+                
+            } else if (parser.getString("action").equals("get_functional_grp_names")) {
+                //FunctionalGroupContainer[] containers = FunctionalGroupContainer.populateList();
+                FunctionalGroupContainer[] containers = new FunctionalGroupContainer[analysis.data_selection_state.functional_groups_in_file.length];
+                int count = 0;
+                for (FunctionalGroupContainer c: analysis.data_selection_state.functional_groups_in_file) {
+                    containers[count++] = c.getSummary();
+                }
+                
+                MappedData md = new MappedData(1, "", "");
+                md.addNameValuePair("functional_group_containers", new Gson().toJson(containers));
+                String json = md.asJSON();
+                sendData(response, json);
+                return;
+                
+            } else if (parser.getString("action").equals("download_enrichment_analysis_results")) {
+                analysis.enrichment_analyzer.doEnrichmentAnalysis(analysis, false);
+                String ea_out_file_name = analysis.enrichment_analyzer.getLastOutputFile();
+                File f = new File(ea_out_file_name);
+                java.io.InputStream is = new FileInputStream(f);
+                byte[] bytes = new byte[(int)f.length()];
+                int read = is.read(bytes, 0, bytes.length);
+                
+                response.setContentType("application/download");
+                response.setHeader("Content-Disposition", "attachment;filename=" + "Enrichment_Analysis_Results.txt");
+                OutputStream os = response.getOutputStream();
+                os.write(bytes, 0, read);
+                os.flush();
+                os.close();
+                return;
+                
+            }  else if (parser.getString("action").equals("get_user_specified_connections")) {
+                
+                List <String[]> usp_conns = new ArrayList <> ();
+                for (String s: analysis.data_selection_state.user_defined_between_omics_linkages.keySet()) {
+                    BipartiteLinkageGraph blg = analysis.data_selection_state.user_defined_between_omics_linkages.get(s);
+                    usp_conns.add(new String[]{blg.display_name, blg.filename});
+                }
+                
+                String json = new Gson().toJson(usp_conns);
+                sendData(response, json);
+                return;
+                
+            }   else if (parser.getString("action").equals("delete_user_specified_connections")) {
+                
+                parser.addParam("filename", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_REQUIRED);
+                if (!parser.parse()) { returnMessage(new ServerResponse(0, "Bad param", parser.error_msg), response); return; }
+                String filename = parser.getString("filename");
+                
+                for (String s: analysis.data_selection_state.user_defined_between_omics_linkages.keySet()) {
+                    BipartiteLinkageGraph blg = analysis.data_selection_state.user_defined_between_omics_linkages.get(s);
+                    if (blg.filename.equals(filename)) {
+                        analysis.data_selection_state.user_defined_between_omics_linkages.remove(s);
+                        returnMessage(new ServerResponse(1, "Connections '" + filename + "' deleted.", ""), response);
+                        return;
+                    }
+                }
+                
+                returnMessage(new ServerResponse(0, "Connections '" + filename + "' not found.", ""), response);
+                return;
             }
             
         } catch (Exception e) {
-            System.out.println(e);
+            Utils.log_exception(e, "");
             ServerResponse resp = new ServerResponse(0, "Could not open analyis, perhaps session has expired.", e.getMessage());
             returnMessage(resp, response);
             return;

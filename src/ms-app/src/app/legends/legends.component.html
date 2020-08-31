@@ -52,7 +52,8 @@
             <div *ngFor="let lg of legend_group" class="legend">
                 <label class="legend_group_heading">{{lg.title}}</label><br>
                 <div *ngFor="let names of lg.legend_names; let i = index" class="legend_inner">
-                    <svg width=15 height=15 style="position: relative; top: 2px">
+                    <svg width=190 height=18 style="position: relative; top: 2px">
+                        <!--
                         <circle cx="7.5px" cy="7.5px" r="7.5px"
                             [style.fill]="'rgb(' + lg.colors[i][0] + ',' + lg.colors[i][1] + ',' + lg.colors[i][2] + ')'"
                             [style.stroke]="'rgb(' + lg.stroke_colors[i][0] + ',' + lg.stroke_colors[i][1] + ',' + lg.stroke_colors[i][2] + ')'"
@@ -60,8 +61,15 @@
                         </circle>
                         <circle *ngIf="i%2==0" cx="7.5px" cy="7.5px" r="2.6px" fill="rgb(255,255,255)">
                         </circle>
+                        -->
+                        <rect x="5" y="0" width="8" height="18" 
+                              [style.fill]="'rgb(' + lg.colors[i][0] + ',' + lg.colors[i][1] + ',' + lg.colors[i][2] + ')'"></rect>
+                        <line x1="0" y1="9" x2="18" y2="9" 
+                              [attr.stroke]="'rgb(' + lg.colors[i][0] + ',' + lg.colors[i][1] + ',' + lg.colors[i][2] + ')'"></line>
+                        <text x="23" y="9" font-size="13px" font-family="'Poppins', sans-serif" text-anchor="start"
+                              fill="black"
+                              dominant-baseline="middle">{{names}}</text>
                     </svg>
-                    {{names}}
                 </div>
             </div>
         </ng-container>

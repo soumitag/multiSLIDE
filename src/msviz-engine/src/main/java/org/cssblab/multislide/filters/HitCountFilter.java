@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.cssblab.multislide.beans.data.ServerResponse;
+import org.cssblab.multislide.utils.Utils;
 /**
  *
  * @author Soumita
@@ -121,7 +122,7 @@ public class HitCountFilter implements Filter, Serializable {
             Logger logger = LogManager.getRootLogger();
             logger.trace(ip + " accessed " + url);
             hitCount++;
-            System.out.println("Site visits count :" + hitCount);
+            Utils.log_info("Site visits count :" + hitCount);
             //request.setAttribute("counter", hitCount); 
             ServerResponse resp = new ServerResponse("TotalHits", hitCount);
             String json = new Gson().toJson(resp);

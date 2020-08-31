@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { ServerResponseData } from '../server_response';
 import { AnalysisService } from '../analysis.service';
 import { LocalSettings } from '../local-settings'

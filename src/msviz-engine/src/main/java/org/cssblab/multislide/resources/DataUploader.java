@@ -8,7 +8,7 @@ package org.cssblab.multislide.resources;
 import com.google.gson.Gson;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -23,10 +23,15 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.cssblab.multislide.beans.data.BipartiteLinkageGraph;
 import org.cssblab.multislide.beans.data.DatasetSpecs;
 import org.cssblab.multislide.beans.data.ServerResponse;
+import org.cssblab.multislide.datahandling.DataParsingException;
+import org.cssblab.multislide.structure.AnalysisContainer;
 import org.cssblab.multislide.utils.FormElementMapper;
 import org.cssblab.multislide.utils.SessionManager;
+import org.cssblab.multislide.utils.FileHandler;
+import org.cssblab.multislide.utils.Utils;
 
 
 /**
@@ -56,6 +61,7 @@ public class DataUploader extends HttpServlet {
         boolean isMultipart = ServletFileUpload.isMultipartContent(request);
         
         if (!isMultipart) {
+            returnMessage(new ServerResponse(0, "Fatal Error", "File upload is unsuccessful"), response);
             return;
         }
         
@@ -75,14 +81,6 @@ public class DataUploader extends HttpServlet {
         
         ServletContext context = request.getServletContext();
         String installPath = (String)context.getAttribute("install_path");
-        
-        // data will be uploaded temporarily to session-dir. session-dir is already created in newExperiment.jsp
-        // here just get the path
-        HttpSession session = request.getSession(false);
-        String session_id = session.getId();
-        //String uploadFolder = SessionManager.getSessionDir(installPath, session.getId());
-        String uploadFolder = SessionManager.getSessionDir(installPath, session_id);
-        //String uploadFolder = "F:\\code_multislide\\Multislide_30_Jun_2018";
         
         // Create a new file upload handler
         ServletFileUpload upload = new ServletFileUpload(factory);
@@ -108,96 +106,234 @@ public class DataUploader extends HttpServlet {
                     }
                 }
             }
+            
+            String[] actions = new String[]{
+                "upload",
+                "upload_add_genes",
+                "upload_connections"
+            };
+            if (!formData.containsKey("analysis_name")) {
+                returnMessage(new ServerResponse(0, "Bad param", "Missing analysis name"), response);
+                return;
+            }
+            if (!formData.containsKey("data_action")) {
+                returnMessage(new ServerResponse(0, "Bad param", "Missing action"), response);
+                return;
+            }
+            String analysis_name = formData.get("analysis_name");
+            String action = formData.get("data_action");
+            if (!Arrays.asList(actions).contains(action)) {
+                returnMessage(new ServerResponse(0, "Bad param", "Unknown action"), response);
+                return;
+            }
+
+            HttpSession session = request.getSession(false);
+            if (session == null) {
+                ServerResponse resp = new ServerResponse(0, "Session not found", "Possibly due to time-out");
+                returnMessage(resp, response);
+                return;
+            }
+            
+            /* 
+            For dataset upload (action=upload)
+            data will be uploaded temporarily to session-dir. session-dir should be already created in crete_experiment
+            here just get the path again
+            */
+            String session_id = session.getId();
+            String uploadFolder = SessionManager.getSessionDir(installPath, session_id);
+
+            if (action.equals("upload")) {
+                
+                uploadDatasets(formData, items, response, uploadFolder);
+                
+            } else if (action.equals("upload_add_genes")) {
+                
+                AnalysisContainer analysis = (AnalysisContainer) session.getAttribute(analysis_name);
+                if (analysis == null) {
+                    ServerResponse resp = new ServerResponse(0, "Analysis not found", "Analysis name '" + analysis_name + "' does not exist");
+                    returnMessage(resp, response);
+                    return;
+                }
+                
+                handleAddGenesPathwayUpload(analysis, formData, items, response, uploadFolder);
+                
+            } else if (action.equals("upload_connections")) {
+                
+                AnalysisContainer analysis = (AnalysisContainer) session.getAttribute(analysis_name);
+                if (analysis == null) {
+                    ServerResponse resp = new ServerResponse(0, "Analysis not found", "Analysis name '" + analysis_name + "' does not exist");
+                    returnMessage(resp, response);
+                    return;
+                }
+                
+                handleAddConnections(analysis, formData, items, response, uploadFolder);
+                
+            }
+
+        }  catch (FileUploadException ex) {
+            Utils.log_exception(ex, "File Upload Exception");
+            returnMessage(new ServerResponse(0, "File upload is unsuccessful", "File upload is unsuccessful"), response);
+        }  catch (Exception ex) {
+            Utils.log_exception(ex, "");
+            returnMessage(new ServerResponse(0, "File upload is unsuccessful", "File upload is unsuccessful"), response);
+        }
+    }
+    
+    public void uploadDatasets(
+            HashMap <String, String> formData, List items, HttpServletResponse response, String uploadFolder)
+    throws IOException, Exception {
         
-            String filePath = "";
-            String fileName = "";
+        String filePath = "";
+        String fileName = "";
+
+        // Parse the request
+        Iterator iter = items.iterator();
+
+        while (iter.hasNext()) {
+            FileItem item = (FileItem) iter.next();
+            if (!item.isFormField()) {
+                fileName = new File(item.getName()).getName();
+
+                if (fileName.toLowerCase().endsWith(".xls")
+                        || fileName.toLowerCase().endsWith(".xlsx")) {
+
+                    String msg = "Upload Failed! multi-SLIDE cannot process Excel files. Please provide a delimited file in tsv, csv or txt format.";
+                    returnMessage(new ServerResponse(0, "Error", msg), response);
+                    
+                } else {
+                    DatasetSpecs specs = new DatasetSpecs(formData, uploadFolder);
+                    filePath = uploadFolder + File.separator + specs.getExpandedFilename();
+                    File uploadedFile = new File(filePath);
+                    item.write(uploadedFile);
+                    item.delete();
+                    specs.addToAnalysis(uploadFolder);
+                }
+            }
+        }
+
+        // success
+        returnMessage(new ServerResponse(1, "Success", "File " + fileName + " uploaded successfully"), response);
+    }
+    
+    public void handleAddConnections(
+            AnalysisContainer analysis, 
+            HashMap <String, String> formData, List items, HttpServletResponse response, String session_dir)
+    throws IOException, Exception {
         
-            // Parse the request
-            iter = items.iterator();
+        String filePath = "";
+        String fileName = "";
 
-            while (iter.hasNext()) {
-                FileItem item = (FileItem) iter.next();
-                if (!item.isFormField()) {
-                    fileName = new File(item.getName()).getName();
+        // Parse the request
+        Iterator iter = items.iterator();
 
-                    if (fileName.toLowerCase().endsWith(".xls")
-                            || fileName.toLowerCase().endsWith(".xlsx")) {
+        while (iter.hasNext()) {
+            FileItem item = (FileItem) iter.next();
+            if (!item.isFormField()) {
+                fileName = new File(item.getName()).getName();
 
-                        String msg = "Upload Failed! Multi-SLIDE cannot process Excel files. Please provide a delimited file in tsv, csv or txt format.";
+                if (fileName.toLowerCase().endsWith(".xls")
+                        || fileName.toLowerCase().endsWith(".xlsx")) {
+
+                    String msg = "Upload Failed! multi-SLIDE cannot process Excel files. Please provide a delimited file in tsv, csv or txt format.";
+                    returnMessage(new ServerResponse(0, "Error", msg), response);
+                    
+                } else {
+                    filePath = session_dir + File.separator + formData.get("analysis_name");
+                    String filename = formData.get("filename");
+                    String fqpath = filePath + File.separator + filename;
+                    File uploadedFile = new File(fqpath);
+                    item.write(uploadedFile);
+                    item.delete();
+                    try {
                         
-                        try (PrintWriter out = response.getWriter()) {
-                            /* TODO output your page here. You may use following sample code. */
-                            ServerResponse resp = new ServerResponse(0, "Error", msg);
-                            String json = new Gson().toJson(resp);
-                            response.setContentType("application/json");
-                            response.setCharacterEncoding("UTF-8");
-                            response.getWriter().write(json);
+                        HashMap <String, String> filename_map = new HashMap <> ();
+                        for (String dataset_name: analysis.data.datasets.keySet()) {
+                            String fname = analysis.data.datasets.get(dataset_name).specs.filename;
+                            filename_map.put(fname.toLowerCase(), dataset_name);
                         }
-
-                        //return failure
+                        
+                        BipartiteLinkageGraph linkage = new BipartiteLinkageGraph(
+                                formData.get("identifier_type"), formData.get("filename"), filePath, formData.get("delimiter"), filename_map);
+                        
+                        analysis.data_selection_state.adduserSpecifiedInterOmicsConnections(linkage);
+                        
+                    } catch (Exception e) {
+                        Utils.log_exception(e, "");
+                        returnMessage(new ServerResponse(0, "Error parsing file.", Arrays.toString(e.getStackTrace())), response);
                         return;
-
-                    } else {
-
-                        /*
-                        String expanded_filename = formData.get("analysis_name") + "_" + 
-                                                   formData.get("upload_type") + "_" + 
-                                                   formData.get("delimiter") + "_" + 
-                                                   formData.get("identifier_type") + "_" + 
-                                                   fileName;
-                        */
-                        DatasetSpecs specs = new DatasetSpecs(formData);
-                        
-                        filePath = uploadFolder + File.separator + specs.expanded_filename;
-                        File uploadedFile = new File(filePath);
-                        item.write(uploadedFile);
-                        item.delete();
-                        
-                        specs.addToAnalysis(uploadFolder);
                     }
                 }
             }
-            
-            // success
-            try (PrintWriter out = response.getWriter()) {
-                
-                ServerResponse resp = new ServerResponse(1, "Success", "File " + fileName + " uploaded successfully");
-                String json = new Gson().toJson(resp);
-                response.setContentType("application/json");
-                response.setCharacterEncoding("UTF-8");
-                response.getWriter().write(json);
-            }  
-            
-            
-            // return success
-            
-        }  catch (FileUploadException ex) {
-            
-            //return failure
-            
-            try (PrintWriter out = response.getWriter()) {
-                /* TODO output your page here. You may use following sample code. */
-                ServerResponse resp = new ServerResponse(0, "Fatal Error", "File upload is unsuccessful");
-                String json = new Gson().toJson(resp);
-                response.setContentType("application/json");
-                response.setCharacterEncoding("UTF-8");
-                response.getWriter().write(json);
-            }
-        }  catch (Exception ex) {
-            
-            //return failure
-            try (PrintWriter out = response.getWriter()) {
-                /* TODO output your page here. You may use following sample code. */
-                ServerResponse resp = new ServerResponse(0, "Fatal Error", "File upload is unsuccessful");
-                String json = new Gson().toJson(resp);
-                response.setContentType("application/json");
-                response.setCharacterEncoding("UTF-8");
-                response.getWriter().write(json);
-            }
-            
         }
+
+        // success
+        returnMessage(new ServerResponse(1, "File " + fileName + " uploaded successfully", ""), response);
         
+    }
+    
+    public void handleAddGenesPathwayUpload(
+            AnalysisContainer analysis, 
+            HashMap <String, String> formData, List items, HttpServletResponse response, String session_dir)
+    throws IOException, DataParsingException, Exception {
         
+        String filePath = "";
+        String fileName = "";
+
+        // Parse the request
+        Iterator iter = items.iterator();
+
+        while (iter.hasNext()) {
+            FileItem item = (FileItem) iter.next();
+            if (!item.isFormField()) {
+                fileName = new File(item.getName()).getName();
+
+                if (fileName.toLowerCase().endsWith(".xls")
+                        || fileName.toLowerCase().endsWith(".xlsx")) {
+
+                    String msg = "Upload Failed! multi-SLIDE cannot process Excel files. Please provide a delimited file in tsv, csv or txt format.";
+                    returnMessage(new ServerResponse(0, "Error", msg), response);
+                    
+                } else {
+                    filePath = session_dir + File.separator + 
+                            formData.get("analysis_name") + File.separator + 
+                            formData.get("filename");
+                    File uploadedFile = new File(filePath);
+                    item.write(uploadedFile);
+                    item.delete();
+                    try {
+                        HashMap <String, String> filename_map = new HashMap <> ();
+                        for (String dataset_name: analysis.data.datasets.keySet()) {
+                            String filename = analysis.data.datasets.get(dataset_name).specs.filename;
+                            filename_map.put(filename.toLowerCase(), dataset_name);
+                        }
+                        
+                        analysis.data_selection_state.setFunctionalGroupsInFile(
+                            FileHandler.parseUserSpecifiedPathways(filePath, formData.get("delimiter"), filename_map, analysis)
+                        );
+                        analysis.data_selection_state.uploaded_filename = formData.get("filename");
+                    } catch (DataParsingException e) {
+                        Utils.log_exception(e, "");
+                        returnMessage(new ServerResponse(0, e.getMessage(), ""), response);
+                        return;
+                    } catch (Exception e) {
+                        Utils.log_exception(e, "");
+                        returnMessage(new ServerResponse(0, "Error parsing file.", Arrays.toString(e.getStackTrace())), response);
+                        return;
+                    }
+                }
+            }
+        }
+
+        // success
+        returnMessage(new ServerResponse(1, "File " + fileName + " uploaded successfully", ""), response);
+        
+    }
+    
+    protected void returnMessage(ServerResponse resp, HttpServletResponse response) throws IOException {
+        String json = new Gson().toJson(resp);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(json);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

@@ -4,6 +4,7 @@ import { DatauploadService } from '../dataupload.service';
 import { Subscription } from 'rxjs/Subscription';
 import { ServerResponseData } from '../server_response';
 import { PreviewData } from '../preview_data';
+import { DatasetSpecs } from '../dataset_specs';
 
 @Component({
   selector: 'app-get-preview',
@@ -12,8 +13,9 @@ import { PreviewData } from '../preview_data';
 })
 export class GetPreviewComponent implements OnInit {
 
+  @Input() analysis_name: string;
   @Input() previewTouched: boolean;
-  @Input() filepreview_payload: FileuploadPayload;
+  @Input() dataset_spec: DatasetSpecs;
 
   private uploadSubscription: Subscription;
   uploadedFiles: FileuploadPayload[] = [];
@@ -27,30 +29,26 @@ export class GetPreviewComponent implements OnInit {
 
   ngOnChanges(changes: SimpleChanges) {
     if (this.previewTouched) {
-      this.previewObject(this.filepreview_payload)
+      this.previewObject(this.dataset_spec)
     }
   }
 
-  previewObject(filepreview_payload: FileuploadPayload) {
-    if (filepreview_payload) {
-      //this.previewTouched = true;
-      console.log("You have selected preview")
-      //var fileupload_payload: FileuploadPayload = this.uploadedFiles[id];
-      filepreview_payload.data_action = "preview"
-      console.log(filepreview_payload)
-
+  previewObject(dataset_spec: DatasetSpecs) {
+    if (dataset_spec) {
       this.uploadSubscription = this.uploadService.previewDataset(
-        filepreview_payload).subscribe(
+        this.analysis_name, dataset_spec.expanded_filename
+      ).subscribe(
             data => {
             this.preview = data
             console.log(this.preview)
-            this.serverResponseOnFileAction = "File " + filepreview_payload.filename + " preview is successful."                  
+            this.serverResponseOnFileAction = "File " + dataset_spec.filename + " preview is successful."                  
           },
           error => {
-            this.serverResponseOnFileAction = "File " + filepreview_payload.filename + " preview is unsuccessful."
+            this.serverResponseOnFileAction = "File " + dataset_spec.filename + " preview is unsuccessful."
           }
         );
     }
   }
+
 
 }

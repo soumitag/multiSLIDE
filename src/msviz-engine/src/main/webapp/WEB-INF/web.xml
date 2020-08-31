@@ -1,16 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
-    <context-param>
-        <param-name>install-path</param-name>
-        <param-value>D:\multiSLIDE</param-value>
-    </context-param>
     <listener>
         <listener-class>org.cssblab.multislide.filters.MultislideSessionListener</listener-class>
     </listener>
-    <context-param>
-        <param-name>log4j-config-location</param-name>
-        <param-value>WEB-INF/log4j_config.xml</param-value>
-    </context-param>
     <filter>
         <filter-name>CORSFilter</filter-name>
         <filter-class>org.cssblab.multislide.filters.CORSFilter</filter-class>
@@ -46,10 +38,6 @@
     <servlet>
         <servlet-name>CreateAnalysis</servlet-name>
         <servlet-class>org.cssblab.multislide.resources.CreateAnalysis</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>DataRemover</servlet-name>
-        <servlet-class>org.cssblab.multislide.resources.DataRemover</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>HomePage</servlet-name>
@@ -96,10 +84,6 @@
         <servlet-class>org.cssblab.multislide.resources.FeatureListServices</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>SetMetadataColumns</servlet-name>
-        <servlet-class>org.cssblab.multislide.resources.SetMetadataColumns</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>NetworkNeighborServices</servlet-name>
         <servlet-class>org.cssblab.multislide.resources.NetworkNeighborServices</servlet-class>
     </servlet>
@@ -114,14 +98,6 @@
     <servlet>
         <servlet-name>GlobalMapConfigServices</servlet-name>
         <servlet-class>org.cssblab.multislide.resources.GlobalMapConfigServices</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>ClusteringService</servlet-name>
-        <servlet-class>org.cssblab.multislide.resources.ClusteringService</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>SignificanceTestingService</servlet-name>
-        <servlet-class>org.cssblab.multislide.resources.SignificanceTestingService</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>JSONParser</servlet-name>
@@ -138,10 +114,6 @@
     <servlet-mapping>
         <servlet-name>CreateAnalysis</servlet-name>
         <url-pattern>/CreateAnalysis</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>DataRemover</servlet-name>
-        <url-pattern>/DataRemover</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>HomePage</servlet-name>
@@ -188,10 +160,6 @@
         <url-pattern>/FeatureListServices</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>SetMetadataColumns</servlet-name>
-        <url-pattern>/SetMetadataColumns</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>NetworkNeighborServices</servlet-name>
         <url-pattern>/NetworkNeighborServices</url-pattern>
     </servlet-mapping>
@@ -210,14 +178,6 @@
     <servlet-mapping>
         <servlet-name>GlobalMapConfigServices</servlet-name>
         <url-pattern>/GlobalMapConfigServices</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ClusteringService</servlet-name>
-        <url-pattern>/ClusteringService</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>SignificanceTestingService</servlet-name>
-        <url-pattern>/SignificanceTestingService</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

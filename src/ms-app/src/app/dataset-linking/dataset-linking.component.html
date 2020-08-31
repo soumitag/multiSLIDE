@@ -1,0 +1,15 @@
+<div class="hc_title">Synchronize Datasets</div>
+<div class="hc_module_controls">
+  <div class="container_block" style="position: relative; top: 10px; left: 5px; width: 400px; height: 300px;">
+    <div *ngFor="let item of is_dataset_linked | keyvalue" id="datasets_div" class="select_block2">
+      {{item.key}}
+      <mat-slide-toggle style="float: right;" color="primary" [(ngModel)]="item.value" [checked]="item.value" [disabled]="" (change)="onSlide(item.key, item.value)" >Yes</mat-slide-toggle>&nbsp;
+    <!--<mat-slide-toggle style="float: right;" color="primary" [(ngModel)]="item.value" [disabled]="" >Yes</mat-slide-toggle>&nbsp;-->
+    </div>
+  </div>
+
+</div>
+
+<div class="apply_changes_div">
+  <button type="button" (click)="applyChanges()">Apply Changes</button>
+</div>

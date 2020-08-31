@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { PhenotypeSortingParams } from '../phenotype_sorting_params'
 
 @Component({
@@ -20,7 +20,7 @@ export class PhenotypeSortingComponent implements OnInit {
     this.analysis_name = data.analysis_name;
     this.phenotypes = data.phenotypes;
     this.dialogRef.updatePosition({ top: '110px', left: '700px' });
-    this.dialogRef.updateSize('650px','450px');
+    this.dialogRef.updateSize('650px','500px');
     if (data.params.phenotypes.length >= 5) {
       var p: string[] = [];
       var s: boolean[] = [];

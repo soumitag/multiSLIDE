@@ -1,12 +1,11 @@
 <app-selection-panel *ngIf="showSelectionPanel"
     [analysis_name]="analysis_name" 
-    [featureListName]="featureListNameInSelectionPanel" 
-    (featureListNameReset)="featureListNameReset($event)"
     (notifyChanges)="notifyChangesToMapContainer($event)">
 </app-selection-panel>
 <app-menu-panel 
     [analysis_name]="analysis_name" 
     (onListChange)="onListChange()"
+    (onConnectionChange)="onConnectionChange()"
     (notifySelectionPanelToggle)="notifyToggleToSelectionPanel()">
 </app-menu-panel>
 <app-map-container 

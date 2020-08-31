@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { ServerResponseData } from '../server_response';
 import { AnalysisService } from '../analysis.service';
 import { StringifyOptions } from 'querystring';
@@ -42,7 +42,7 @@ export class SaveWorkspaceComponent implements OnInit {
   showResponse(response:ServerResponseData) {
     if(response.status == 1) {
       this.filename = response.message;
-      this.message = "File '" + this.filename + ".mslide' is ready.";
+      this.message = "File '" + this.filename + "' is ready.";
       this.show_buttons = true;
     } else if (response.status == 0) {
       this.message = 'Could not prepare workspace file. ' + response.detailed_reason;

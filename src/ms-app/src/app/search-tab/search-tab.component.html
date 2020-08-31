@@ -1,0 +1,44 @@
+<div style="position: relative; top: 15px; left: 10px; height: 750px; width: 1000px;">
+<div class="search_text_container">
+  <div style="position: relative;">
+    <input type="text" #query name="searchText" size="42"
+      placeholder="Search genes, pathways, GO terms or labels"
+      matTooltip="Use 'pathway:immune response' to specifically search for all pathway names containing the string 'immune response'; Use 'gene:' and 'go:' to search specifically for genes and GO terms similarly. You can also simultaneously search multiple comma separated terms, for example, 'gene:cdk1,pten, go:response to virus'"
+      (keyup.enter)="doSearch(query.value)" />
+    <button type="submit" class="search_button" (click)="doSearch(query.value)"></button>
+  </div>
+</div>
+<div style="position: relative; top: 15px; left: 10px; height: 500px; width: 450px; display:inline-block;">
+<div class="search_results_container">
+  <div *ngFor="let result_group of current_search_results; let g = index">
+    {{result_group.query}}
+    <div *ngFor="let result of result_group.search_result_summaries; let i = index" class="search_result_tr">
+      <div (click)="toggleResult(i)"
+        [ngClass]="{'search_result_td_selected': isSearchSelected(result.search_id), 'search_result_td': !isSearchSelected(result.search_id)}"
+        [matTooltip]="'Genes in [' + result_group.dataset_names + ']: [' + result.intersection_counts_per_dataset + ']'">
+        {{result.html_display_tag_pre}}<b>{{result.html_display_tag_mid}}</b>{{result.html_display_tag_post}}
+      </div>
+      <div>
+        <div *ngIf="isSearchSelected(result.search_id);then add else remove"></div>
+        <ng-template #add>
+          <div class="minus_button" (click)="toggleResult(g,i)"></div>
+        </ng-template>
+        <ng-template #remove>
+          <div class="plus_button" (click)="toggleResult(g,i)"></div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<div style="position: relative; top: 30px; left: 10px; height: 500px; width: 450px; display:inline-block; float:right;">
+<div class="search_container">
+<div *ngFor="let result of selected_searches" id="datasets_div" class="select_block" [matTooltip]="'Genes in [' + dataset_names + ']: [' + result.intersection_counts_per_dataset + ']'" >
+  {{result.display_tag}} [{{result.background_count}}, {{result.intersection_count}}]
+  <div class="minus_button" (click)="removeSearchResult(result)"></div>
+</div>
+</div>
+</div>
+<div class="apply_changes_div">
+  <button type="button" (click)="applyChanges()">Apply Changes</button>
+</div><br><br><br>

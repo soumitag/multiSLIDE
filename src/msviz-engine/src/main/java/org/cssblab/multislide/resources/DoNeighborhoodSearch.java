@@ -7,7 +7,6 @@ package org.cssblab.multislide.resources;
 
 import com.google.gson.Gson;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.servlet.ServletContext;
@@ -17,7 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.cssblab.multislide.beans.data.NeighborhoodSearchResults;
-import org.cssblab.multislide.beans.data.SearchResults;
 import org.cssblab.multislide.beans.data.ServerResponse;
 import org.cssblab.multislide.datahandling.DataParser;
 import org.cssblab.multislide.datahandling.DataParsingException;
@@ -25,7 +23,7 @@ import org.cssblab.multislide.datahandling.RequestParam;
 import org.cssblab.multislide.graphics.Heatmap;
 import org.cssblab.multislide.searcher.network.NetworkSearchHandler;
 import org.cssblab.multislide.structure.AnalysisContainer;
-import org.cssblab.multislide.utils.FileHandler;
+import org.cssblab.multislide.utils.Utils;
 
 /**
  *
@@ -73,20 +71,32 @@ public class DoNeighborhoodSearch extends HttpServlet {
             Heatmap heatmap = analysis.heatmaps.get(parser.getString("dataset_name"));
             
             ServletContext context = request.getServletContext();
-            HashMap <String, Integer> identifier_index_map = (HashMap <String, Integer> )context.getAttribute("identifier_index_map");
-            int idenitifier_index = identifier_index_map.get(heatmap.column_label);
+            //HashMap <String, Integer> identifier_index_map = (HashMap <String, Integer> )context.getAttribute("identifier_index_map");
+            HashMap <String, Integer> identifier_index_map = AnalysisContainer.createIdentifierIndexMap();
+            
+            String[] a = heatmap.getMapConfig().getSelectedFeatureIdentifiers();
+            Utils.log_info("Num. Selected Column Identifiers: " + a.length);
+            for (String s: a)
+                Utils.log_info(s);
+            
+            //int idenitifier_index = identifier_index_map.get(heatmap.getMapConfig().getSelectedColumnIdentifiers()[0]);
+            String linker_identifier_type = analysis.data.datasets.get(parser.getString("dataset_name")).specs.linker_identifier_type;
+            Utils.log_info("linker_identifier_type: " + linker_identifier_type);
+            int idenitifier_index = identifier_index_map.get(linker_identifier_type);
             
             NeighborhoodSearchResults nsr = new NeighborhoodSearchResults();
-            nsr.makeNeighborhoodSearchResultObject(analysis.searcher, heatmap.column_label, idenitifier_index, search_results, analysis.data.metadata.entrezMaster);
+            nsr.makeNeighborhoodSearchResultObject(analysis.searcher, 
+                    heatmap.getMapConfig().getSelectedFeatureIdentifiers()[0], 
+                    idenitifier_index, search_results, analysis.data.entrez_master_as_map);
             sendData(response, nsr.asJSON());
         
         } catch (DataParsingException dpe) {
-            System.out.println(dpe);
+            Utils.log_exception(dpe,"Data Parsing Exception");
             NeighborhoodSearchResults nsr = new NeighborhoodSearchResults();
             nsr.message = dpe.getMessage();
             sendData(response, nsr.asJSON());
         } catch (Exception e) {
-            System.out.println(e);
+            Utils.log_exception(e, "");
             returnMessage(new ServerResponse(0, "Data parsing exception", e.getMessage()), response);
         }
         

@@ -1,12 +1,17 @@
 package org.cssblab.multislide.structure;
 
+import com.google.gson.Gson;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import org.cssblab.multislide.searcher.Searcher;
+import org.cssblab.multislide.utils.Utils;
 
 /**
  *
@@ -14,42 +19,69 @@ import org.cssblab.multislide.searcher.Searcher;
  */
 public class Serializer implements Serializable {
     
+    public static String TYPE_OBJ = "object";
+    public static String TYPE_JSON = "json";
+    
     private static final long serialVersionUID = 1L;
     
     public Serializer(){}
     
-    public void serializeAnalysis(AnalysisContainer analysis, String filepath) {
+    public String serializeAnalysis(AnalysisContainer analysis, String filepath, String session_folder_path, String type) throws Exception {
         
-        try (ObjectOutputStream oos
-                = new ObjectOutputStream(new FileOutputStream(filepath + File.separator + analysis.analysis_name + ".mslide"))) {
+        AnalysisState state = new AnalysisState(analysis, session_folder_path);
+
+        if (type.equals(Serializer.TYPE_OBJ)) {
             
-            analysis.searcher = null;
-            oos.writeObject(analysis);
-            System.out.println("Analysis saved.");
+            ObjectOutputStream oos
+                    = new ObjectOutputStream(new FileOutputStream(filepath + File.separator + state.analysis_name + ".mslide"));
             
-            //create a searcher object
-            analysis.setSearcher(new Searcher(analysis.species));
+            oos.writeObject(state);
+            Utils.log_info("Analysis saved.");
+            return state.analysis_name + ".mslide";
             
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } else if (type.equals(Serializer.TYPE_JSON)) {
+            
+            String json = state.asJSON();
+            
+            BufferedWriter writer = new BufferedWriter(new FileWriter(filepath + File.separator + state.analysis_name + ".mslide", false));
+            writer.append(json);
+            writer.close();
+            return state.analysis_name + ".mslide";
+            
+        } else {
+            throw new MultiSlideException("Unknown type: " + type + ". Can be 'object' or 'json'.");
         }
-        
+
     }
     
-    public AnalysisContainer loadAnalysis(String filepath) {
+    public AnalysisState loadAnalysis(String filepath, String type) throws Exception {
         
-        AnalysisContainer analysis = null;
-
-        try (ObjectInputStream ois
-                = new ObjectInputStream(new FileInputStream(filepath))) {
-
-            analysis = (AnalysisContainer) ois.readObject();
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        if (type.equals(Serializer.TYPE_OBJ)) {
+            
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filepath));
+            AnalysisState state = (AnalysisState) ois.readObject();
+            return state;
+            
+        } else if (type.equals(Serializer.TYPE_JSON)) {
+            
+            BufferedReader br = new BufferedReader(new FileReader(filepath));
+            AnalysisState state = new Gson().fromJson(br, AnalysisState.class);  
+            return state;
+            
+        } else {
+            throw new MultiSlideException("Unknown type: " + type + ". Can be 'object' or 'json'.");
         }
-
-        return analysis;
+    }
+    
+    public static void mslideObjectToJSON(String infile, String outfile) throws Exception {
+        
+        Serializer s = new Serializer();
+        AnalysisState state = s.loadAnalysis(infile, Serializer.TYPE_OBJ);
+        
+        String json = state.asJSON();
+        BufferedWriter writer = new BufferedWriter(new FileWriter(outfile, false));
+        writer.append(json);
+        writer.close();
     }
     
 }

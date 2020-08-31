@@ -1,6 +1,6 @@
 .map_controls_title {
     text-align:left;
-    font-family: verdana;
+    font-family: 'Poppins', sans-serif;
     font-size: 20px;
     font-weight: normal;
     margin-top: 10px;
@@ -12,7 +12,7 @@
 
 .map_control_labels {
     text-align:left;
-    font-family: verdana;
+    font-family: 'Poppins', sans-serif;
     font-size: 14px;
     font-weight: normal;
     margin-top: 10px;
@@ -22,7 +22,7 @@
 
 .colrmap_type_labels {
     text-align:left;
-    font-family: verdana;
+    font-family: 'Poppins', sans-serif;
     font-size: 14px;
     font-weight: normal;
     line-height: 25px;
@@ -30,7 +30,7 @@
 
 .map_settings_controls {
     text-align:left;
-    font-family: verdana;
+    font-family: 'Poppins', sans-serif;
     font-size: 14px;
     font-weight: normal;
     margin-top: 10px;
@@ -39,7 +39,7 @@
 .map_settings_control_items {
     padding-left: 10px;
     text-align:left;
-    font-family: verdana;
+    font-family: 'Poppins', sans-serif;
     font-size: 14px;
     font-weight: normal;
     margin-left: 10px;
@@ -50,7 +50,7 @@
     margin-left: 30px;
     margin-top: 5px;
     text-align:left;
-    font-family: verdana;
+    font-family: 'Poppins', sans-serif;
     font-size: 14px;
     font-weight: normal;
     line-height: 10px
@@ -61,6 +61,7 @@
     top: 30px; 
     width: 500px; 
     padding-top: 18px;
+    padding-bottom: 18px;
     border-top: black 1px solid; 
     align-content: center;
     text-align: center;
@@ -77,6 +78,28 @@ button {
     cursor: pointer;
     letter-spacing: 2px;
     font-family: 'Verdana';
+}
+
+.add_button {
+    background-color: #F8F8F8;
+    padding: 5px 16px;
+    font-size: 9px;
+    color: #505050;
+    text-transform: uppercase;
+    border: 1px solid #505050;
+    border-radius: 10px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    font-family: 'Verdana';
+}
+
+.minus_button {
+    width: 18px;
+    height: 18px;
+    float: right;
+    cursor: pointer;
+    background-image: url('assets/img/minus512_green_filled.png');
+    background-size: 18px 18px;
 }
 
 button:hover {
@@ -109,4 +132,26 @@ button:hover {
     float: right;
     width: 220px;
     line-height: normal;
+}
+
+.select_block2 {
+    text-align:left;
+    float: left;
+    background-color:#FDFDFD;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    font-weight: normal;
+    height: 18px;
+    width: 92%;
+    overflow-y: auto;
+    /*border-bottom: 1px solid white;*/
+}
+
+.container_block {
+    
 }

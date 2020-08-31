@@ -1,7 +1,6 @@
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { Injectable } from '@angular/core';
-import { Http } from "@angular/http";
 import { HttpClient } from '@angular/common/http';
 import "rxjs/Rx"
 import { ServerResponseData } from './server_response';
@@ -13,7 +12,7 @@ export class CreateSessionService {
 
 	private baseUrl = LocalSettings.MSVIZ_ENGINE_URL + "/CreateSession";  // web api URL
 	
-	constructor(private http: Http, private httpClient: HttpClient) { }
+	constructor(private httpClient: HttpClient) { }
 
 	createSessionData(analysis_name): Observable<ServerResponseData> {
 		console.log("getting response...");

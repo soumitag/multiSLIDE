@@ -11,10 +11,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import org.cssblab.multislide.structure.AnalysisContainer;
-import org.cssblab.multislide.structure.ClinicalInformation;
+import org.cssblab.multislide.structure.data.ClinicalInformation;
 import org.cssblab.multislide.structure.GeneGroup;
 import org.cssblab.multislide.structure.MultiSlideException;
 import org.cssblab.multislide.structure.NetworkNeighbor;
+import org.cssblab.multislide.utils.Utils;
 
 /**
  *
@@ -77,30 +78,34 @@ public class LegendGroup implements Serializable {
     public static ArrayList <LegendGroup> createPhenotypeLegendGroups(AnalysisContainer analysis) throws MultiSlideException {
         
         HashMap <String, HashMap <String, double[]>> phenotypeColorMap = analysis.data.clinical_info.phenotypeColorMap;
-        HashMap <String, HashMap <String, Integer>> phenotypeValueSortMap = analysis.data.clinical_info.phenotypeValueSortMap;
+        HashMap <String, HashMap <String, Integer>> phenotypeValueSortMap = analysis.data.clinical_info.getDistinctPhenotypeValues(
+                analysis.data_selection_state.selected_phenotypes
+        );
         
-        ArrayList <LegendGroup> L = new ArrayList <LegendGroup> ();
+        ArrayList <LegendGroup> L = new ArrayList <> ();
         
         for (Map.Entry pair : phenotypeColorMap.entrySet()) {
             String phenotype = (String)pair.getKey();
-            if (analysis.data.fs_data.hasPhenotype(phenotype)) {
+            if (analysis.data_selection_state.hasPhenotype(phenotype)) {
                 if (analysis.data.clinical_info.getPhenotypeDatatype(phenotype) == ClinicalInformation.PHENOTYPE_DATATYPE_CONTINUOUS) {
                     L.add(new LegendGroup(phenotype, analysis.data.clinical_info.getPhenotypeRange(phenotype), analysis.data.clinical_info.standard_continuous_colors));
                 } else {
                     int sz = phenotypeValueSortMap.get(phenotype).size();
                     String[] names = new String[sz];
                     double[][] colors = new double[sz][3];
+                    int position = 0;
                     for (Map.Entry pair_1 : ((HashMap <String, double[]>)pair.getValue()).entrySet()) {
                         String name = (String)pair_1.getKey();
-                        int position = phenotypeValueSortMap.get(phenotype).get(name);
+                        //int position = phenotypeValueSortMap.get(phenotype).get(name);
                         if (name.equals("")){
                             name = "-";
                         }
                         names[position] = name;
                         colors[position] = (double[])pair_1.getValue();
+                        position++;
                     }
-                    ArrayList <String> names_list = new ArrayList <String> (Arrays.asList(names));
-                    ArrayList <double[]> colors_list = new ArrayList <double[]> (Arrays.asList(colors));
+                    ArrayList <String> names_list = new ArrayList <> (Arrays.asList(names));
+                    ArrayList <double[]> colors_list = new ArrayList <> (Arrays.asList(colors));
                     L.add(new LegendGroup(phenotype, names_list, colors_list));
                 }
             }
@@ -116,15 +121,17 @@ public class LegendGroup implements Serializable {
         //String[] group_ids = analysis.data_selection_state.getGeneGroupNames();
         //String[] queryTypes = analysis.data_selection_state.getGeneGroupTypes();
         
-        HashMap <String, GeneGroup> gene_groups = analysis.data.fs_data.getGeneGroups();
+        HashMap <String, GeneGroup> gene_groups = analysis.data.selected.getGeneGroups();
         
         LegendGroup pathways = new LegendGroup("Pathways", new ArrayList <String> (), new ArrayList <double[]> ());
         LegendGroup ontologies = new LegendGroup("Gene Ontologies", new ArrayList <String> (), new ArrayList <double[]> ());
         LegendGroup genes = new LegendGroup("Genes", new ArrayList <String> (), new ArrayList <double[]> ());
+        LegendGroup user_defined = new LegendGroup("User-defined Functional Groups", new ArrayList <String> (), new ArrayList <double[]> ());
         
         boolean hasGenes = false;
         boolean hasPathways = false;
         boolean hasOntologies = false;
+        boolean hasUserDefined = false;
         
         for (GeneGroup gene_group : gene_groups.values()) {
             if (gene_group.type.equals("entrez")) {
@@ -141,6 +148,10 @@ public class LegendGroup implements Serializable {
                 hasOntologies = true;
                 ontologies.legend_names.add(gene_group.display_tag);
                 ontologies.colors.add(gene_group.color);
+            } else if (gene_group.type.equals("user_defined")) {
+                hasUserDefined = true;
+                user_defined.legend_names.add(gene_group.display_tag);
+                user_defined.colors.add(gene_group.color);
             }
         }
         
@@ -154,6 +165,9 @@ public class LegendGroup implements Serializable {
         if (hasOntologies) {
             L.add(ontologies);
         }
+        if (hasUserDefined) {
+            L.add(user_defined);
+        }
         
         return L;
     }
@@ -164,24 +178,18 @@ public class LegendGroup implements Serializable {
         ArrayList <LegendGroup> G = new ArrayList <LegendGroup> ();
         LegendGroup L = new LegendGroup();
         L.title = "Network and Neighbor Types";
-        L.legend_names.add("Protein-Protein Interactions Search Key");
         L.legend_names.add("Protein-Protein Interactions");
-        L.legend_names.add("miRNA Targets Search Key");
         L.legend_names.add("miRNA Targets");
-        L.legend_names.add("Transcription Factor Targets Search Key");
         L.legend_names.add("Transcription Factor Targets");
-        L.colors.add(NetworkNeighbor.PPI_ENTREZ_NEIGHBOR_COLOR);
+        L.legend_names.add("Search Key");
         L.colors.add(NetworkNeighbor.PPI_ENTREZ_NEIGHBOR_COLOR);
         L.colors.add(NetworkNeighbor.MIRNA_ID_NEIGHBOR_COLOR);
-        L.colors.add(NetworkNeighbor.MIRNA_ID_NEIGHBOR_COLOR);
         L.colors.add(NetworkNeighbor.TF_ENTREZ_NEIGHBOR_COLOR);
-        L.colors.add(NetworkNeighbor.TF_ENTREZ_NEIGHBOR_COLOR);
-        L.stroke_colors.add(NetworkNeighbor.PPI_ENTREZ_NEIGHBOR_STROKE_COLOR);
+        L.colors.add(NetworkNeighbor.SEARCH_KEY_COLOR);
         L.stroke_colors.add(NetworkNeighbor.PPI_ENTREZ_NEIGHBOR_STROKE_COLOR);
         L.stroke_colors.add(NetworkNeighbor.MIRNA_ID_NEIGHBOR_STROKE_COLOR);
-        L.stroke_colors.add(NetworkNeighbor.MIRNA_ID_NEIGHBOR_STROKE_COLOR);
         L.stroke_colors.add(NetworkNeighbor.TF_ENTREZ_NEIGHBOR_STROKE_COLOR);
-        L.stroke_colors.add(NetworkNeighbor.TF_ENTREZ_NEIGHBOR_STROKE_COLOR);
+        L.stroke_colors.add(NetworkNeighbor.SEARCH_KEY_COLOR);
         G.add(L);
         return G;
     }

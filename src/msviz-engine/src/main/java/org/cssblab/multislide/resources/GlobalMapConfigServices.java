@@ -2,26 +2,30 @@ package org.cssblab.multislide.resources;
 
 import com.google.gson.Gson;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.Map;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.apache.commons.collections4.map.ListOrderedMap;
 import org.cssblab.multislide.algorithms.clustering.HierarchicalClusterer;
 import org.cssblab.multislide.beans.data.MappedData;
-import org.cssblab.multislide.beans.data.SearchResultSummary;
 import org.cssblab.multislide.beans.data.ServerResponse;
 import org.cssblab.multislide.beans.data.SignificanceTestingParams;
 import org.cssblab.multislide.datahandling.DataParser;
 import org.cssblab.multislide.datahandling.DataParsingException;
 import org.cssblab.multislide.datahandling.RequestParam;
+import org.cssblab.multislide.graphics.ColorPalette;
+import org.cssblab.multislide.graphics.Heatmap;
+import org.cssblab.multislide.graphics.PyColorMaps;
 import org.cssblab.multislide.structure.AnalysisContainer;
 import org.cssblab.multislide.structure.ClusteringParams;
 import org.cssblab.multislide.structure.GlobalMapConfig;
-import org.cssblab.multislide.structure.MultiSlideException;
 import org.cssblab.multislide.structure.PhenotypeSortingParams;
+import org.cssblab.multislide.utils.Utils;
 
 /**
  *
@@ -70,16 +74,28 @@ public class GlobalMapConfigServices extends HttpServlet {
         mapped_data_response_actions.put("set_current_feature_start", RequestParam.DATA_TYPE_INT);
         */
         
+        boolean _roll_back = false;
+        GlobalMapConfig _cached_global_map_config = null;
+        AnalysisContainer analysis = null;
+        
         try {
             
+            /*
+            Removed:
+            "set_rows_per_page", 
+            "set_cols_per_page", 
+            "set_current_sample_start",
+            "set_current_feature_start",
+            */
+            
             String[] actions = new String[]{
+                "set_selected_phenotypes",
+                "set_selected_datasets",
                 "get_global_map_config", 
                 "set_map_resolution", 
                 "set_grid_layout", 
                 "set_col_header_height", 
                 "set_row_label_width", 
-                "set_rows_per_page", 
-                "set_cols_per_page", 
                 "set_clustering_params", 
                 "set_row_ordering",
                 "set_col_ordering", 
@@ -87,10 +103,29 @@ public class GlobalMapConfigServices extends HttpServlet {
                 "set_sample_filtering",
                 "set_significance_testing_params", 
                 "set_phenotype_sorting_params", 
-                "set_current_sample_start",
-                "set_current_feature_start",
-                "set_map_orientation"
+                "set_map_orientation",
+                "set_is_dataset_linking_on",
+                "set_database_linkings"
             };
+            
+            HashMap <String, Boolean> _atomic_transactions = new HashMap <> ();
+            _atomic_transactions.put("set_selected_phenotypes", true);
+            _atomic_transactions.put("set_selected_datasets", true);
+            _atomic_transactions.put("set_map_resolution", true);
+            _atomic_transactions.put("set_grid_layout", true);
+            _atomic_transactions.put("set_col_header_height", true);
+            _atomic_transactions.put("set_row_label_width", true);
+            _atomic_transactions.put("set_clustering_params", true);
+            _atomic_transactions.put("set_row_ordering", true);
+            _atomic_transactions.put("set_col_ordering", true);
+            _atomic_transactions.put("set_gene_filtering", true);
+            _atomic_transactions.put("set_sample_filtering", true);
+            _atomic_transactions.put("set_significance_testing_params", true);
+            _atomic_transactions.put("set_phenotype_sorting_params", true);
+            _atomic_transactions.put("set_map_orientation", true);
+            _atomic_transactions.put("set_is_dataset_linking_on", true);
+            _atomic_transactions.put("set_database_linkings", true);
+            
             DataParser parser = new DataParser(request);
             parser.addParam("analysis_name", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_REQUIRED);
             parser.addParam("action", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_REQUIRED, actions);
@@ -108,11 +143,19 @@ public class GlobalMapConfigServices extends HttpServlet {
                 return;
             }
 
-            AnalysisContainer analysis = (AnalysisContainer)session.getAttribute(analysis_name);
+            analysis = (AnalysisContainer)session.getAttribute(analysis_name);
             if (analysis == null) {
                 ServerResponse resp = new ServerResponse(0, "Analysis not found", "Analysis name '" + analysis_name + "' does not exist");
                 returnMessage(resp, response);
                 return;
+            }
+            
+            /*
+            Create a savepoint to restore to in case transaction fails 
+            */
+            if (_atomic_transactions.containsKey(action)) {
+                _roll_back = true;
+                _cached_global_map_config = analysis.global_map_config.clone();
             }
 
             String json = "";
@@ -150,8 +193,8 @@ public class GlobalMapConfigServices extends HttpServlet {
                 parser.addParam("param_value", RequestParam.DATA_TYPE_INT, RequestParam.PARAM_TYPE_REQUIRED);
                 if (!parser.parse()) { returnMessage(new ServerResponse(0, "Bad param", parser.error_msg), response); return; }
                 analysis.global_map_config.setColumnOrderingScheme(parser.getInt("param_value"));
-                analysis.data.fs_data.recomputeColOrdering(analysis);
-                analysis.global_map_config.setCurrentFeatureStart(0);
+                analysis.data.selected.recomputeFeatureOrdering(analysis);
+                //analysis.global_map_config.setCurrentFeatureStart(0);
                 returnMessage(new ServerResponse(1, "", ""), response); return;
                 
             } else if(action.equalsIgnoreCase("set_row_ordering")) {
@@ -159,8 +202,8 @@ public class GlobalMapConfigServices extends HttpServlet {
                 parser.addParam("param_value", RequestParam.DATA_TYPE_INT, RequestParam.PARAM_TYPE_REQUIRED);
                 if (!parser.parse()) { returnMessage(new ServerResponse(0, "Bad param", parser.error_msg), response); return; }
                 analysis.global_map_config.setSampleOrderingScheme(parser.getInt("param_value"));
-                analysis.data.fs_data.recomputeRowOrdering(analysis);
-                analysis.global_map_config.setCurrentSampleStart(0);
+                analysis.data.selected.recomputeSampleOrdering(analysis);
+                //analysis.global_map_config.setCurrentSampleStart(0);
                 returnMessage(new ServerResponse(1, "", ""), response); return;
                 
             } else if(action.equalsIgnoreCase("set_map_orientation")) {
@@ -169,69 +212,21 @@ public class GlobalMapConfigServices extends HttpServlet {
                 if (!parser.parse()) { returnMessage(new ServerResponse(0, "Bad param", parser.error_msg), response); return; }
                 analysis.global_map_config.setMapOrientation(parser.getInt("param_value"));
                 returnMessage(new ServerResponse(1, "", ""), response); return;
-                
-                
-                
-                
-            } else if(action.equalsIgnoreCase("set_rows_per_page")) {
-                
-                parser.addParam("param_value", RequestParam.DATA_TYPE_INT, RequestParam.PARAM_TYPE_REQUIRED);
-                if (!parser.parse()) { returnMessage(new ServerResponse(0, "Bad param", parser.error_msg), response); return; }
-                analysis.global_map_config.setUserSpecifiedRowsPerPage(parser.getInt("param_value"));
-                analysis.global_map_config.setCurrentSampleStart(analysis.global_map_config.getCurrentSampleStart());
-                MappedData md = new MappedData(1, "", "");
-                md.addNameValuePair("rowsPerPageDisplayed", analysis.global_map_config.getRowsPerPageDisplayed()+"");
-                md.addNameValuePair("userSpecifiedRowsPerPage", analysis.global_map_config.getUserSpecifiedRowsPerPage()+"");
-                md.addNameValuePair("current_sample_start", analysis.global_map_config.getCurrentSampleStart()+"");
-                json = md.asJSON();
-                sendData(response, json);
-                
-            } else if(action.equalsIgnoreCase("set_cols_per_page")) {
-                
-                parser.addParam("param_value", RequestParam.DATA_TYPE_INT, RequestParam.PARAM_TYPE_REQUIRED);
-                if (!parser.parse()) { returnMessage(new ServerResponse(0, "Bad param", parser.error_msg), response); return; }
-                analysis.global_map_config.setUserSpecifiedColsPerPage(parser.getInt("param_value"));
-                analysis.global_map_config.setCurrentFeatureStart(analysis.global_map_config.getCurrentFeatureStart());
-                MappedData md = new MappedData(1, "", "");
-                md.addNameValuePair("colsPerPageDisplayed", analysis.global_map_config.getColsPerPageDisplayed()+"");
-                md.addNameValuePair("userSpecifiedColsPerPage", analysis.global_map_config.getUserSpecifiedColsPerPage()+"");
-                md.addNameValuePair("current_feature_start", analysis.global_map_config.getCurrentFeatureStart()+"");
-                json = md.asJSON();
-                sendData(response, json);
-                
-            } else if(action.equalsIgnoreCase("set_current_sample_start")) {
-                
-                parser.addParam("param_value", RequestParam.DATA_TYPE_INT, RequestParam.PARAM_TYPE_REQUIRED);
-                parser.addParam("scrollBy", RequestParam.DATA_TYPE_INT, RequestParam.PARAM_TYPE_REQUIRED);
-                if (!parser.parse()) { returnMessage(new ServerResponse(0, "Bad param", parser.error_msg), response); return; }
-                analysis.global_map_config.setScrollBy(parser.getInt("scrollBy"));
-                analysis.global_map_config.setCurrentSampleStart(parser.getInt("param_value"));
-                MappedData md = new MappedData(1, "", "");
-                md.addNameValuePair("current_sample_start", analysis.global_map_config.getCurrentSampleStart()+"");
-                json = md.asJSON();
-                sendData(response, json);
-                
-            } else if(action.equalsIgnoreCase("set_current_feature_start")) {
-                
-                parser.addParam("param_value", RequestParam.DATA_TYPE_INT, RequestParam.PARAM_TYPE_REQUIRED);
-                parser.addParam("scrollBy", RequestParam.DATA_TYPE_INT, RequestParam.PARAM_TYPE_REQUIRED);
-                if (!parser.parse()) { returnMessage(new ServerResponse(0, "Bad param", parser.error_msg), response); return; }
-                analysis.global_map_config.setCurrentFeatureStart(parser.getInt("param_value"));
-                analysis.global_map_config.setScrollBy(parser.getInt("scrollBy"));
-                MappedData md = new MappedData(1, "", "");
-                md.addNameValuePair("current_feature_start", analysis.global_map_config.getCurrentFeatureStart()+"");
-                json = md.asJSON();
-                sendData(response, json);
-                
+   
             } else if(action.equalsIgnoreCase("set_gene_filtering")) {
                 
                 parser.addParam("param_value", RequestParam.DATA_TYPE_BOOLEAN, RequestParam.PARAM_TYPE_REQUIRED);
                 if (!parser.parse()) { returnMessage(new ServerResponse(0, "Bad param", parser.error_msg), response); return; }
                 analysis.global_map_config.setGeneFilteringOn(parser.getBool("param_value"));
-                analysis.data.fs_data.recomputeColOrdering(analysis);
-                analysis.global_map_config.setAvailableCols(analysis.data.fs_data.nFilteredGenes);
+                analysis.data.selected.recomputeFeatureOrdering(analysis);
+                
+                /*
+                analysis.global_map_config.setAvailableCols(analysis.data.selected.getNumFeatures(analysis.global_map_config));
                 analysis.global_map_config.setUserSpecifiedColsPerPage(analysis.global_map_config.getUserSpecifiedColsPerPage());
                 analysis.global_map_config.setCurrentFeatureStart(0);
+                */
+                
+                /*
                 MappedData md = new MappedData(1, "", "");
                 md.addNameValuePair("available_cols", analysis.global_map_config.available_cols+"");
                 md.addNameValuePair("colsPerPageDisplayed", analysis.global_map_config.getColsPerPageDisplayed()+"");
@@ -239,35 +234,57 @@ public class GlobalMapConfigServices extends HttpServlet {
                 md.addNameValuePair("current_feature_start", analysis.global_map_config.getCurrentFeatureStart()+"");
                 json = md.asJSON();
                 sendData(response, json);
+                */
+                
+                returnMessage(new ServerResponse(1, "", ""), response); return;
                 
             } else if(action.equalsIgnoreCase("set_sample_filtering")) {
                 
                 parser.addParam("param_value", RequestParam.DATA_TYPE_BOOLEAN, RequestParam.PARAM_TYPE_REQUIRED);
                 if (!parser.parse()) { returnMessage(new ServerResponse(0, "Bad param", parser.error_msg), response); return; }
                 analysis.global_map_config.setSampleFilteringOn(parser.getBool("param_value"));
-                
-            
-                
-                
-                
+         
             } else if(action.equalsIgnoreCase("set_significance_testing_params")) {
                 
                 parser.addParam("dataset", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_REQUIRED);
                 parser.addParam("phenotype", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_REQUIRED);
                 parser.addParam("significance_level", RequestParam.DATA_TYPE_DOUBLE, RequestParam.PARAM_TYPE_REQUIRED);
+                parser.addParam("testtype", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_REQUIRED);
+                parser.addParam("apply_fdr", RequestParam.DATA_TYPE_BOOLEAN, RequestParam.PARAM_TYPE_REQUIRED);
+                
                 if (!parser.parse()) {
                     returnMessage(new ServerResponse(0, "Bad param", parser.error_msg), response);
                     return;
                 }
-                analysis.global_map_config.setSignificanceTestingParameters(new SignificanceTestingParams(
-                        parser.getString("dataset"), parser.getString("phenotype"), parser.getDouble("significance_level")
-                ));
+
+                if(!parser.getBool("apply_fdr")){
+                    analysis.global_map_config.setSignificanceTestingParameters(new SignificanceTestingParams(
+                            parser.getString("dataset"), parser.getString("phenotype"), parser.getDouble("significance_level"),
+                            parser.getString("testtype"), false, 1.0
+                    ));
+                } else {
+                    parser.addParam("fdr_threshold", RequestParam.DATA_TYPE_DOUBLE, RequestParam.PARAM_TYPE_REQUIRED);
+                    if (!parser.parse()) {
+                        returnMessage(new ServerResponse(0, "Bad param", parser.error_msg), response);
+                        return;
+                    }
+                    analysis.global_map_config.setSignificanceTestingParameters(new SignificanceTestingParams(
+                            parser.getString("dataset"), parser.getString("phenotype"), parser.getDouble("significance_level"),
+                            parser.getString("testtype"), true, parser.getDouble("fdr_threshold")
+                    ));
+                }
                 
                 if (analysis.global_map_config.isGeneFilteringOn) {
-                    analysis.data.fs_data.recomputeColOrdering(analysis);
-                    analysis.global_map_config.setAvailableCols(analysis.data.fs_data.nFilteredGenes);
+                    
+                    analysis.data.selected.recomputeFeatureOrdering(analysis);
+                    
+                    /*
+                    analysis.global_map_config.setAvailableCols(analysis.data.selected.getNumFeatures(analysis.global_map_config));
                     analysis.global_map_config.setUserSpecifiedColsPerPage(analysis.global_map_config.getUserSpecifiedColsPerPage());
                     analysis.global_map_config.setCurrentFeatureStart(0);
+                    */
+                    
+                    /*
                     MappedData md = new MappedData(1, "", "");
                     md.addNameValuePair("available_cols", analysis.global_map_config.available_cols+"");
                     md.addNameValuePair("colsPerPageDisplayed", analysis.global_map_config.getColsPerPageDisplayed()+"");
@@ -275,20 +292,39 @@ public class GlobalMapConfigServices extends HttpServlet {
                     md.addNameValuePair("current_feature_start", analysis.global_map_config.getCurrentFeatureStart()+"");
                     json = md.asJSON();
                     sendData(response, json);
+                    */
+                    
+                    returnMessage(new ServerResponse(1, "", ""), response); return;
+                    
                 } else if (analysis.global_map_config.columnOrderingScheme == GlobalMapConfig.SIGNIFICANCE_COLUMN_ORDERING) {
-                    analysis.data.fs_data.recomputeColOrdering(analysis);
+                    
+                    analysis.data.selected.recomputeFeatureOrdering(analysis);
+                    
+                    /*
                     analysis.global_map_config.setCurrentFeatureStart(0);
                     MappedData md = new MappedData(1, "", "");
                     json = md.asJSON();
                     sendData(response, json);
+                    */
+                    
+                    returnMessage(new ServerResponse(1, "", ""), response); return;
+                    
                 } else {
+                    /*
                     MappedData md = new MappedData(1, "", "");
                     json = md.asJSON();
                     sendData(response, json);
+                    */
+                    returnMessage(new ServerResponse(1, "", ""), response); return;
                 }
                 
             }  else if(action.equalsIgnoreCase("set_clustering_params")) {
                 
+                /*
+                parser.addParam("is_joint", RequestParam.DATA_TYPE_BOOLEAN, RequestParam.PARAM_TYPE_REQUIRED);
+                parser.addParam("use_aggregate", RequestParam.DATA_TYPE_BOOLEAN, RequestParam.PARAM_TYPE_REQUIRED);
+                parser.addParam("aggregate_func", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_REQUIRED);
+                */
                 parser.addParam("type", RequestParam.DATA_TYPE_INT, RequestParam.PARAM_TYPE_REQUIRED);
                 parser.addParam("dataset", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_REQUIRED);
                 parser.addParam("use_defaults", RequestParam.DATA_TYPE_BOOLEAN, RequestParam.PARAM_TYPE_REQUIRED);
@@ -299,40 +335,52 @@ public class GlobalMapConfigServices extends HttpServlet {
                     returnMessage(new ServerResponse(0, "Bad param", parser.error_msg), response);
                     return;
                 }
-                if (parser.getInt("type") == HierarchicalClusterer.TYPE_ROW_CLUSTERING) {
+                if (parser.getInt("type") == ClusteringParams.TYPE_SAMPLE_CLUSTERING) {
                     if (parser.getBool("use_defaults")) {
                         analysis.setRowClusteringParams(new ClusteringParams(
-                            HierarchicalClusterer.TYPE_ROW_CLUSTERING, 
+                            ClusteringParams.TYPE_SAMPLE_CLUSTERING,
                             parser.getString("dataset")
                         ));
                     } else {
                         analysis.setRowClusteringParams(new ClusteringParams(
-                            HierarchicalClusterer.TYPE_ROW_CLUSTERING, 
+                            ClusteringParams.TYPE_SAMPLE_CLUSTERING, 
                             parser.getInt("linkage_function"), 
                             parser.getInt("distance_function"), 
                             parser.getInt("leaf_ordering"),
                             parser.getString("dataset")
                         ));
+                        
+                        /*
+                        parser.getBool("is_joint"),
+                        parser.getBool("use_aggregate"),
+                        parser.getString("aggregate_func")
+                        */
                     }
-                    analysis.data.fs_data.recomputeRowOrdering(analysis);
-                    analysis.global_map_config.setCurrentSampleStart(0);
-                } else if (parser.getInt("type") == HierarchicalClusterer.TYPE_COL_CLUSTERING) {
+                    analysis.data.selected.recomputeSampleOrdering(analysis);
+                    //analysis.global_map_config.setCurrentSampleStart(0);
+                } else if (parser.getInt("type") == ClusteringParams.TYPE_FEATURE_CLUSTERING) {
                     if (parser.getBool("use_defaults")) {
                         analysis.setColClusteringParams(new ClusteringParams(
-                            HierarchicalClusterer.TYPE_COL_CLUSTERING, 
+                            ClusteringParams.TYPE_FEATURE_CLUSTERING, 
                             parser.getString("dataset")
                         ));
                     } else {
                         analysis.setColClusteringParams(new ClusteringParams(
-                            HierarchicalClusterer.TYPE_COL_CLUSTERING, 
+                            ClusteringParams.TYPE_FEATURE_CLUSTERING, 
                             parser.getInt("linkage_function"), 
                             parser.getInt("distance_function"), 
                             parser.getInt("leaf_ordering"),
                             parser.getString("dataset")
                         ));
+                        
+                        /*
+                        parser.getBool("is_joint"),
+                        parser.getBool("use_aggregate"),
+                        parser.getString("aggregate_func")
+                        */
                     }
-                    analysis.data.fs_data.recomputeColOrdering(analysis);
-                    analysis.global_map_config.setCurrentFeatureStart(0);
+                    analysis.data.selected.recomputeFeatureOrdering(analysis);
+                    //analysis.global_map_config.setCurrentFeatureStart(0);
                 }
                 
                 returnMessage(new ServerResponse(1, "", ""), response);
@@ -352,8 +400,8 @@ public class GlobalMapConfigServices extends HttpServlet {
                         parser.getBoolArray("sort_orders")
                     )
                 );
-                analysis.data.fs_data.recomputeRowOrdering(analysis);
-                analysis.global_map_config.setCurrentSampleStart(0);
+                analysis.data.selected.recomputeSampleOrdering(analysis);
+                //analysis.global_map_config.setCurrentSampleStart(0);
                 returnMessage(new ServerResponse(1, "", ""), response);
                 
             } else if (action.equalsIgnoreCase("get_global_map_config")) {
@@ -362,14 +410,125 @@ public class GlobalMapConfigServices extends HttpServlet {
                 json = global_config.mapConfigAsJSON();
                 sendData(response, json);
                 
+            } else if (action.equalsIgnoreCase("set_selected_datasets")) {
+                
+                parser.addListParam("selected_datasets", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_REQUIRED, ",");
+                if (!parser.parse()) {
+                    returnMessage(new ServerResponse(0, "Bad param", parser.error_msg), response);
+                    return;
+                }
+                Utils.log_info("setting selected datasets");
+                analysis.data_selection_state.setSelectedDatasets(parser.getStringArray("selected_datasets"));
+                analysis.clearCaches();
+                ServletContext context = request.getServletContext();
+                ColorPalette gene_group_color_palette = (ColorPalette)context.getAttribute("gene_group_color_palette");
+                analysis.data.createSelection(
+                        analysis,
+                        gene_group_color_palette
+                );
+                /*
+                analysis.global_map_config.setAvailableRows(analysis.data.selected.getNumSamples());
+                analysis.global_map_config.setAvailableCols(analysis.data.selected.getNumFeatures(analysis.global_map_config));
+                */
+                //analysis.global_map_config.setGeneFilteringOn(false);
+
+                Map<String, Heatmap> heatmaps = new ListOrderedMap <> ();
+                for (String dataset_name : analysis.data_selection_state.selected_datasets) {
+
+                    Heatmap heatmap;
+                    if (analysis.heatmaps.containsKey(dataset_name)) {
+                        Heatmap reference_heatmap = analysis.heatmaps.get(dataset_name);
+                        heatmap = new Heatmap(analysis.data.selected, dataset_name, reference_heatmap);
+                    } else {
+                        heatmap = new Heatmap(
+                                analysis, dataset_name,
+                                analysis.data.datasets.get(dataset_name).specs,
+                                20, "data_bins", "SEISMIC", -1, 1);
+                    }
+                    heatmap.genColorData((PyColorMaps) context.getAttribute("colormaps"));
+                    heatmap.assignBinsToRows(analysis.spark_session, analysis.data.selected);
+                    heatmaps.put(dataset_name, heatmap);
+
+                }
+                analysis.heatmaps = heatmaps;
+
+                returnMessage(new ServerResponse(1, "Done", ""), response);
+                return;
+                
+            } else if (action.equalsIgnoreCase("set_selected_phenotypes")) {
+                
+                parser.addListParam("selected_phenotypes", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_OPTIONAL, ",");
+                if (!parser.parse()) {
+                    returnMessage(new ServerResponse(0, "Bad param", parser.error_msg), response);
+                    return;
+                }
+                analysis.data_selection_state.setSelectedPhenotypes(parser.getStringArray("selected_phenotypes"));
+                analysis.global_map_config.phenotype_sorting_params.updateOnPhenSelectionChange(parser.getStringArray("selected_phenotypes"));
+                analysis.data.selected.updateSelectedPhenotypes(analysis, analysis.data.clinical_info);
+                returnMessage(new ServerResponse(1, "Done", ""), response);
+                return;
+                
+            } else if(action.equalsIgnoreCase("set_is_dataset_linking_on")) {
+                
+                parser.addParam("param_value", RequestParam.DATA_TYPE_BOOLEAN, RequestParam.PARAM_TYPE_REQUIRED);
+                if (!parser.parse()) { returnMessage(new ServerResponse(0, "Bad param", parser.error_msg), response); return; }
+                analysis.global_map_config.setDatasetLinkingOn(parser.getBool("param_value"));
+                analysis.data.selected.updateDatasetLinkages(analysis);
+                returnMessage(new ServerResponse(1, "Done", ""), response);
+                
+            } else if(action.equalsIgnoreCase("set_database_linkings")) {
+                
+                parser.addListParam("dataset_names", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_REQUIRED, ",");
+                parser.addListParam("is_dataset_linked_arr", RequestParam.DATA_TYPE_BOOLEAN, RequestParam.PARAM_TYPE_REQUIRED, ",");
+                if (!parser.parse()) {
+                    returnMessage(new ServerResponse(0, "Bad param", parser.error_msg), response);
+                    return;
+                }
+                String[] dataset_names_arr = parser.getStringArray("dataset_names");
+                boolean[] is_dataset_linked_arr = parser.getBoolArray("is_dataset_linked_arr");
+                for(int i = 0; i < dataset_names_arr.length; i++) {
+                    analysis.global_map_config.updateDatasetLinkings(dataset_names_arr[i], is_dataset_linked_arr[i]);
+                }
+                
+                analysis.data.selected.updateDatasetLinkages(analysis);
+                
+                Utils.log_info("dataset linkages:");
+                HashMap <String, Boolean> t = analysis.global_map_config.getDatasetLinkages();
+                for(String s: t.keySet())
+                    Utils.log_info("dataset: " + s + "\tis_linked=" + t.get(s));
+                
+                returnMessage(new ServerResponse(1, "Done", ""), response);
+                
             }
             
         } catch (DataParsingException dpe) {
-            System.out.println(dpe);
+            
+            rollbackSettings(_roll_back, analysis, _cached_global_map_config);
+            
+            Utils.log_exception(dpe, "Data parsing exception");
             returnMessage(new ServerResponse(0, "Data parsing exception", dpe.getMessage()), response);
+            
         } catch (Exception e) {
-            System.out.println(e);
-            returnMessage(new ServerResponse(0, "Data parsing exception", e.getMessage()), response);
+            
+            rollbackSettings(_roll_back, analysis, _cached_global_map_config);
+            
+            Utils.log_exception(e, "Error in GlobalMapConfigServices");
+            returnMessage(new ServerResponse(0, "Error in GlobalMapConfigServices", e.getMessage()), response);
+            
+        }
+    }
+    
+    private void rollbackSettings(boolean _roll_back, AnalysisContainer analysis, GlobalMapConfig _cached_global_map_config) {
+        if (_roll_back) {
+            if (analysis != null) {
+                if (_cached_global_map_config != null) {
+                    analysis.global_map_config = _cached_global_map_config;
+                } else {
+                    Utils.log_info("Warning: trying to roll back settings with null global map config");
+                }
+            } else {
+                Utils.log_info("Warning: trying to roll back settings on null analysis");
+            }
         }
     }
 

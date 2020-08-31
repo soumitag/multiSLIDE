@@ -23,15 +23,21 @@ export class DataUploaderComponent implements OnInit, OnDestroy {
   selectedDelimiter: string = '';
   selectedIdentifier: string = '';
   selectedUploadType: string = '';
+  selectedUploadTypeCode: string = '';
   allowedDelimiters: string[] = ['','Tab','Comma','Space','Pipe','Semi-colon'];
   allowedIdentifiers: string[] = ['', 'Entrez', 'Gene Symbol', 'RefSeq ID', 'Ensembl Gene ID', 'Ensembl Transcript ID', 'Ensembl Protein ID', 'UniProt ID']
-  allowedUploadTypes: string[] = ['', 'Copy Number Variation', 'DNA Methylation', 'Gene Expression (mRNA)', 'microRNA Expression (miRNA)', 'Protein', 'Others']
+  allowedUploadTypes: string[] = ['', 
+                                  'Copy Number Variation', 'DNA Methylation', 'Transcriptome', 'microRNA Expression', 
+                                  'Protein', 'Phosphoproteome', 'Gene Isoform Expression', 'Metabolome', 'Lipidome', 'Others']
+  allowedUploadTypeCodes: string[] = ['', 
+                                  'cnv', 'dna_meth', 'm_rna', 'mi_rna', 'protein', 'phosphoproteome', 'gene_isoform_expression', 
+                                  'metabolome', 'lipidome', 'others']                             
   _ref:any;
   server_response: ServerResponseData = null;
   fileupload_payload: FileuploadPayload = null;
 
-  @ViewChild('fileInput') fileInputItem: any;
-  @ViewChild('uploadForm') uploadForm: NgForm;
+  @ViewChild('fileInput', { static: true }) fileInputItem: any;
+  @ViewChild('uploadForm', { static: true }) uploadForm: NgForm;
 
   constructor(private uploadService: DatauploadService) {}
 
@@ -73,13 +79,17 @@ export class DataUploaderComponent implements OnInit, OnDestroy {
   handleSubmit() {
     this.submitTouched = true;
     if (this.fileToUpload != null && this.selectedDelimiter != null && this.selectedDelimiter != '') {
+
+      let i = this.allowedUploadTypes.indexOf(this.selectedUploadType);
+      this.selectedUploadTypeCode = this.allowedUploadTypeCodes[i];
+
       console.log("ready to submit");
 
       var fileupload_payload: FileuploadPayload = {
         'data_action' : "upload",
         'analysis_name' : this.analysis_name,
         'delimiter' : this.selectedDelimiter,
-        'upload_type' : this.selectedUploadType,
+        'upload_type' : this.selectedUploadTypeCode,
         'identifier_type' : this.selectedIdentifier,
         'filename': this.fileToUpload.name
       }
@@ -100,18 +110,12 @@ export class DataUploaderComponent implements OnInit, OnDestroy {
                                       if (this.server_response.status == 0) {
 
                                       } else if (this.server_response.status == 1) {
-                                        console.log(this.server_response)
-                                        console.log(this.server_response.detailed_reason)
                                         this.handleReset()
                                         this.notifySuccessfullFileUpload.emit(fileupload_payload)
                                       }
                                     },
                                     error=>{
-                                      this.server_response = error
-                                      console.log(error)
-                                      console.log("Server error")
-                                      console.log(fileupload_payload["data_action"])
-                                      console.log(fileupload_payload["analysis_name"])                                   
+                                      this.server_response = error                                
                                     }
                                   ); 
     }

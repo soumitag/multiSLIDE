@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import org.cssblab.multislide.utils.Utils;
 
 /**
  *
@@ -19,13 +20,28 @@ public class NetworkNeighbor implements Serializable {
     public static final String NETWORK_TYPE_MIRNA_ID = "mirna_id";
     public static final String NETWORK_TYPE_PPI_ENTREZ = "ppi_entrez";
     
+    
+    /*
     public static final double[] TF_ENTREZ_NEIGHBOR_COLOR = new double[]{0, 150, 136};
     public static final double[] MIRNA_ID_NEIGHBOR_COLOR = new double[]{255, 193, 7};
     public static final double[] PPI_ENTREZ_NEIGHBOR_COLOR = new double[]{103, 58, 183};
+    */
+    
+    public static final double[] SEARCH_KEY_COLOR = new double[]{0, 0, 0};
+    
+    public static final double[] TF_ENTREZ_NEIGHBOR_COLOR = new double[]{0, 150, 0};
+    public static final double[] MIRNA_ID_NEIGHBOR_COLOR = new double[]{166, 94, 46};
+    public static final double[] PPI_ENTREZ_NEIGHBOR_COLOR = new double[]{106, 13, 173};
+    
+    public static final double[] TF_ENTREZ_NEIGHBOR_STROKE_COLOR = new double[]{0, 141, 0};
+    public static final double[] MIRNA_ID_NEIGHBOR_STROKE_COLOR = new double[]{166, 94, 46};
+    public static final double[] PPI_ENTREZ_NEIGHBOR_STROKE_COLOR = new double[]{106, 13, 173};
 
+    /*
     public static final double[] TF_ENTREZ_NEIGHBOR_STROKE_COLOR = new double[]{0, 0, 0};
     public static final double[] MIRNA_ID_NEIGHBOR_STROKE_COLOR = new double[]{0, 0, 0};
     public static final double[] PPI_ENTREZ_NEIGHBOR_STROKE_COLOR = new double[]{0, 0, 0};
+    */
     
     String id;
     String query_entrez;
@@ -74,13 +90,20 @@ public class NetworkNeighbor implements Serializable {
     }
 
     public final void setNeighborEntrezList(String query_entrez, String[] neighbor_entrez_list) {
-        // sanitize neighbor list
-        HashMap <String, Boolean> duplicate_remove_map = new HashMap <String, Boolean> ();
-        for (int i=0; i<neighbor_entrez_list.length; i++) {
-            if (!neighbor_entrez_list[i].equals(query_entrez)) {
-                duplicate_remove_map.put(neighbor_entrez_list[i], Boolean.FALSE);
+        /* 
+        sanitize neighbor list: remove duplicates
+        */
+        HashMap <String, Boolean> duplicate_remove_map = new HashMap <> ();
+        for (String neighbor_entrez : neighbor_entrez_list) {
+            if (!neighbor_entrez.equals(query_entrez)) {
+                duplicate_remove_map.put(neighbor_entrez, Boolean.FALSE);
             }
         }
+        /*
+        
+        /*
+        Convert to array
+        */
         this.neighbor_entrez_list = new String[duplicate_remove_map.size()];
         Iterator it = duplicate_remove_map.entrySet().iterator();
         int i = 0;

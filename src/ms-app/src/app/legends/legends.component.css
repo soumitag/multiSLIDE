@@ -3,33 +3,39 @@
     padding-right: 16px; 
     padding-top: 7px;
     background-color:rgb(255, 255, 255);
-    font-family: verdana;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: normal;
     margin: 10px;
+    font-family: 'Poppins', sans-serif;
+    width: 200px;
 }
 
 .legend_inner {
     text-align:left;
     padding-right: 9px; 
     background-color:rgb(255, 255, 255);
-    font-family: verdana;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: normal;
+    font-family: 'Poppins', sans-serif;
+    line-height: 18px;
+    padding-top: 2px;
+    color: black;
 }
 
 .legend_heading {
     width: 100%;
     font-size: 20px; 
 	text-anchor: middle;
-    font-family: Verdana;
     text-align: center;
     color: black;
+    padding-top: 10px;
+    font-family: 'Poppins', sans-serif;
 }
 
 .legend_group_heading {
-    font-size: 12px; 
-    font-family: Verdana;
+    font-size: 13px; 
     font-weight: bolder;
     color: black;
+    font-family: 'Poppins', sans-serif;
+    display: block;
 }

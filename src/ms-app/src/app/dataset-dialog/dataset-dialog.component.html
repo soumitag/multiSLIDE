@@ -1,0 +1,43 @@
+<ng-container *ngIf="dialogNum==0">
+  <div class="hc_title">Dataset(s)</div>
+  <div class="hc_module_controls">
+    <div style="position: relative; top: 15px; left: 10px; height: 80px">
+      <label for="selectedDataset"></label>
+      <select name="selectedDataset" [(ngModel)]="selected_dataset">
+        <option *ngFor="let dname of datasets" [value]="dname">{{dname}}</option>
+      </select>
+      &nbsp;
+      <button type="button" (click)="addDataset()">Add</button>
+    </div>
+  </div>
+  <div class="container_block" style="position: relative; top: 10px; left: 5px; width: 300px; height: 200px;">
+    <div *ngFor="let dataset of selected_datasets" id="datasets_div" class="select_block2">
+      {{dataset}}
+      <div class="minus_button" (click)="removeDataset(dataset)"></div>
+    </div>
+  </div>
+</ng-container>
+
+<ng-container *ngIf="dialogNum==1">
+  <div class="hc_title">Phenotype(s)</div>
+  <div class="hc_module_controls">
+    <div style="position: relative; top: 15px; left: 10px; height: 80px">
+      <label for="selectedPhenotype"></label>
+      <select name="selectedPhenotype" [(ngModel)]="selected_phenotype">
+        <option *ngFor="let ptype of phenotypes" [value]="ptype">{{ptype}}</option>
+      </select>
+      &nbsp;
+      <button type="button" (click)="addPhenotype()">Add</button>
+    </div>
+  </div>
+  <div class="container_block" style="position: relative; top: 10px; left: 5px; width: 300px; height: 200px;">
+    <div *ngFor="let phenotype of selected_phenotypes" id="datasets_div" class="select_block2">
+      {{phenotype}}
+      <div class="minus_button" (click)="removePhenotype(phenotype)"></div>
+    </div>
+  </div>
+</ng-container>
+
+<div class="apply_changes_div">
+  <button type="button" (click)="applyChanges()">Apply Changes</button>
+</div>

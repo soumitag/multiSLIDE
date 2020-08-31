@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import org.cssblab.multislide.utils.Utils;
 
 /**
  *
@@ -77,7 +78,7 @@ public class MicroRNANetwork {
                 }
                 doc.put("mir_families", mir_family_map_dbo);
                 
-                System.out.println(count + ": " + doc);
+                Utils.log_info(count + ": " + doc);
                 C.insert(doc);
                 count++;    
             }
@@ -120,7 +121,7 @@ public class MicroRNANetwork {
                 doc.put("mirbase_id", mirbase_id);
                 doc.put("mirbase_acc", mirbase_acc);  
                 
-                System.out.println(count + ": " + doc);
+                Utils.log_info(count + ": " + doc);
                 C.insert(doc);
                 count++;                  
             }     
@@ -149,7 +150,7 @@ public class MicroRNANetwork {
             if (db.collectionExists("MM_geneMap2")) {
                     DBCollection genemap = db.getCollection("MM_geneMap2");
                     genemap.drop();
-                    System.out.println("Collection dropped");
+                    Utils.log_info("Collection dropped");
             }
             
         }catch(Exception e){

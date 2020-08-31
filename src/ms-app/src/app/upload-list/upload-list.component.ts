@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Inject } from '@angular/core';
 import { DatauploadService } from '../dataupload.service'
 import { Subscription } from 'rxjs/Subscription'
-import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { FileuploadPayload } from '../fileupload_payload';
 import { ServerResponseData } from '../server_response';
 
@@ -35,7 +35,6 @@ export class UploadListComponent implements OnInit {
     this.analysis_name = data.analysis_name;
     this.dialogRef.updatePosition({ top: '110px', left: '700px' });
     this.dialogRef.updateSize('550px', '500px');
-
   }
 
   ngOnInit() {
@@ -88,7 +87,6 @@ export class UploadListComponent implements OnInit {
       alert("Failed to create list: " + this.serverResponseOnListUpload.message + " " + this.serverResponseOnListUpload.detailed_reason)
       this.dialogRef.close(0);
     }
-    
   }
 
 }

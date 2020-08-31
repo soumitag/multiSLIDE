@@ -1,0 +1,51 @@
+<div style="position: relative; top: 15px; left: 10px; height: 550px; width: 500px;">
+  <div class="hc_title">Upload Functional Group Information</div>
+  <div class="hc_module_controls">
+    <form #uploadForm='ngForm' name="uploadForm">
+      <div style="position: relative; top: 15px; left: 10px; height: 100px">
+        <label for="file">Functional Group Information Upload</label><br>
+        <input #fileInput type="file" id="file_selector" name="file_selector"
+          (change)="handleFileInput($event.target.files)" required> <br><br>
+
+        <div class="errorMsg" *ngIf="submitTouched && fileToUpload == null">
+          File is required.
+        </div>
+        <button type="button" class="highlight_button" (click)="handleSubmit()">Submit</button>
+      </div>
+    </form>
+    <br>
+    <br>
+    <div>
+      <div class="serverMsg">
+        {{upload_message}}
+      </div>
+    </div>
+    <div style="position: relative; top: 15px; left: 10px; height: 80px">
+      <label for="selectedFuncGrp">Functional Groups</label><br>
+      <select name="selectedFuncGrp" [(ngModel)]="currently_selected_functional_group">
+        <option *ngFor="let func_grp of functional_groups_in_file; let i = index"
+          [value]="func_grp.functional_grp_name">
+          {{func_grp.functional_grp_name}} &nbsp; ({{func_grp.size}} members)
+        </option>
+      </select>
+      <div>
+        <button type="button" (click)="addFunctionalGroup()">Add</button>
+      </div>
+    </div>
+    <br>
+    <br>
+    <div style="position: relative; top: 15px; left: 10px; height: 100px">
+      <div class="search_container">
+        <div *ngFor="let func_grp of selected_functional_groups" id="datasets_div" class="select_block">
+          {{func_grp.functional_grp_name}}
+          <div class="minus_button" (click)="removeFunctionalGroup(func_grp)"></div>
+        </div>
+      </div>
+    </div>
+    <br>
+    <br>
+    <div class="apply_changes_div">
+      <button type="button" (click)="applyChanges()">Apply Changes</button>
+    </div><br><br><br>
+  </div>
+</div>

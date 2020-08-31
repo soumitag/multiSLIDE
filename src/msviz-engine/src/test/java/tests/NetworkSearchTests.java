@@ -11,6 +11,7 @@ import org.cssblab.multislide.beans.data.NeighborhoodSearchResults;
 import org.cssblab.multislide.searcher.Searcher;
 import org.cssblab.multislide.searcher.network.NetworkSearchHandler;
 import org.cssblab.multislide.structure.MultiSlideException;
+import org.cssblab.multislide.utils.Utils;
 
 /**
  *
@@ -26,7 +27,7 @@ public class NetworkSearchTests {
             //searchP.processQuery("tf-entrez=26469");
             //searchP.processQuery("ppi-entrez=2303");
             //HashMap <String, ArrayList<String>> search_results = searchP.processQuery("mirna-id=hsa-mir-99b-5p");
-            HashMap <String, Boolean> entrezMaster = new HashMap <String, Boolean> ();
+            HashMap <String, Integer> entrezMaster = new HashMap <> ();
             
             HashMap <String, Integer> identifier_index_map = createIdentifierIndexMap();
             int idenitifier_index = identifier_index_map.get("genesymbol_2021158607524066");
@@ -37,10 +38,10 @@ public class NetworkSearchTests {
             nsr.makeNeighborhoodSearchResultObject(searcher, "genesymbol_2021158607524066", idenitifier_index, search_results, entrezMaster);
             
             for(int i = 0; i < nsr.neighbor_display_tag.length; i++){
-                System.out.println(nsr.neighbor_display_tag[i]);
+                Utils.log_info(nsr.neighbor_display_tag[i]);
             }
         } catch (Exception e) {
-            System.out.println(e);
+            Utils.log_exception(e, "");
         }
     }
     

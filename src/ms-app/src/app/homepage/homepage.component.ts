@@ -191,11 +191,11 @@ export class HomepageComponent implements OnInit {
       //alert(this.response_onLoadAnalysis.detailed_reason);
       this.router.navigateByUrl(
         this.router.createUrlTree(
-          ['visualization_home'], { queryParams: { analysis_name: this.response_onLoadAnalysis.message } }
+          ['visualization_home'], { queryParams: { analysis_name: this.response_onLoadAnalysis.message, source: 'load_analysis' } }
         )
       );
     } else {
-      alert(this.response_onLoadAnalysis.message + ": " + this.response_onLoadAnalysis.detailed_reason)      
+      alert(this.response_onLoadAnalysis.message + ": " + this.response_onLoadAnalysis.detailed_reason)
     }
     
   }

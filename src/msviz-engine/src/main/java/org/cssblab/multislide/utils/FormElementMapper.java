@@ -5,6 +5,8 @@
  */
 package org.cssblab.multislide.utils;
 
+import org.cssblab.multislide.beans.data.DatasetSpecs;
+
 /**
  *
  * @author soumitag
@@ -36,8 +38,14 @@ public class FormElementMapper {
     
     public static String parseDataUploadType(String value) {
         
-        value = value.trim().toLowerCase();
+        int i = DatasetSpecs.OMICS_TYPE_DIPSLAY_NAMES.indexOf(value);
+        if (i == -1)
+            return value;
+        else
+            return DatasetSpecs.OMICS_TYPES.get(i);
         
+        /*
+        value = value.trim().toLowerCase();
         if (value.equalsIgnoreCase("copy number variation")) {
             return "cnv";
         } else if (value.equalsIgnoreCase("dna methylation")) {
@@ -48,9 +56,18 @@ public class FormElementMapper {
             return "mi_rna";
         } else if (value.equalsIgnoreCase("protein")) {
             return "protein";
+        } else if (value.equalsIgnoreCase("phosphoproteome")) {
+            return "phosphoproteome";
+        } else if (value.equalsIgnoreCase("gene isoform expression")) {
+            return "gene_isoform_expression";
+        } else if (value.equalsIgnoreCase("metabolome")) {
+            return "metabolome";
+        } else if (value.equalsIgnoreCase("lipidome")) {
+            return "lipidome";
         } else {
             return value;
         }
+        */
     }
     
     public static String parseRowIdentifierType(String value) {
@@ -79,14 +96,22 @@ public class FormElementMapper {
     public static String parseFormData(String name, String value) {
         
         name = name.trim().toLowerCase();
-        value = value.trim().toLowerCase();
         
         if (name.equalsIgnoreCase("delimiter")) {
+
+            value = value.trim().toLowerCase();
             return FormElementMapper.parseDelimiter(value);
+            
         } else if (value.equalsIgnoreCase("upload_type")) {
+            
+            value = value.trim().toLowerCase();
             return FormElementMapper.parseDataUploadType(value);
+            
         } else if (value.equalsIgnoreCase("identifier_type")) {
+            
+            value = value.trim().toLowerCase();
             return FormElementMapper.parseRowIdentifierType(value);
+            
         } else {
             return value;
         }

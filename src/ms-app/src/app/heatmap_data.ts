@@ -1,5 +1,8 @@
 export class HeatmapData {
     title: string;
+    description: string
+    nSamples: number;
+    nEntrez: number;
     bin_colors: number[][];
     cell_bin_indices: number[][];
     /*
@@ -12,7 +15,8 @@ export class HeatmapData {
   gene_group_keys: string[];
   entrez: string[];
   */
-    colorbar_keys: number[];
+    hist_x_values: string[];
+    hist_frequencies: number[];
   /*
   search_tag_colors: number[][];
   search_tag_stroke_colors: number[][];
@@ -24,4 +28,9 @@ export class HeatmapData {
   search_tag_positions: number[][];
   is_search_query: number[][];
   */
+  entrez: string[];
+  column_headers: string[];
+  gene_tags: number[][];
+  search_tag_positions: number[][];
+  //is_search_query: number[][];
 }

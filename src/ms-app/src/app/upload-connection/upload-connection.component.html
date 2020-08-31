@@ -1,0 +1,44 @@
+<div style="float: left; width:400px;">
+    <div class="upload_list_title">Upload Inter-omics Conncections</div>
+    <div style="position:relative; top:10px; left:0px; width:400px;">
+
+        <label for="listname">Give This Set of Conncections a Name</label><br>
+        <input class="upload_list_item" type="text" [(ngModel)]="name" maxlength="30" size="30" required>
+        <div class="errorMsg" *ngIf="uploadTouched && (name == '' || name == null)">
+            Name is required
+        </div>
+        <br>
+        <br>
+        <label for="file">Choose a File</label><br>
+        <input #fileInput type="file" id="file_selector" name="file_selector"
+            (change)="handleFileInput($event.target.files)" required>
+        <div class="errorMsg" *ngIf="uploadTouched && file == null">
+            File is required.
+        </div>
+        <br>
+        <br>
+        <label for="selectedDelimiter">File Delimiter</label><br>
+        <select name="delimiter" [(ngModel)]="delimiter" required>
+            <option *ngFor="let delim of available_delimiters" [value]="delim">{{delim}}</option>
+        </select>
+        <div class="errorMsg" *ngIf="uploadTouched && (delimiter == '' || delimiter == null)">
+            Delimiter is required.
+        </div>
+        <div class="apply_changes_div">
+            <button type="button" (click)="uploadConnection()">Upload</button>
+        </div>
+    </div>
+</div>
+
+<div class="show_connections">
+<div class="upload_list_title">Available Inter-omics Connections</div>
+<div style="position: relative; top: 0px; left: 5px; width: 400px; height: 210px; ; overflow-y: auto; margin-bottom: 0px;">
+    <div *ngFor="let conns of available_connections">
+        <div class="select_block2">{{conns[0]}} ({{conns[1]}})</div>
+        <div class="minus_button" (click)="removeUserSpecifiedConnections(conns[1])"></div>
+    </div>
+</div>
+<div class="apply_changes_div">
+    <button type="button" (click)="close()">Done</button>
+</div>
+</div>

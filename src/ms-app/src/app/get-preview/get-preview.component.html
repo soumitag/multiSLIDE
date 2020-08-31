@@ -3,9 +3,8 @@
         <div *ngIf="preview.response.status == 1;else msg">
             <div class="preview_table_container">
             <table>
-                <tr *ngFor="let rows of preview.data; let rows = index">
+                <tr *ngFor="let rows of preview.data">
                     <td *ngFor="let col of rows">{{col}}</td>
-
                 </tr>
             </table>
             </div>

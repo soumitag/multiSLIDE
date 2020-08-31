@@ -1,4 +1,5 @@
 export class HeatmapLayout {
+    name: string;
     cell_width_height: number;
     gene_tag_height: number;
     gene_tag_background_width: number;
@@ -39,4 +40,13 @@ export class HeatmapLayout {
     colorbar_tick_x1_x2: number[];
     colorbar_tick_text_x: number;
     missing_value_colorbar_tick_y: number;
+
+    info_hist_panel_width: number;
+    info_panel_top: number;
+    info_panel_left: number;
+    hist_left: number;
+    hist_top: number;
+    hist_width: number;
+    hist_height: number;
+    
   }

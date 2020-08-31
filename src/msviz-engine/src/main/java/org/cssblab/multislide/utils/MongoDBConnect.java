@@ -136,7 +136,7 @@ public class MongoDBConnect {
             if (db.collectionExists("MM_geneMap2")) {
                 DBCollection genemap = db.getCollection("MM_geneMap2");
                 genemap.drop();
-                System.out.println("Collection dropped");
+                Utils.log_info("Collection dropped");
             }
 
         } catch (Exception e) {

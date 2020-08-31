@@ -1,14 +1,21 @@
 export class MapConfig {
-    custom_gene_identifiers: string[];
+    //custom_gene_identifiers: string[];
     data_min: number;
     data_max: number;
-    columnLabel: string;
+    //columnLabel: string;
     nColors: number;
     colorScheme: string;
     binningRange: string;
     binningRangeStart: number;
     binningRangeEnd: number;
 
+    has_linker: boolean;
+    available_feature_identifiers: string[];
+    selected_feature_identifiers: string[];
+    show_aggregated: boolean;
+    aggregate_function: string;
+
+    /*
     constructor() {
         this.custom_gene_identifiers = [];
         this.data_min = 0;
@@ -20,4 +27,5 @@ export class MapConfig {
         this.binningRangeStart = 0;
         this.binningRangeEnd = 0;
     }
+    */
 }

@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.Serializable;
 import java.util.ArrayList;
+import org.cssblab.multislide.utils.Utils;
 
 /**
  *
@@ -83,7 +84,7 @@ public class GeneCoordinate implements Serializable {
             }
                 
             } catch (Exception e) {
-            System.out.println(e);
+            Utils.log_exception(e, "");
         } 
          
         

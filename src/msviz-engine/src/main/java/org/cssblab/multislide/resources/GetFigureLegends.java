@@ -7,7 +7,6 @@ package org.cssblab.multislide.resources;
 
 import com.google.gson.Gson;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.ArrayList;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -18,6 +17,7 @@ import org.cssblab.multislide.beans.data.LegendData;
 import org.cssblab.multislide.beans.data.LegendGroup;
 import org.cssblab.multislide.beans.data.ServerResponse;
 import org.cssblab.multislide.structure.AnalysisContainer;
+import org.cssblab.multislide.utils.Utils;
 
 /**
  *
@@ -73,7 +73,7 @@ public class GetFigureLegends extends HttpServlet {
             response.getWriter().write(json);
             
         } catch (Exception e) {
-            System.out.println(e);
+            Utils.log_exception(e, "");
             ServerResponse resp = new ServerResponse(0, "Error generating figure legends", e.getMessage());
             String json = new Gson().toJson(resp);
             response.setContentType("application/json");

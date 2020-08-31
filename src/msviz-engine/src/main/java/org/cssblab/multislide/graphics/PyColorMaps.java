@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.cssblab.multislide.structure.MultiSlideException;
+import org.cssblab.multislide.utils.Utils;
 
 /**
  *
@@ -68,7 +69,7 @@ public class PyColorMaps implements Serializable {
                     palette.put(ColorMaps.valueOf(file_name.toUpperCase()), global_color_arr);
                 
                 } catch (Exception e) {
-                    System.out.println(e);
+                    Utils.log_exception(e, "");
                 }
             
             }

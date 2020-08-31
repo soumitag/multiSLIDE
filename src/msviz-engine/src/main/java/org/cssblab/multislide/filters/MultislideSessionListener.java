@@ -7,6 +7,7 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import org.cssblab.multislide.structure.AnalysisContainer;
 import org.cssblab.multislide.structure.Serializer;
+import org.cssblab.multislide.utils.Utils;
 
 /**
  *
@@ -31,6 +32,6 @@ public class MultislideSessionListener implements HttpSessionListener {
 
     @Override
     public void sessionCreated(HttpSessionEvent se) {
-        System.out.println("Created new session");
+        Utils.log_info("Created new session");
     }
 }

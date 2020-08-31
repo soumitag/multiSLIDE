@@ -19,11 +19,33 @@
         </select>
       </div>
       <div style="position: relative; top: 15px; left: 10px; height: 80px">
+        <label for="selectedTesttype">Test Type</label><br>
+        <select name="selectedTesttype" [(ngModel)]="significance_testing_params.testtype">
+          <option *ngFor="let testtype of testtypes; let i = index" [value]="testtype"
+            [attr.selected]="testtype == significance_testing_params.testtype ? true : null">
+            {{testtype}}
+          </option>
+        </select>
+      </div>
+      <div style="position: relative; top: 15px; left: 10px; height: 80px">
         <label for="significanceLevel">Significance Level</label><br>
         <input type="number" name="significanceLevel" 
-          min="0.01" max="1" placeholder="0.05" step="0.01" size="4"
+          min="0.000001" max="1" placeholder="0.050000" step="0.01" size="8"
           [(ngModel)]="significance_testing_params.significance_level"
           [value]="significance_testing_params.significance_level">
+      </div>
+      
+      <div style="position: relative; top: 15px; left: 10px; height: 120px">
+        <div style="height: 40px">
+          <label for="fdr">Multiple Testing Correction</label><br>
+        </div>
+        <div style="height:80px">
+          <input type="checkbox" name="applyfdr" [(ngModel)]="significance_testing_params.apply_fdr">
+          <label for="applyfdr">False Discovery Rate</label><br>
+          <input type="number" name="fdr" min="1" max="100" placeholder="1" step="1" size="3"
+            [(ngModel)]="significance_testing_params.fdr_threshold" [value]="significance_testing_params.fdr_threshold">
+          <label for="fdr">% (Enter a number between 0.01-1.0)</label>
+        </div>
       </div>
       <div class="apply_changes_div">
         <button type="button" (click)="saveChanges()">Save Changes</button>

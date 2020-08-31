@@ -23,6 +23,7 @@ public class SearchResultSummary implements Serializable {
     public static final byte TYPE_PATH_SUMMARY = 5;
     public static final byte TYPE_GO_SUMMARY = 6;
     
+    public String search_id;
     public byte type;
     public String display_tag;
     public String html_display_tag_pre;
@@ -45,6 +46,7 @@ public class SearchResultSummary implements Serializable {
         this.type = summary_type;
         this.display_tag = display_tag;
         this._id = _id;
+        this.search_id = this.type + "_" + this._id;
         this.background_count = background_count;
         this.intersection_counts_per_dataset = intersection_counts_per_dataset;
         this.intersection_count = Utils.arrayMax(intersection_counts_per_dataset);
@@ -98,17 +100,21 @@ public class SearchResultSummary implements Serializable {
     public String mapGeneGroupCodeToType()
             throws MultiSlideException {
 
-        switch (this.type) {
+        return SearchResultSummary.mapGeneGroupCodeToType(this.type);
+    }
+    
+    public static String mapGeneGroupCodeToType(byte type)
+            throws MultiSlideException {
+        
+        switch (type) {
             case SearchResultSummary.TYPE_GENE_SUMMARY:
-                return "entrez";
+                return "gene_group_entrez";
             case SearchResultSummary.TYPE_PATH_SUMMARY:
                 return "pathid";
             case SearchResultSummary.TYPE_GO_SUMMARY:
                 return "goid";
             default:
-                throw new MultiSlideException("Invalid Gene Group Type Code: " + this.type + " valid values are: 4, 5, and 6");
+                throw new MultiSlideException("Invalid Gene Group Type Code: " + type + " valid values are: 4, 5, and 6");
         }
     }
-    
-    
 }

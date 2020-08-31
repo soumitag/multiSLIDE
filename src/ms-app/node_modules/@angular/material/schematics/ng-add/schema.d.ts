@@ -5,13 +5,14 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/// <amd-module name="@angular/material/schematics/ng-add/schema" />
 export interface Schema {
     /** Name of the project. */
     project: string;
-    /** Whether gesture support should be set up. */
-    gestures: boolean;
     /** Whether Angular browser animations should be set up. */
     animations: boolean;
     /** Name of pre-built theme to install. */
     theme: 'indigo-pink' | 'deeppurple-amber' | 'pink-bluegrey' | 'purple-green' | 'custom';
+    /** Whether to set up global typography styles. */
+    typography: boolean;
 }

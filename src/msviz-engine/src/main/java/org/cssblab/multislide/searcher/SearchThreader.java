@@ -3,6 +3,7 @@ package org.cssblab.multislide.searcher;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
+import org.cssblab.multislide.utils.Utils;
 
 /**
  *
@@ -28,7 +29,7 @@ public class SearchThreader implements Callable, Serializable {
     
     @Override
     public ArrayList <SearchResultObject> call() {
-        System.out.println("Inside : " + Thread.currentThread().getName());
+        Utils.log_info("Inside : " + Thread.currentThread().getName());
         return this.searcher.processAllDB(this.cursor_type, this.queryString, this.search_type, this.keyword);
     }
     

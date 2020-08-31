@@ -8,59 +8,91 @@ package org.cssblab.multislide.beans.data;
 import com.google.gson.Gson;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import org.cssblab.multislide.graphics.ColorPalette;
-
+import java.util.List;
 import org.cssblab.multislide.graphics.Heatmap;
 import org.cssblab.multislide.structure.AnalysisContainer;
-import org.cssblab.multislide.structure.FilteredSortedData;
-import org.cssblab.multislide.structure.GeneGroup;
+import org.cssblab.multislide.structure.data.Selection;
 import org.cssblab.multislide.structure.GlobalMapConfig;
 import org.cssblab.multislide.structure.MultiSlideException;
 import org.cssblab.multislide.structure.NetworkNeighbor;
+import org.cssblab.multislide.utils.Utils;
 
 public class HeatmapData implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
-    private transient final int nSamples;
-    private transient final int nEntrez;
+    public int nSamples;
+    public int nEntrez;
     
     public String title;
+    public String description;
+    public String entrez[];
+    public String column_headers[];
+    public List <List <Integer>> gene_tags;
     public double bin_colors[][];
     public int cell_bin_indices[][];
-    public String colorbar_keys[];
+    public String hist_x_values[];
+    public double hist_frequencies[];
     public boolean[] search_tag_origin_map_ind;
-
+    public List <List <Integer>> search_tag_positions;
+    //public ArrayList <ArrayList <Integer>> is_search_query;
+    
+    /*
+    public int rowsPerPageDisplayed;
+    public int colsPerPageDisplayed;
+    public int current_sample_start;
+    public int current_feature_start;
+    public int available_rows;
+    public int available_cols;
+    */
     
     public HeatmapData(
             GlobalMapConfig global_map_config,
-            FilteredSortedData data, 
+            Selection selected_data, 
             Heatmap heatmap, 
             String dataset_name, 
             AnalysisContainer analysis
     ) throws MultiSlideException {
         
-        this.title = dataset_name;
-        this.nSamples = global_map_config.getRowsPerPageDisplayed();
-        this.nEntrez = global_map_config.getColsPerPageDisplayed();
+        long startTime = System.nanoTime();
+        
+        this.title = analysis.data.datasets.get(dataset_name).specs.display_name;
+        this.nSamples = analysis.data.selected.getNumSamples();
+        this.nEntrez = analysis.data.selected.getNumFeatures(dataset_name, global_map_config);
+        this.description = global_map_config.makeDescString(nEntrez, nSamples);
         
         ArrayList <NetworkNeighbor> network_neighbors = analysis.data_selection_state.getNetworkNeighbors();
 
+        cell_bin_indices = selected_data.getExpressionBins(dataset_name, analysis.global_map_config, heatmap.hist.nBins);
+        
+        Utils.log_info("HeatmapData time to 0 " + (System.nanoTime() - startTime)/1000000 + " milliseconds");
+        
         bin_colors = new double[heatmap.hist.nBins][3];
         this.bin_colors = heatmap.hist.rgb;
-        
-        cell_bin_indices = data.getExpressionBinNos(dataset_name, analysis.global_map_config);
-        
-        colorbar_keys = new String[5];
-        double tick_space = (heatmap.hist.MAX_VAL-heatmap.hist.MIN_VAL)/4.0;
-        for (int i=0; i<5; i++) {
-            double v = heatmap.hist.MIN_VAL + i*tick_space;
-            this.colorbar_keys[i] = String.format("%5.2e",v);
+        heatmap.hist.normalizeHist();
+        this.hist_frequencies = heatmap.hist.normedFrequencies;
+        this.hist_x_values = new String[this.hist_frequencies.length];
+        for (int i=0; i<hist_frequencies.length; i++) {
+            double v = heatmap.hist.MIN_VAL + i*heatmap.hist.binsize;
+            this.hist_x_values[i] = String.format("%5.2e",v);
         }
+        
+        Utils.log_info("HeatmapData time to 1 " + (System.nanoTime() - startTime)/1000000 + " milliseconds");
+        
+        List <String> entrez_ids = selected_data.getEntrez(dataset_name, analysis.global_map_config);
+        List <List<String>> feature_ids = selected_data.getFeatureIDs(
+                dataset_name, analysis.global_map_config, heatmap.getMapConfig().getSelectedFeatureIdentifiers());
+        
+        this.entrez = new String[entrez_ids.size()];
+        this.column_headers = new String[feature_ids.size()];
+        for (int i=0; i<feature_ids.size(); i++) {
+            this.entrez[i] = entrez_ids.get(i);
+            this.column_headers[i] = String.join(", ", feature_ids.get(i));
+        }
+        
+        gene_tags = selected_data.getGeneTags(dataset_name, analysis.global_map_config);
+        
+        Utils.log_info("HeatmapData time to 2 " + (System.nanoTime() - startTime)/1000000 + " milliseconds");
         
         search_tag_origin_map_ind = new boolean[network_neighbors.size()];
         for (int i=0; i<network_neighbors.size(); i++) {
@@ -69,6 +101,24 @@ public class HeatmapData implements Serializable {
                 search_tag_origin_map_ind[i] = true;
             }
         }
+        
+        search_tag_positions = new ArrayList <> ();
+        //is_search_query = new ArrayList <> ();
+        
+        this.search_tag_positions = analysis.data.selected.getSearchTags(dataset_name, analysis.global_map_config);
+        /*
+        Temporarily create an indicator variable wil all 0s
+        till a better strategy is designed to differentiate query vs neighbors in the same position list
+        */
+        for (int i=0; i<this.search_tag_positions.size(); i++) {
+            ArrayList <Integer> is_search_query_i = new ArrayList <> ();
+            for (int j=0; j<this.search_tag_positions.get(i).size(); j++) {
+                is_search_query_i.add(0);
+            }
+            //this.is_search_query.add(is_search_query_i);
+        }
+        
+        Utils.log_info("HeatmapData time to 3 " + (System.nanoTime() - startTime)/1000000 + " milliseconds");
     }
     
     

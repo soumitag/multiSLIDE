@@ -11,7 +11,7 @@
 
         <div class="species_input">
           <label for="selectedSpecies">Species Type</label><br>
-          <select name="selectedSpecies" [(ngModel)]="selectedSpecies" (ngModelChange)="splog()" required>
+          <select name="selectedSpecies" [(ngModel)]="selectedSpecies" required>
             <option *ngFor="let species of allowedSpeciesTypes; let i = index" [value]="allowedSpeciesValues[i]">{{species}}</option>
           </select>
         </div>
@@ -39,8 +39,7 @@
           <br>
 
           <label for="selectedClinicalDelimiter">Clinical Information File Delimiter</label><br>
-          <select name="selectedClinicalDelimiter" [(ngModel)]="selectedClinicalDelimiter" (ngModelChange)="ftlog()"
-            required>
+          <select name="selectedClinicalDelimiter" [(ngModel)]="selectedClinicalDelimiter" required>
             <option *ngFor="let delim of allowedClinicalDelimiters" [value]="delim">{{delim}}</option>
           </select>
           <div class="errorMsg"
@@ -83,7 +82,7 @@
 
       <div class="each_data_container">
         <app-data-uploader [analysis_name]="analysis_name"
-          (notifySuccessfullFileUpload)="handleFileUploadSuccess($event)">
+          (notifySuccessfullFileUpload)="handleFileUploadSuccess()">
         </app-data-uploader>
         <div class="server_response_msg_panel">
           <div class="serverMsg">
@@ -101,27 +100,42 @@
       <div class="upload_table_container">
         <table>
           <tr>
-            <th width="23%">Filename</th>
+            <th width="8%">Display Name</th>
+            <th width="18%">Filename</th>
             <th width="12%">Data Type</th>
-            <th width="11%">Delimiter</th>
-            <th width="36%">Metadata Column Information</th>
-            <th width="10%">Preview</th>
+            <th width="8%">Delimiter</th>
+            <th width="30%">Metadata Column Information</th>
+            <th width="8%">Edit</th>
+            <th width="8%">Preview</th>
             <th width="8%">Delete</th>
           </tr>
           <ng-container *ngIf="uploadedFiles.length == 0">
             <tr>
-              <td colspan="6">No files added yet</td>
+              <td colspan="8">No files added yet</td>
             </tr>
           </ng-container>
           <tr *ngFor="let f of uploadedFiles; let i = index">
-            <td width="23%">{{f.filename}}</td>
-            <td width="12%">{{f.upload_type}}</td>
-            <td width="11%">{{f.delimiter}}</td>
-            <td width="36%">Metadata Columns <br>{{metadata_mappings[i][0]}}<br>
-              Metadata Mappings <br>{{metadata_mappings[i][1]}}
-              <button class="edit_button" id="btn-{{i}}" (click)="openMetadataMapDialog(i)"></button></td>
-            <td width="10%">
-              <button type="button" class="preview_button" (click)="togglePreview2(i)" id="btn-{{i}}"></button>
+            <td width="8%">{{f.display_name}}</td>
+            <td width="18%">{{f.filename}}</td>
+            <td width="12%">{{getUploadType(f.omics_type)}}</td>
+            <td width="8%">{{prepDelimiterForDisplay(f.delimiter)}}</td>
+            <td width="30%">
+              <b>Metadata Columns:</b>
+              <div *ngFor="let mc of f.metadata_columns">&nbsp;{{mc}}</div>
+              <br>
+              <b>Linker(Gene) Column Mapping:</b> 
+              <ng-container *ngIf="f.has_linker"><div>{{f.linker_colname}} &nbsp; &#8594; &nbsp; {{prepIdentifierForDisplay(f.linker_identifier_type)}}</div></ng-container>
+              <br>
+              <b>Molecular-level Specific Identifier(s):</b>
+              <div *ngFor="let imc of f.identifier_metadata_columns">&nbsp;{{imc}}</div>
+            </td>
+            <td width="8%">
+              <div>
+                <button class="edit_button" id="btn-{{i}}" (click)="openMetadataMapDialog(i)"></button>
+              </div>
+            </td>
+            <td width="8%">
+              <button type="button" class="preview_button" (click)="togglePreview2(i)" id="btn-preview-{{i}}"></button>
               <!--<ng-container *ngIf="showClosedBook">
                 <button type="button" class="close_preview_button" (click)="togglePreview2(i)" id="btn-{{i}}"></button>
               </ng-container>-->
@@ -136,9 +150,13 @@
       <div class="errorMsg" *ngIf="createTouched && this.uploadedFiles.length == 0">
         At least one dataset is required.
       </div>
+      <div class="errorMsg" *ngIf="createTouched && !validateIdentifierMappings()">
+        Metadata information is insufficient for the dataset: {{missing_metadata_dataset}} <br>
+        Either a linker column or a molecular-level specific identifier is required for each dataset. 
+      </div>
       <br>
       <div class="divider"></div>
-      <app-get-preview [previewTouched]="previewTouched" [filepreview_payload]="filepreview_payload">
+      <app-get-preview [analysis_name]="analysis_name" [previewTouched]="previewTouched" [dataset_spec]="filepreview_payload">
       </app-get-preview>
 
       <br><br>
@@ -150,6 +168,7 @@
       </div>
 
       <br><br>
+      
       <div class="errorMsg" *ngIf="createTouched && this.serverResponseOnCreate && this.serverResponseOnCreate.status == 0">
         Create analysis failed due to the following error: <br>
         {{this.serverResponseOnCreate.message}}<br>

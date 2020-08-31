@@ -1,6 +1,5 @@
 import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
-import { Http } from "@angular/http";
 import { HttpClient } from '@angular/common/http';
 import { SearchResults } from './search_results';
 import { NeighborhoodSearchResults } from './neighborhood_search_results';
@@ -14,7 +13,7 @@ export class SearchService {
 
 	private neighborhoodSearchUrl = LocalSettings.MSVIZ_ENGINE_URL + "/DoNeighborhoodSearch";
 
-	constructor(private http: Http, private httpClient: HttpClient) { }
+	constructor(private httpClient: HttpClient) { }
 
 	doSearch(analysis_name, query): Observable<SearchResults[]> {
 

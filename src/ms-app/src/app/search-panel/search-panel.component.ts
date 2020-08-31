@@ -2,6 +2,9 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { SearchResults } from '../search_results';
 import { SearchService } from '../search.service';
 import { SearchResultSummary } from '../search_result_summary';
+import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
+import { EnrichmentAnalysisParams } from '../enrichment_analysis_params';
+import { EnrichmentAnalysisComponent } from '../enrichment-analysis/enrichment-analysis.component'
 
 @Component({
   selector: 'app-search-panel',
@@ -29,7 +32,11 @@ export class SearchPanelComponent implements OnInit {
   search_panel_open: boolean = false;
   search_panel_handler_text: string = "Add Genes";
 
-  constructor(private searchService: SearchService) { }
+  enrichmentDialogRef: MatDialogRef<EnrichmentAnalysisComponent>;
+
+  constructor(private dialog: MatDialog,
+              private searchService: SearchService
+            ) { }
 
   ngOnInit() { }
 
@@ -101,6 +108,25 @@ export class SearchPanelComponent implements OnInit {
       this.search_panel_open = true;
       this.search_panel_handler_text = "Add Genes";
     }
+  }
+
+  openEnrichmentDialog() {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.data = {
+      analysis_name: this.analysis_name,
+      enrichment_analysis_params: new EnrichmentAnalysisParams()
+    };
+    
+    var prev_data = new EnrichmentAnalysisParams();
+    
+    this.enrichmentDialogRef = this.dialog.open(EnrichmentAnalysisComponent, dialogConfig);
+    this.enrichmentDialogRef.afterClosed()
+    		.subscribe( data=>this.handleEnrichmentParamsUpdate(prev_data, data) );
+  }
+
+  handleEnrichmentParamsUpdate(prev_data, data) {
+    console.log(prev_data);
+    console.log(data)
   }
 
 }

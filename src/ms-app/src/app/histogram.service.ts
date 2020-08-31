@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { Injectable } from '@angular/core';
-import { Http } from "@angular/http";
+/*import { Http } from "@angular/http";*/
 import { HttpClient } from '@angular/common/http';
 import { HistogramData } from './histogram_data';
 import { LocalSettings } from './local-settings'
@@ -13,7 +13,7 @@ export class HistogramService {
 
 	private baseUrl = LocalSettings.MSVIZ_ENGINE_URL + "/GetHistogram";  // web api URL
 	
-	constructor(private http: Http, private httpClient: HttpClient) { }
+	constructor(private httpClient: HttpClient) { }
 
 	getHistogramData(analysis_name, data_type, img_width, img_height): Observable<HistogramData> {
 		console.log("getting data...");

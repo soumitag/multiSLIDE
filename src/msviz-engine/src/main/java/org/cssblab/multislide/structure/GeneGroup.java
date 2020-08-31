@@ -18,7 +18,7 @@ public class GeneGroup implements Serializable {
     
     private final String _id;
     public int tag;        // the index of this GeneGroup among all unique_gene_groups in FilteredSortedData. Used in HeatmapData to get color. 
-    public String type;     // entrez, pathid, pathname, goid
+    public String type;     // gene_group_entrez (since "entrez" alone is too non-descript), pathid, pathname, goid, user_defined
     public String name;     // the value of pathid, pathname, goid, etc
     public String display_tag;         // used to color
     public ArrayList <String> entrez_list;
@@ -29,7 +29,7 @@ public class GeneGroup implements Serializable {
         this.type = type;
         this.name = group_name;
         this.entrez_list = new ArrayList <String> ();
-        if (this.type.equalsIgnoreCase("entrez")) {
+        if (this.type.equalsIgnoreCase("gene_group_entrez")) {
             this._id = this.type;
         } else {
             this._id = this.name + "_" + this.type;

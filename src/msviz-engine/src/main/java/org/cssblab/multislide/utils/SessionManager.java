@@ -11,8 +11,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import org.cssblab.multislide.beans.data.DatasetSpecs;
 import org.cssblab.multislide.structure.AnalysisContainer;
@@ -81,7 +83,7 @@ public class SessionManager {
             in.close();
             return line;
         } catch (Exception e) {
-            System.out.println ("Failed to read multi-slide.config");
+            Utils.log_info ("Failed to read multi-slide.config");
             return null;
         }
     }
@@ -97,7 +99,7 @@ public class SessionManager {
             in.close();
             return line;
         } catch (Exception e) {
-            System.out.println ("Failed to read multi-slide.config");
+            Utils.log_info ("Failed to read multi-slide.config");
             return null;
         }
     }
@@ -182,16 +184,15 @@ public class SessionManager {
         return new String[]{filename, sample_series_mapping_filename};
     }
     
-    public static void moveInputFilesToAnalysisDir (String uploadFolder, String analysis_basepath, HashMap <String, DatasetSpecs> dataset_specs_map)
+    public static void moveInputFilesToAnalysisDir (String uploadFolder, String analysis_basepath, List <DatasetSpecs> dataset_specs_map)
     throws MultiSlideException {
         
         try {
-            Iterator it = dataset_specs_map.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry pair = (Map.Entry)it.next();
-                DatasetSpecs spec = (DatasetSpecs)pair.getValue();
-                String orig_path = uploadFolder + File.separator + spec.expanded_filename;
-                String new_path = analysis_basepath + File.separator + spec.filename_within_analysis_folder;
+            for(DatasetSpecs spec: dataset_specs_map) {
+                //Map.Entry pair = (Map.Entry)it.next();
+                //DatasetSpecs spec = (DatasetSpecs)pair.getValue();
+                String orig_path = uploadFolder + File.separator + spec.getExpandedFilename();
+                String new_path = analysis_basepath + File.separator + spec.getFilenameWithinAnalysisFolder();
                 File data_file_source = new File(orig_path);
                 File data_file_target = new File(new_path);
                 FileUtils.copyFile(data_file_source, data_file_target);
@@ -199,21 +200,21 @@ public class SessionManager {
                 //data_file.renameTo(new File(new_path));
             }
         } catch (Exception e) {
-            throw new MultiSlideException("Error transferring data to analysis directory: " + e.getMessage());
+            Utils.log_exception(e, "");
+            throw new MultiSlideException("Error transferring data to analysis directory.");
         }
         
     }
     
-    public static void moveInputFilesToAnalysisDir_ForDemo (String uploadFolder, String analysis_basepath, HashMap <String, DatasetSpecs> dataset_specs_map)
+    public static void moveInputFilesToAnalysisDir_ForDemo (String uploadFolder, String analysis_basepath, List <DatasetSpecs> dataset_specs_map)
     throws MultiSlideException {
         
         try {
-            Iterator it = dataset_specs_map.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry pair = (Map.Entry)it.next();
-                DatasetSpecs spec = (DatasetSpecs)pair.getValue();
-                String orig_path = uploadFolder + File.separator + spec.filename;
-                String new_path = analysis_basepath + File.separator + spec.filename_within_analysis_folder;
+            for(DatasetSpecs spec: dataset_specs_map) {
+                //Map.Entry pair = (Map.Entry)it.next();
+                //DatasetSpecs spec = (DatasetSpecs)pair.getValue();
+                String orig_path = uploadFolder + File.separator + spec.getFilename();
+                String new_path = analysis_basepath + File.separator + spec.getFilenameWithinAnalysisFolder();
                 File data_file_source = new File(orig_path);
                 File data_file_target = new File(new_path);
                 FileUtils.copyFile(data_file_source, data_file_target);
@@ -221,7 +222,8 @@ public class SessionManager {
                 //data_file.renameTo(new File(new_path));
             }
         } catch (Exception e) {
-            throw new MultiSlideException("Error transferring data to analysis directory: " + e.getMessage());
+            Utils.log_exception(e, "");
+            throw new MultiSlideException("Error transferring data to analysis directory.");
         }
         
     }

@@ -3,14 +3,17 @@ import { DataUploaderComponent } from '../data-uploader/data-uploader.component'
 import { DatauploadService } from '../dataupload.service'
 import { Subscription } from 'rxjs/Subscription'
 import { FileuploadPayload } from '../fileupload_payload'
+import { DatasetSpecs } from '../dataset_specs'
 import { ActivatedRoute } from '@angular/router';
 import { ServerResponseData } from '../server_response'
 import { PreviewData } from '../preview_data'
 import { MetadataMapComponent } from '../metadata-map/metadata-map.component'
-import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material";
+import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
 import { Router } from '@angular/router';
-import { stringify } from '@angular/core/src/util';
-import { ReturnStatement } from '@angular/compiler';
+/*import { stringify } from '@angular/core/src/util';*/
+import { ReturnStatement, Identifiers } from '@angular/compiler';
+/*import { AnimationGroupPlayer } from '@angular/animations/src/players/animation_group_player';*/
+import deepEqual from "deep-equal";
 
 @Component({
   selector: 'app-create-analysis',
@@ -31,33 +34,35 @@ export class CreateAnalysisComponent implements OnInit {
   allowedClinicalDelimiters: string[] = ['', 'Tab', 'Comma', 'Space', 'Pipe', 'Semi-colon'];
   allowedSpeciesTypes: string[] = ['', 'Homo sapiens', 'Mus musculus', 'Other'];
   allowedSpeciesValues: string[] = ['', 'human', 'mouse', 'Other'];
+  identifierCols = new Map([['entrez_2021158607524066', 'Entrez'],
+                            ['genesymbol_2021158607524066', 'Gene Symbol'],
+                            ['refseq_2021158607524066', 'RefSeq ID'],
+                            ['ensembl_gene_id_2021158607524066', 'Ensembl gene ID'],
+                            ['uniprot_id_2021158607524066', 'UniProt ID'],
+                            ['mirna_id_2021158607524066', 'miRNA ID'],
+                            ['other_id_2021158607524066', 'Others']]);
 
   serverResponseOnFileAction: string = null;
   serverResponseOnClinicalUpload: ServerResponseData = null;
   serverResponseOnRemove: ServerResponseData = null;
   serverResponseOnCreate: ServerResponseData = null;
+  serverResponseOnSpecUpdate: ServerResponseData = null;
   //serverResponseOnPreview: ServerResponseData = null;
-  uploadedFiles: FileuploadPayload[] = [];
-  filepreview_payload: FileuploadPayload = null;
+  uploadedFiles: DatasetSpecs[] = [];
+  filepreview_payload: DatasetSpecs = null;
   
   previewTouched: boolean = false;
   showClosedBook: boolean = false;
   preview_curr_id: number = -1;
+
+  missing_metadata_dataset: string;
   
   //@Input() analysis_name: String;
-  @ViewChild('fileInput') fileInputItem: any;
+  @ViewChild('fileInput', { static: true }) fileInputItem: any;
 
   preview : PreviewData;
   metadataMappingDialogRef: MatDialogRef<MetadataMapComponent>;
-  metadata_mappings: string[][] = [];
 
-  /*
-  // Keep track of list of generated components for removal purposes
-  components = [];
-
-  // Expose class so that it can be used in the template
-  dataUploaderComponentClass = DataUploaderComponent;
-  */
 
   constructor(private router: Router, 
     private uploadService: DatauploadService,
@@ -66,34 +71,36 @@ export class CreateAnalysisComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private dialog: MatDialog
   ) { }
-  /*
-  addComponent(componentClass: Type<any>) {
-    // Create component dynamically inside the ng-template
-    const componentFactory = this.componentFactoryResolver.resolveComponentFactory(componentClass);
-    const component = this.container.createComponent(componentFactory);
-    component.instance.analysis_name = this.analysis_name;
-    //component.instance.visibility.subscribe(v => this.serverResponseOnFileRemove);
-    component.instance.output.subscribe(event => console.log(event));
 
-    // Push the component so that we can keep track of which components are created
-    this.components.push(component);
+  ngOnInit() {
+    this.activatedRoute.queryParams.subscribe(params => {
+      this.analysis_name = params['analysis_name'];
+      for (let key in params) {
+        console.log(key + ": " + params[key]);
+      }
+    });
+    this.getDatasetSpecs();
   }
-  */
 
-  /*
-  setNumOmics () {
-    this.numOmicsDatasetArray = Array(parseInt(this.numOmicsDataset)).fill(0).map((x,i)=>i);
-    console.log(this.numOmicsDatasetArray);
-  } 
-  */
+  handleFileUploadSuccess() {
+    this.getDatasetSpecs();
+  }
 
-  handleFileUploadSuccess(notification: FileuploadPayload) {
-    console.log("handleFileUploadSuccess() called");
-    this.serverResponseOnFileAction = "File '" + notification.filename + "' added.";
-    this.uploadedFiles.push(notification);
-    var t = ["",""];
-    this.metadata_mappings.push(t);
-    console.log(this.metadata_mappings);
+  getDatasetSpecs() {
+    this.uploadSubscription = this.uploadService.getDatasetSpecs(this.analysis_name)
+      .subscribe(
+          data => this.uploadedFiles = data, 
+          () => console.log("create error")
+      );
+  }
+
+  prepDelimiterForDisplay(delimiter: string) {
+    let d = delimiter.charAt(0).toUpperCase() + delimiter.slice(1);
+    return d;
+  }
+
+  prepIdentifierForDisplay(identifier: string) {
+    return this.identifierCols.get(identifier);
   }
 
   handleFileInput(files: FileList) {
@@ -108,6 +115,7 @@ export class CreateAnalysisComponent implements OnInit {
     this.submitTouched = false;
   }
 
+  /*
   ftlog() {
     console.log(this.selectedClinicalDelimiter);
   }
@@ -115,15 +123,7 @@ export class CreateAnalysisComponent implements OnInit {
   splog() {
     console.log(this.selectedSpecies);
   }
-
-  ngOnInit() {
-    this.activatedRoute.queryParams.subscribe(params => {
-      this.analysis_name = params['analysis_name'];
-      for (let key in params) {
-        console.log(key + ": " + params[key]);
-      }
-    });
-  }
+  */
 
   ngOnDestroy() {
     if (this.uploadSubscription) {
@@ -163,7 +163,8 @@ export class CreateAnalysisComponent implements OnInit {
   handleCreate() {
     this.createTouched = true;
     if (this.selectedSpecies != null && this.selectedSpecies != ''
-      && this.uploadedFiles.length > 0 && this.clinicalFileUploaded) {
+      && this.uploadedFiles.length > 0 && this.clinicalFileUploaded
+      && this.validateIdentifierMappings()) {
 
       this.uploadSubscription = this.uploadService.createAnalysis(
         this.analysis_name, this.selectedSpecies)
@@ -173,6 +174,27 @@ export class CreateAnalysisComponent implements OnInit {
           	() => this.handleCreateResponse()
         );
     }
+  }
+
+  validateIdentifierMappings() {
+    for (let i=0; i<this.uploadedFiles.length; i++) {
+      let ds = this.uploadedFiles[i];
+      if (!ds.has_linker && !ds.has_additional_identifiers) {
+        this.missing_metadata_dataset = ds.display_name;
+        return false;
+      }
+      if (ds.has_linker) {
+        if (ds.linker_colname == null || ds.linker_colname == '' || ds.linker_identifier_type == null || ds.linker_identifier_type == '') {
+          this.missing_metadata_dataset = ds.display_name;
+          return false;
+        }
+      }
+      if (ds.has_additional_identifiers && ds.identifier_metadata_columns.length == 0) {
+        this.missing_metadata_dataset = ds.display_name;
+        return false;
+      }
+    }
+    return true;
   }
 
   handleCreateResponse() {
@@ -230,28 +252,22 @@ export class CreateAnalysisComponent implements OnInit {
   }  
 
   removeObject(id: number) {
-    console.log(id);
-    console.log("Deleting..")
-    var fileupload_payload: FileuploadPayload = this.uploadedFiles[id];
-    fileupload_payload.data_action = "remove"
-
-    console.log(fileupload_payload)
 
     this.uploadSubscription = this.uploadService.removeDataset(
-      fileupload_payload).subscribe(
+      this.analysis_name, 
+      this.uploadedFiles[id].expanded_filename
+    ).subscribe(
         res => {
           this.serverResponseOnRemove = res
-          console.log(res)
-          console.log(this.serverResponseOnRemove)
           if (this.serverResponseOnRemove.status == 1) {
-            this.serverResponseOnFileAction = "File " + fileupload_payload.filename + " has been removed."
+            this.serverResponseOnFileAction = "File " + this.uploadedFiles[id].filename + " has been removed."
             this.uploadedFiles.splice(id, 1);
           } else {
-            this.serverResponseOnFileAction = "File " + fileupload_payload.filename + " could not be removed."
+            this.serverResponseOnFileAction = "File " + this.uploadedFiles[id].filename + " could not be removed."
           }
         },
         error => {
-          this.serverResponseOnFileAction = "File " + fileupload_payload.filename + " could not be removed."
+          this.serverResponseOnFileAction = "File " + this.uploadedFiles[id].filename + " could not be removed."
         }
       );
   }
@@ -267,7 +283,8 @@ export class CreateAnalysisComponent implements OnInit {
     
     dialogConfig.data = {
       analysis_name: this.analysis_name,
-      expanded_filename: this.get_expanded_filename(this.uploadedFiles[id]),
+      spec: JSON.parse(JSON.stringify(this.uploadedFiles[id]))
+      //expanded_filename: this.get_expanded_filename(this.uploadedFiles[id]),
 		};
     this.metadataMappingDialogRef = this.dialog.open(MetadataMapComponent, dialogConfig);
     
@@ -275,8 +292,22 @@ export class CreateAnalysisComponent implements OnInit {
     		.subscribe( data=>this.applyMetdadataMappingChanges(data, id) );
   }
   
-  applyMetdadataMappingChanges(return_val: string[], id: number) {
-    this.metadata_mappings[id] = return_val;
+  applyMetdadataMappingChanges(new_spec: DatasetSpecs, id: number) {
+    if (new_spec) {
+      if (!deepEqual(new_spec, this.uploadedFiles[id])) {
+        this.uploadSubscription = this.uploadService.updateDatasetSpecs(this.analysis_name, new_spec)
+          .subscribe(
+            data => this.handleServerResponseOnSpecUpdate(data, new_spec, id), 
+            () => console.log("Dataset spec update error")
+          );
+      }
+    }
+  }
+
+  handleServerResponseOnSpecUpdate(res: ServerResponseData, new_spec: DatasetSpecs, id: number) {
+    if (res.status == 1) {
+      this.uploadedFiles[id] = new_spec;
+    }
   }
 
   /*
@@ -316,6 +347,23 @@ export class CreateAnalysisComponent implements OnInit {
                         + file_details.delimiter.toLowerCase() + "_"
                         + file_details.filename.toLowerCase() ;
   return expanded_filename;
+ }
+
+ getUploadType(omics_type: string) {
+
+  if (omics_type == "cnv") {
+    return "Copy Number Variation";
+  } else if (omics_type == "dna_meth") {
+    return "DNA Methylation";
+  } else if (omics_type == "m_rna") {
+    return "Gene Expression (mRNA)";
+  } else if (omics_type == "mi_rna") {
+    return "microRNA Expression (miRNA)";
+  } else if (omics_type == "protein") {
+    return "Protein";
+  } else {
+    return "Other";
+  }
  }
 
 }

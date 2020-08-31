@@ -126,6 +126,10 @@ public class SortOrderCache implements Serializable {
             key = (new SorterCacheEntry()).makeCacheKey(
                     1, GlobalMapConfig.HIERARCHICAL_COLUMN_ORDERING, with_filtering, significance_testing_params.toString(), col_clustering_params.toString()
             );
+        } else if (feature_ordering_scheme == GlobalMapConfig.HIERARCHICAL_COLUMN_ORDERING) {
+            key = (new SorterCacheEntry()).makeCacheKey(
+                    1, GlobalMapConfig.HIERARCHICAL_COLUMN_ORDERING, with_filtering, significance_testing_params.toString(), col_clustering_params.toString()
+            );
         }
         
         if(!cache.containsKey(key)) {
@@ -163,6 +167,11 @@ public class SortOrderCache implements Serializable {
             ArrayList <Integer> significant_gene_indices
     ) {
         if (feature_ordering_scheme == GlobalMapConfig.HIERARCHICAL_COLUMN_ORDERING) {
+            SorterCacheEntry entry = new SorterCacheEntry(
+                1, GlobalMapConfig.HIERARCHICAL_COLUMN_ORDERING, with_filtering, significance_testing_params.toString(), col_clustering_params.toString(), sort_order, significant_gene_indices
+            );
+            cache.put(entry.makeCacheKey(), entry);
+        } if (feature_ordering_scheme == GlobalMapConfig.HIERARCHICAL_COLUMN_ORDERING) {
             SorterCacheEntry entry = new SorterCacheEntry(
                 1, GlobalMapConfig.HIERARCHICAL_COLUMN_ORDERING, with_filtering, significance_testing_params.toString(), col_clustering_params.toString(), sort_order, significant_gene_indices
             );

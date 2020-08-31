@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { HeatmapService } from '../heatmap.service'
 import { MapConfig } from '../map-config_data'
 
@@ -10,17 +10,18 @@ import { MapConfig } from '../map-config_data'
 })
 export class MapSettingsComponent implements OnInit {
 
-  custom_gene_identifiers: string[];
+  available_feature_identifiers: string[];
+  selected_feature_identifier: string;
   data_min: number = 0;
   data_max: number = 0;
-
   analysis_name: string;
   datasetName: string;
-
   new_map_config: MapConfig;
   numColorsStr: string;
   binningRangeStartStr: string;
   binningRangeEndStr: string;
+  aggregate_function: string;
+  show_aggregated: boolean;
 
   numColorsErrMsg: string = "";
   rangeErrMsg: string = "";
@@ -41,15 +42,16 @@ export class MapSettingsComponent implements OnInit {
                             'Ensembl Gene Id','Ensembl Transcript Id',
                             'Ensembl Protein Id','Uniprot Id']
 
+  aggregate_functions: string[] = ['Maximum', 'Minimum', 'Mean', 'Median']
+
   constructor( private heatmapService: HeatmapService, 
                private dialogRef: MatDialogRef<MapSettingsComponent>,
                @Inject(MAT_DIALOG_DATA) data) {
 
         this.analysis_name = data.analysis_name;
         this.datasetName = data.datasetName;
-        this.custom_gene_identifiers = data.custom_gene_identifiers;
-        this.dialogRef.updatePosition({ top: '90px', left: '700px' });
-        this.dialogRef.updateSize('560px','820px');
+        this.dialogRef.updatePosition({ top: '60px', left: '700px' });
+        this.dialogRef.updateSize('560px','900px');
   }
 
   ngOnInit() { 
@@ -113,8 +115,27 @@ export class MapSettingsComponent implements OnInit {
       }
     }
 
-    this.new_map_config.columnLabel = 'genesymbol_2021158607524066';
+    this.new_map_config.show_aggregated = this.show_aggregated;
+    this.new_map_config.aggregate_function = this.aggregate_function;
+    /*
+    this.new_map_config.selected_feature_identifiers = [];
+    this.new_map_config.selected_feature_identifiers.push(this.selected_feature_identifier);
+    */
     this.close();
+  }
+
+  addFeatureCol() {
+    let i = this.new_map_config.selected_feature_identifiers.indexOf(this.selected_feature_identifier)
+    if (i<0) {
+      this.new_map_config.selected_feature_identifiers.push(this.selected_feature_identifier);
+    }
+  }
+
+  removeFeatureCol(col: string) {
+    let i = this.new_map_config.selected_feature_identifiers.indexOf(col);
+    if (i >= 0) {
+      this.new_map_config.selected_feature_identifiers.splice(i,1);
+    }
   }
 
   getMapConfig(): void {
@@ -134,9 +155,12 @@ export class MapSettingsComponent implements OnInit {
     this.numColorsStr = this.new_map_config.nColors.toString();
     this.binningRangeStartStr = this.new_map_config.binningRangeStart.toString();
     this.binningRangeEndStr = this.new_map_config.binningRangeEnd.toString();
-    this.custom_gene_identifiers = this.new_map_config.custom_gene_identifiers;
+    this.available_feature_identifiers = this.new_map_config.available_feature_identifiers;
+    this.selected_feature_identifier = this.new_map_config.selected_feature_identifiers[0];
     this.data_min = this.new_map_config.data_min;
     this.data_max = this.new_map_config.data_max;
+    this.aggregate_function = this.new_map_config.aggregate_function;
+    this.show_aggregated = this.new_map_config.show_aggregated;
   }
 
 }

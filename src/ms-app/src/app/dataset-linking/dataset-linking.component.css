@@ -1,0 +1,110 @@
+.sub_container_selector {
+    position: relative; 
+    top: 2px; 
+    left: 3px; 
+    width: 268px;
+    height: 30px;
+}
+
+.hc_module_controls {
+    text-align:left;
+    font-family:'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: normal;
+    margin-top: 10px;
+}
+
+option {
+    font-family:  'Poppins', sans-serif;
+}
+
+input[type=text], select {
+    width: 300px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-top: 6px;
+    margin-bottom: 16px;
+    resize: vertical;
+    font-size: 16px;    
+}
+
+button {
+    background-color: #F8F8F8;
+    padding: 5px 16px;
+    font-size: 11px;
+    color: #505050;
+    text-transform: uppercase;
+    border: 1px solid #505050;
+    border-radius: 10px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    font-family: 'Verdana';
+}
+
+button:hover {
+    border-color: rgb(255,99,23);
+    color: rgb(255,99,0);
+    background-color: #fbfbfb;
+}
+
+.hc_title {
+    text-align:left;
+    font-family:'Poppins', sans-serif;
+    font-size: 20px;
+    font-weight: normal;
+    margin-top: 10px;
+    padding-bottom: 10px;
+    line-height: 25px;
+    width: 400px; 
+    border-bottom: 1px black solid;
+}
+
+.minus_button {
+    float: right;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    background-image: url('assets/img/minus512_green_filled.png');
+    background-size: 20px 20px;
+}
+
+.select_block2 {
+    text-align:left;
+    align-content: center;
+    float: left;
+    background-color:#FDFDFD;
+    /*background-color: rgb(36, 41, 46);*/
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    color: black;
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px; 
+    letter-spacing: 2px;
+    font-weight: normal;
+    height: 40px;
+    width: 70%;
+    overflow-y: hidden;
+    padding: 10px;
+    padding-right: 20px;
+    /*border-bottom: 1px solid white;*/
+}
+
+.container_block {
+    margin-top: 10px;
+    overflow-y: auto;
+    /*border: 1px solid #000000;*/
+}
+
+.apply_changes_div {
+    position: relative; 
+    top: 30px; 
+    width: 400px; 
+    padding-top: 18px;
+    border-top: black 1px solid; 
+    align-content: center;
+    text-align: center;
+}

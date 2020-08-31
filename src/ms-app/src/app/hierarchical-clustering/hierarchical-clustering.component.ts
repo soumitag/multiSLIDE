@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { ClusteringParams } from '../clustering_params';
-import { ClusteringService } from '../clustering.service'
+/*import { ClusteringService } from '../clustering.service' */
 import { ServerResponseData } from '../server_response';
 
 @Component({
@@ -18,6 +18,7 @@ export class HierarchicalClusteringComponent implements OnInit {
   toggleView: boolean = false;
   showClustParams: boolean = false;
   showDefaultClustParams: boolean = false;
+  rc_type: number;
 
   /*
   toggleCol: boolean = false;
@@ -25,12 +26,15 @@ export class HierarchicalClusteringComponent implements OnInit {
   showDefaultColClustParams: boolean = false;
   */
 
-  linkage_function_values = [0,1,2,3,4,5]
-  linkage_function_disps = ['Average','Complete','Median','Centroid','Ward','Weighted']
+  linkage_function_values = [0,1,2,3,4,5,6]
+  linkage_function_disps = ['Average','Complete','Median','Centroid','Ward','Weighted','Single']
   distance_function_values = [0,1,2,3,4]
   distance_function_disps = ['Euclidean','Manhattan','Cosine','Correlation','Chebyshev']
-  leaf_ordering_values = [0,1,2,3];
-  leaf_ordering_disps = ['Smallest Child First','Largest Child First','Most Diverse Child First','Least Diverse Child First'];
+  leaf_ordering_values = [0,1,2,3,4];
+  leaf_ordering_disps = ['Optimal (can be slow for large datasets)', 'Smallest Child First (based on count)', 'Largest Child First (based on count)', 
+  'Closest Child First (based on distance)', 'Farthest Child First (based on distance)'];
+  //leaf_ordering_disps = ['Smallest Child First','Largest Child First','Most Diverse Child First','Least Diverse Child First'];
+  //allowed_aggregate_values = ['Mean', 'Max', 'Sum'];
   
   TYPE_ROW: number = 0;
   TYPE_COL: number = 1;
@@ -44,6 +48,7 @@ export class HierarchicalClusteringComponent implements OnInit {
     this.analysis_name = data.analysis_name;
     this.dataset_names = data.dataset_names;
     this.type = data.clustering_params.type;
+    this.rc_type = data.rc_type;
     this.dialogRef.updatePosition({ top: '110px', left: '700px' });
     this.dialogRef.updateSize('550px','600px');
     console.log(this.clustering_params)

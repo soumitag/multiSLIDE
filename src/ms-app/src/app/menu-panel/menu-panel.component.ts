@@ -2,7 +2,8 @@ import { Component, OnInit, Input, Output, OnChanges, SimpleChange, EventEmitter
 import { CreateListComponent } from '../create-list/create-list.component'
 import { HierarchicalClusteringComponent } from '../hierarchical-clustering/hierarchical-clustering.component'
 import { UploadListComponent } from '../upload-list/upload-list.component'
-import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material";
+import { UploadConnectionComponent } from '../upload-connection/upload-connection.component'
+import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
 import { ListService } from '../list.service'
 import { AnalysisService } from '../analysis.service'
 import { ServerResponseData } from '../server_response'
@@ -21,6 +22,7 @@ export class MenuPanelComponent implements OnInit {
   @Input() analysis_name: string;
   @Output() notifySelectionPanelToggle = new EventEmitter();
   @Output() onListChange = new EventEmitter<string>();
+  @Output() onConnectionChange = new EventEmitter<string>();
   /*
   @Output() clusteringParamsChange = new EventEmitter<string>();
   */
@@ -28,6 +30,7 @@ export class MenuPanelComponent implements OnInit {
   server_response: ServerResponseData;
   createListDialogRef: MatDialogRef<CreateListComponent>;
   uploadListDialogRef: MatDialogRef<UploadListComponent>;
+  uploadConnectionsDialogRef: MatDialogRef<UploadConnectionComponent>;
   //clusteringDialogRef: MatDialogRef<ClusteringDialogComponent>;
   clusteringDialogRef: MatDialogRef<HierarchicalClusteringComponent>;
 
@@ -85,7 +88,7 @@ export class MenuPanelComponent implements OnInit {
     this.uploadListDialogRef.afterClosed()
     		.subscribe( data=>this.uploadList(data) );
   }
-  
+
   uploadList(status: number) {
     if (status == 1) {
       this.onListChange.emit();
@@ -110,6 +113,29 @@ export class MenuPanelComponent implements OnInit {
 		} else {
 			alert(this.server_response.message + '. ' + this.server_response.detailed_reason);
 		}
+  }
+
+  openUploadInterOmicsConnections() {
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.height = '500';
+		dialogConfig.width = '200';
+		dialogConfig.position = {
+			top: '300',
+			left: '300'
+    };
+    dialogConfig.data = {
+			analysis_name: this.analysis_name
+		};
+    this.uploadConnectionsDialogRef = this.dialog.open(UploadConnectionComponent, dialogConfig);
+    
+    this.uploadConnectionsDialogRef.afterClosed()
+    		.subscribe( hasChanged=>this.notifyParent(hasChanged) );
+  }
+  
+  notifyParent(hasChanged: number) {
+    if (hasChanged==1) {
+      this.onConnectionChange.emit();
+    }
   }
 
   saveWorkspace() {

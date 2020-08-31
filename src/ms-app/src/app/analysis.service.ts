@@ -1,6 +1,5 @@
 import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
-import { Http } from "@angular/http";
 import { HttpClient } from '@angular/common/http';
 import { ServerResponseData } from './server_response';
 import "rxjs/Rx"
@@ -14,7 +13,7 @@ export class AnalysisService {
 	private demoUrl = LocalSettings.MSVIZ_ENGINE_URL + "/LoadDemo"; 
 	private serializeUrl = LocalSettings.MSVIZ_ENGINE_URL + "/SerializeAnalysis"; 
 	
-	constructor(private http: Http, private httpClient: HttpClient) { }
+	constructor(private httpClient: HttpClient) { }
 
 	reInitializeAnalysis (analysis_name: string, source: string): Observable<ServerResponseData> {
 		console.log("re-initializing analysis...")
@@ -33,28 +32,15 @@ export class AnalysisService {
 	}
 
 	initializeAnalysis (analysis_name: string, 
-						datasets: string[],
-						phenotypes: string[],
-						group_ids: string[],
-						group_types: number[],
-						group_display_tags: string[],
-						intersection_counts: number[],
-						intersection_counts_per_dataset: string,
-						background_counts: number[]
+						source: string,
+						search_ids: string[]
 	): Observable<ServerResponseData> {
 		console.log("initializing analysis...")
 		return this.httpClient.get ( this.baseUrl, {
 				params: { 
 						  'analysis_name': analysis_name,
-						  'source': 'init',
-						  'dataset_names': datasets.toString(),
-						  'clinicalFilters': phenotypes.toString(),
-						  'groupIDs': group_ids.toString(),
-						  'groupTypes': group_types.toString(),
-						  'groupNames': group_display_tags.toString(),
-						  'intersection_counts': intersection_counts.toString(),
-						  'intersection_counts_per_dataset': intersection_counts_per_dataset,
-						  'background_counts': background_counts.toString()
+						  'source': source,
+						  'ids': search_ids.toString(),
 						},
 				withCredentials: true
 		  	})

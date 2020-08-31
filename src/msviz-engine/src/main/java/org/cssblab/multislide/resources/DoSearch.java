@@ -2,12 +2,8 @@ package org.cssblab.multislide.resources;
 
 import com.google.gson.Gson;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.StringTokenizer;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -17,13 +13,11 @@ import org.cssblab.multislide.beans.data.SearchResults;
 import org.cssblab.multislide.beans.data.ServerResponse;
 import org.cssblab.multislide.datahandling.DataParser;
 import org.cssblab.multislide.datahandling.RequestParam;
-import org.cssblab.multislide.searcher.GeneObject;
-import org.cssblab.multislide.searcher.GoObject;
-import org.cssblab.multislide.searcher.PathwayObject;
 import org.cssblab.multislide.searcher.SearchHandler;
 import org.cssblab.multislide.searcher.SearchResultObject;
 import org.cssblab.multislide.searcher.Searcher;
 import org.cssblab.multislide.structure.AnalysisContainer;
+import org.cssblab.multislide.utils.Utils;
 
 /**
  *
@@ -72,19 +66,30 @@ public class DoSearch extends HttpServlet {
                 returnMessage(new ServerResponse(0, "Empty query string", parser.error_msg), response);
             }
             
+            /*
+                check if at least one dataset has mi_rna
+            */
+            boolean has_mi_rna = false;
+            for (String name: analysis.data.datasets.keySet()) {
+                has_mi_rna = has_mi_rna || analysis.data.datasets.get(name).specs.has_mi_rna;
+            }
+            /*
+                search
+            */
             Searcher searcher = (Searcher)analysis.searcher;
-            HashMap <String, ArrayList <SearchResultObject>> search_results_map = SearchHandler.processSearchQuery(query, searcher, analysis.data.metadata, analysis.data.has_miRNA_Data);
+            HashMap <String, ArrayList <SearchResultObject>> search_results_map = SearchHandler.processSearchQuery(
+                    query, searcher, analysis.data, has_mi_rna);
             ArrayList <SearchResults> search_result_groups = SearchResults.compileSearchResults(
                     search_results_map, 
-                    analysis.data.metadata.entrezMaster, 
                     analysis.data
             );
-            analysis.setCurrentSearchResults(search_result_groups);
+            analysis.data_selection_state.setCurrentSearchResults(search_result_groups);
             
             String json = new Gson().toJson(search_result_groups);
             sendData(response, json);
             
         } catch(Exception e) {
+            Utils.log_exception(e, "");
             ServerResponse resp = new ServerResponse(0, "Unexpected error occurred during search", e.getMessage());
             String json = new Gson().toJson(resp);
             sendData(response, json);

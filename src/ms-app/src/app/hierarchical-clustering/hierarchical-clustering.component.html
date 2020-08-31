@@ -21,7 +21,7 @@
       </div>
 
     <div *ngIf="!clustering_params.use_defaults">
-
+      <div *ngIf="rc_type==1 || rc_type==0">
       <div style="position: relative; top: 15px; left: 10px; height: 80px; padding-left: 25px;">
         <label for="selectedDatasetRow">Dataset</label><br>
         <select name="selectedDatasetRow" [(ngModel)]="clustering_params.dataset">
@@ -31,8 +31,24 @@
           </option>
         </select>
       </div>
+    </div>
 
+    <!--
+    <div *ngIf="rc_type==1 || rc_type==2">
+      <div style="height:80px">
+        <input type="checkbox" name="use_aggregate" [(ngModel)]="clustering_params.use_aggregate" [value]="clustering_params.use_aggregate">
+        <label for="use_aggregate">Aggregate for Visualization (if available)</label><br>
+      </div>
       <div style="position: relative; top: 15px; left: 10px; height: 80px; padding-left: 25px;">
+        <label for="selectedAggregateFunc">Aggregate Function</label><br>
+        <select name="selectedAggregateFunc" [(ngModel)]="clustering_params.aggregate_func">
+          <option *ngFor="let aggregate_value of allowed_aggregate_values; let i = index" [value]="aggregate_value">{{aggregate_value}}</option>
+        </select>
+      </div>
+    </div>
+    -->
+
+    <div style="position: relative; top: 15px; left: 10px; height: 80px; padding-left: 25px;">
         <label for="selectedRowLinkage">Linkage Function</label><br>
         <select name="rowLinkage" [(ngModel)]="clustering_params.linkage_function">
           <option *ngFor="let lfv of linkage_function_values; let i = index" [value]="lfv"

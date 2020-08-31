@@ -90,6 +90,23 @@ public class Histogram implements Serializable {
         }
     }
     
+    public static int getBinNum_Int(Float val, int nBins, double MIN_VAL, double binsize){
+        
+        if (Float.isNaN(val)) {
+            return nBins;
+        }
+        
+        int binnum = (int)Math.floor((val - MIN_VAL)/binsize);
+        
+        if (binnum < 0) {
+            return (byte)(0);
+        } else if (binnum >= nBins) {
+            return (nBins-1);
+        } else {
+            return binnum;
+        }
+    }
+    
     public void addToBin_Int(int bin_no) {
         frequencies[bin_no]++;
     }
@@ -109,4 +126,8 @@ public class Histogram implements Serializable {
         return "";
     }
     
+    
+    
 }
+
+

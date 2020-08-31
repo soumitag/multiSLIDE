@@ -1,60 +1,74 @@
 <ng-container *ngIf="preview; else loading">
 <div class="metadata_map_title">Metadata Column Selection and Identifier Mapping</div>
 <div style="position:relative; top:10px; left:10px; width:500px;">
-
-  <form #createListForm='ngForm' name="metaDataMapForm">
     <div class="metadata_map_controls">
         <label for="selectedMetaDataCols">Metadata Columns</label><br>
-        <select name="selectedMetaDataCols" [(ngModel)]="selectedMetaDataCols" (ngModelChange)="metalog()" required>
-          <!--<option *ngFor="let rows of preview.data" [value]="rows">{{rows}}</option>-->
+        <select name="selectedMetaDataCols" [(ngModel)]="selectedMetaDataCols" required>
           <option *ngFor="let rows of column_names" [value]="rows">{{rows}}</option>
         </select>
         <div class="divider"></div>
         <button type="button" (click)="addMetaDataCols()">Add</button>
         <br>
-        <div class="container_block" style="position: relative; top: 10px; left: 5px; width: 268px; height: 150px;">
-          <div *ngFor="let cols of selected_metadata_cols_new" id="metadata_cols_div" class="select_block2">
+        <div style="position: relative; top: 0px; left: 5px; width: 268px; height: 120px; ; overflow-y: auto; margin-bottom: 15px;">
+          <div *ngFor="let cols of dataset_spec.metadata_columns" id="metadata_cols_div" class="select_block2">
             {{cols}}
             <div class="minus_button" (click)="removeMetaDataCols(cols)"></div>
           </div>
         </div>
        
-        <label for="MetaDataColsMap">Metadata Columns -> Standard Identifier Mapping</label><br>
-        <br>
-        <label for="selectedMetaDataCols2">Metadata Columns Selected</label><br>
-        <select name="selectedMetaDataCols2" [(ngModel)]="selectedMetaDataCols2" (ngModelChange)="metaDataCols_log()">
-          <option *ngFor="let cols of selected_metadata_cols_new" [value]="cols">{{cols}}</option>
-        </select>
-        <br>
-        <label for="identifierCols">Standard Identifiers</label><br>
-        <!--<select name="identifierCols" [(ngModel)]="identifierCols" (ngModelChange)="identifierCols_log()">
-          <option id="entrez" value="entrez">Entrez</option>
-          <option id="genesymbol" value="genesymbol" >Gene Symbol</option>
-          <option id="refseq" value="refseq" >RefSeq ID</option>
-          <option id="ensembl_gene_id" value="ensembl_gene_id" >Ensembl gene ID</option>
-          <option id="ensembl_transcript_id" value="ensembl_transcript_id" >Ensembl transcript ID</option>
-          <option id="ensembl_protein_id" value="ensembl_protein_id" >Ensembl protein ID</option>
-          <option id="uniprot_id" value="uniprot_id" >UniProt ID</option>
-        </select>
-        -->
-        <select name="identifierCols" [(ngModel)]="selected_identifier_value" (ngModelChange)="identifierCols_log()">
-          <option *ngFor="let col of identifierCols" [value]="col.value">{{col.text}}</option>
-        </select>
-        <div class="divider"></div>
-        <button type="button" (click)="addMetaDataIdentifierCols()">Add</button>
-        <br>
-        <div class="container_block" style="position: relative; top: 10px; left: 5px; width: 400px; height: 150px;">
-            <div *ngFor="let mappings of identifier_mapping_new" id="identifier_col_container" class="select_block2">
-              {{mappings}}
-              <div class="minus_button" (click)="removeMetaDataIdentifierCols(cols)"></div>
-            </div>
+        <label for="linkerCol">Does this dataset contain a 'Gene' column or a 'Linker' variable?</label> <br>
+        <label class="info_label">Linker variable are used to align omics identifiers across molecular levels. Learn more.</label>
+        <button class="help_button" title="Details about Linker variable" (click)="openHelpDialog()"></button>
+          <mat-radio-group class="radio_group_control" [(ngModel)]="linker_col_present" (change)="updateHasLinker()">
+            <mat-radio-button class="radio_button_control" *ngFor="let index of linker_var_present" [value]="index">{{index}}</mat-radio-button>
+          </mat-radio-group>
+        <div *ngIf="linker_col_present=='Yes'">
+          <label for="MetaDataColsMap">Map Linker Column -> Standard Identifier</label><br>
+          <br>
+          <label for="selectedMetaDataCols2">Linker Column</label><br>
+          <select name="selectedMetaDataCols2" [(ngModel)]="selected_meta_col_std">
+            <option *ngFor="let cols of dataset_spec.metadata_columns" [value]="cols">{{cols}}</option>
+          </select>
+          <br>
+          <label for="identifierCols">Standard Identifiers</label><br>
+          <select name="identifierCols" [(ngModel)]="selected_identifier_value">
+            <option *ngFor="let col of identifierCols | keyvalue" [value]="col.key">{{col.value}}</option>
+          </select>
+          <div class="divider"></div>
+          <button type="button" (click)="addLinkerCol()">Add</button>
+          <br>
+          <div class="container_block" style="position: relative; top: 10px; left: 5px; width: 400px; height: 80px;">
+              <div *ngIf="dataset_spec.has_linker" id="identifier_col_container" class="select_block2">
+                {{this.dataset_spec.linker_colname}} &nbsp; &#8594; &nbsp; {{this.identifierCols.get(this.dataset_spec.linker_identifier_type)}}
+                <div class="minus_button" (click)="removeLinkerCol()"></div>
+              </div>
+          </div>
         </div>
+        <label for="linkerCol2">Does this dataset have molecular-level specific identifiers?</label> <br>
+        <label class="info_label"><i>(for e.g. genomic coordinates, transcript identifiers etc.)</i></label><br>
+        <mat-radio-group class="radio_group_control" [(ngModel)]="has_additional_identifiers_local" (change)="updateHasAdditionalIdentifiers()">
+          <mat-radio-button class="radio_button_control" *ngFor="let index of linker_var_present" [value]="index">{{index}}</mat-radio-button>
+        </mat-radio-group>
+        <div *ngIf="has_additional_identifiers_local=='Yes'">
+          <label for="OtherOmicsColMap">Identify the column(s) with molecular-level specific identifiers</label><br>
+          <select name="selectedMetaDataCols3" [(ngModel)]="selected_second_meta_col">
+            <option *ngFor="let cols of remaining_cols_second_col" [value]="cols">{{cols}}</option>
+          </select>
+          <div class="divider"></div>
+          <button type="button" (click)="addSecondMetaDataCols()">Add</button>
+          <div class="container_block" style="position: relative; top: 10px; left: 5px; width: 268px; height: 150px;">
+            <div *ngFor="let cols of this.dataset_spec.identifier_metadata_columns" id="metadata_cols_div" class="select_block2">
+              {{cols}}
+              <div class="minus_button" (click)="removeSecondMetaDataCols(cols)"></div>
+            </div>
+          </div>
+        </div>
+
 
     </div>
     <div class="apply_changes_div">
-        <button type="button" (click)="updateMetaDataInfo()">Save Changes</button>
+        <button type="button" (click)="saveChanges()">Save Changes</button>
       </div><br><br><br>
-  </form>
 </div>
 </ng-container>
 <ng-template #loading>Fetching Column Headers...</ng-template>

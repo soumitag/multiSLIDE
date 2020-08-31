@@ -1,0 +1,17 @@
+<div class="sub_container_selector">
+  <label for="selectedPhenotype"></label>
+  <select name="selectedPhenotype" [(ngModel)]="selectedPhenotype">
+    <ng-container *ngIf="data">
+      <option *ngFor="let phenotype of data.phenotypes" [value]="phenotype">{{phenotype}}</option>
+    </ng-container>
+  </select>
+  <button type="button" (click)="addPhenotype()">Add</button>
+</div>
+
+<div class="container_block" style="position: relative; top: 10px; left: 5px; width: 268px; height: 150px">
+  <div *ngFor="let phenotype of selected_phenotypes_new" id="phenotypes_div" class="select_block2">
+    <div class="select_block2_text" [matTooltip]="phenotype">{{phenotype}}</div>
+    <div class="minus_button" (click)="removePhenotype(phenotype)"></div>
+  </div>
+</div>
+

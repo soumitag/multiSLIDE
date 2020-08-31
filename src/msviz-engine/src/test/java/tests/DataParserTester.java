@@ -10,9 +10,9 @@ package tests;
  * @author abhikdatta
  */
 
-import java.util.HashMap;
 import org.cssblab.multislide.datahandling.DataParser;
 import org.cssblab.multislide.datahandling.RequestParam;
+import org.cssblab.multislide.utils.Utils;
 
 public class DataParserTester {
 
@@ -34,7 +34,7 @@ public class DataParserTester {
         parser.addListParam("empty_list_test",    "",    RequestParam.DATA_TYPE_DOUBLE,  RequestParam.PARAM_TYPE_OPTIONAL, ",");
         
         if (!parser.parse()) {
-            System.out.println(parser.error_msg);
+            Utils.log_info(parser.error_msg);
         } else {
             try {
                 String dataset_name = parser.getString("dataset_name");
@@ -46,19 +46,19 @@ public class DataParserTester {
                 String[] list_test1 = parser.getStringArray("list_test1");
                 double[] list_test2 = parser.getDoubleArray("list_test2");
                 double[] empty_list = parser.getDoubleArray("empty_list_test");
-                System.out.println(empty_list);
-                System.out.println("Positive Tests Passed.");
+                Utils.log_info(empty_list.toString());
+                Utils.log_info("Positive Tests Passed.");
             } catch (Exception e) {
-                System.out.println(e);
+                Utils.log_exception(e, "");
             }
         }
         
         parser.addListParam("list_test3",    "11,22,dd",    RequestParam.DATA_TYPE_DOUBLE,  RequestParam.PARAM_TYPE_REQUIRED, ",");
         if (!parser.parse()) {
-            System.out.println(parser.error_msg);
-            System.out.println("Negative Test Passed.");
+            Utils.log_info(parser.error_msg);
+            Utils.log_info("Negative Test Passed.");
         } else {
-            System.out.println("Negative Test Failed.");
+            Utils.log_info("Negative Test Failed.");
         }
     }
     

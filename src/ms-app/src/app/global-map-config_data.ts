@@ -7,17 +7,19 @@ export class GlobalMapConfig {
     mapOrientation: number;
     mapResolution: string;
     gridLayout: number;
+    colHeaderHeight: number;
+    rowLabelWidth: number;
+    /*
     rowsPerPageDisplayed: number;
     colsPerPageDisplayed: number;
     userSpecifiedRowsPerPage: number;
     userSpecifiedColsPerPage: number;
-    colHeaderHeight: number;
-    rowLabelWidth: number;
     current_sample_start: number;
     current_feature_start: number;
     available_rows: number;
     available_cols: number;
     scrollBy: number;
+    */
     columnOrderingScheme: number;
     sampleOrderingScheme: number;
     isGeneFilteringOn: boolean;
@@ -26,5 +28,7 @@ export class GlobalMapConfig {
     col_clustering_params: ClusteringParams;
     significance_testing_params: SignificanceTestingParams;
     phenotype_sorting_params: PhenotypeSortingParams;
-
+    isDatasetLinkingOn: boolean;
+    dataset_linkings = [];
+    
 }

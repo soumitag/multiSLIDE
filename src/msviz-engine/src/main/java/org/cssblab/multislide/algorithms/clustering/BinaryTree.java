@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
 import org.cssblab.multislide.structure.MultiSlideException;
@@ -56,10 +57,16 @@ public class BinaryTree implements Serializable {
         }
     }
     
+    /*
     public static final int LARGEST_CHILD_FIRST_LEAF_ORDER = 0;
     public static final int SMALLEST_CHILD_FIRST_LEAF_ORDER = 1;
     public static final int MOST_DIVERSE_CHILD_FIRST_LEAF_ORDER = 2;
     public static final int LEAST_DIVERSE_CHILD_FIRST_LEAF_ORDER = 3;
+    */
+    private static final int LARGEST_CHILD_FIRST_LEAF_ORDER = 0;
+    private static final int SMALLEST_CHILD_FIRST_LEAF_ORDER = 1;
+    private static final int MOST_DIVERSE_CHILD_FIRST_LEAF_ORDER = 2;
+    private static final int LEAST_DIVERSE_CHILD_FIRST_LEAF_ORDER = 3;
     
     public int num_internal_nodes;
     public int num_leaf_nodes;
@@ -70,7 +77,7 @@ public class BinaryTree implements Serializable {
     ArrayList <int[]> labels;
     
     int leaf_ordering_strategy;
-    public ArrayList <Integer> leaf_ordering;
+    public List <Integer> leaf_ordering;
     public int[][] node_start_end;
     public HashMap <Integer, Integer> leafPositionMap;
     
@@ -296,10 +303,6 @@ public class BinaryTree implements Serializable {
     
     public void processSubTree(double[][] linkage_tree, int node_id) {
         
-        if (node_id == 3355) {
-            int debugStop = 1;
-        }
-        
         if (isLeaf(node_id)) {
             return;
         }
@@ -307,14 +310,6 @@ public class BinaryTree implements Serializable {
         int left_child_id = (int)linkage_tree[getRow(node_id)][0];
         int right_child_id = (int)linkage_tree[getRow(node_id)][1];
 
-        if (left_child_id == 3355) {
-            int debugStop = 1;
-        }
-        
-        if (right_child_id == 3355) {
-            int debugStop = 1;
-        }
-        
         processSubTree(linkage_tree, left_child_id);
         processSubTree(linkage_tree, right_child_id);
         

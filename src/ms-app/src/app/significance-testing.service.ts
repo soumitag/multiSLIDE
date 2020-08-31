@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Http } from "@angular/http";
 import { HttpClient } from '@angular/common/http';
 import { SignificanceTestingParams } from './significance_testing_params';
 import { GlobalMapConfig } from './global-map-config_data';
@@ -13,6 +12,9 @@ import { Observable } from 'rxjs/Observable';
 
 export class SignificanceTestingService {
 
+	//This class is to be deleted
+
+	/*
   private sigTestUrl = LocalSettings.MSVIZ_ENGINE_URL + "/SignificanceTestingService";
 
   constructor(private http: Http, private httpClient: HttpClient) { }
@@ -20,8 +22,8 @@ export class SignificanceTestingService {
   getDatasetsAndPhenotypes(analysis_name: string): Observable<string[][]> {
     return this.httpClient.get(this.sigTestUrl, {
 			params: {
-        'analysis_name': analysis_name,
-        'action': 'get_dataset_names_and_phenotypes'
+				'analysis_name': analysis_name,
+				'action': 'get_dataset_names_and_phenotypes'
 			},
 			withCredentials: true
 		})
@@ -53,6 +55,7 @@ export class SignificanceTestingService {
 			console.log(error);
 			return Observable.throw(error);
 		});
- 	}
+	 }
+	 */
 
 }

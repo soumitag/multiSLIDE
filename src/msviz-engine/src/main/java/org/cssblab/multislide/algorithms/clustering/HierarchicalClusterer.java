@@ -10,23 +10,34 @@ package org.cssblab.multislide.algorithms.clustering;
  * @author Soumita
  */
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Files;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.PriorityQueue;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.RowFactory;
+import org.apache.spark.sql.SparkSession;   
+import static org.apache.spark.sql.functions.monotonically_increasing_id;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
+import org.cssblab.multislide.beans.data.ServerResponse;
 import org.cssblab.multislide.structure.AnalysisContainer;
 import org.cssblab.multislide.structure.ClusteringParams;
-import org.cssblab.multislide.structure.Data;
 import org.cssblab.multislide.utils.FileHandler;
 import org.cssblab.multislide.structure.MultiSlideException;
-
+import org.cssblab.multislide.utils.HttpClientManager;
+import org.cssblab.multislide.utils.Utils;
+import org.cssblab.multislide.algorithms.clustering.BinaryTree;
+import org.cssblab.multislide.datahandling.DataParsingException;
+import org.cssblab.multislide.structure.data.Data;
+import org.cssblab.multislide.structure.data.table.Table;
+import org.cssblab.multislide.utils.CollectionUtils;
 
 /**
  *
@@ -36,175 +47,210 @@ public class HierarchicalClusterer implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
-    public static final int SINGLE_LINKAGE      = 0;
-    public static final int COMPLETE_LINKAGE    = 1;
-    public static final int AVERAGE_LINKAGE     = 2;
-    public static final int MEDIAN_LINKAGE      = 3;
-    public static final int CENTROID_LINKAGE    = 4;
-    public static final int WARD_LINKAGE        = 5;
-    public static final int WEIGHTED_LINKAGE    = 6;
     
-    public static final int EUCLIDEAN_DISTANCE      = 0;
-    public static final int CITYBLOCK_DISTANCE      = 1;
-    public static final int COSINE_DISTANCE         = 2;
-    public static final int CORRELATION_DISTANCE    = 3;
-    public static final int CHEBYSHEV_DISTANCE      = 4;
+    public String CACHE_PATH;
+    public String message;
+    public int status;
+    private final HttpClientManager analytics_engine_comm;
     
-    public static final int TYPE_ROW_CLUSTERING = 0;
-    public static final int TYPE_COL_CLUSTERING = 1;
-    
-    public String PYTHON_HOME;
-    public String PYTHON_MODULE_PATH;
-    public String DATA_FILES_PATH;
-
-    HashMap <String, String> cache;
-    
-    public HierarchicalClusterer (String data_files_path,
-                                  String python_module_path,
-                                  String python_home) {
-        
-        this.PYTHON_MODULE_PATH = python_module_path;
-        this.PYTHON_HOME = python_home;
-        this.DATA_FILES_PATH = data_files_path;
-        
-        this.cache = new HashMap <String, String> ();
+    public HierarchicalClusterer (String cache_path, HttpClientManager analytics_engine_comm) {
+        this.CACHE_PATH = cache_path;
+        this.status = 0;
+        this.analytics_engine_comm = analytics_engine_comm;
     }
     
+    /*
     public HierarchicalClusterer () { }
-
-    public BinaryTree doClustering(
-        ArrayList <ArrayList <Float>> data,
-        AnalysisContainer analysis,
-        String dataset_name,
-        ClusteringParams params
-    ) throws MultiSlideException {
-        
-        String key = getCacheKey(analysis, params.getType());
-        if (false) {
-        //if (this.cache.containsKey(key)) {
-            String filetag = cache.get(key);
-            String linkage_tree_fname = DATA_FILES_PATH + File.separator + "ClusteringOutput_" + filetag + ".txt";
-            double[][] linkage_tree = null;
-            try {
-                linkage_tree = FileHandler.loadDoubleDelimData(linkage_tree_fname, " ", false);
-            } catch (Exception e) {
-                throw new MultiSlideException("Cannot read linkage file " + linkage_tree_fname);
-            }
-            return new BinaryTree(linkage_tree, params.getLeafOrdering());
-        } else {
-            try {
-                return doClustering(data, analysis, dataset_name, params.getType(), params.getLinkageFunctionS(), params.getDistanceFunctionS(), params.getLeafOrdering(), key);
-            } catch (Exception e) {
-                throw new MultiSlideException("Exception in HierarchicalClustering.java");
-            }
-        }
-    }
+    */
     
-    private String getCacheKey (AnalysisContainer analysis, int type) throws MultiSlideException { 
-        String cluster_params_hash_string = analysis.getClusteringParams(type).getHashString();
-        String key = cluster_params_hash_string;
-        return key;
-    }
-
-    public BinaryTree doClustering (ArrayList <ArrayList <Float>> data, AnalysisContainer analysis, String dataset_name, int type, String linkage, String distance_function, int leaf_ordering, String key)
-    throws MultiSlideException {
+    public Table doClustering(
+            SparkSession spark, String dataset_name,
+            ClusteringParams params, Dataset <Row> data, 
+            Dataset <Row> phenotype_data, String[] group_by
+    ) throws MultiSlideException, DataParsingException {
         
-        String id = System.currentTimeMillis() + "";
-        FileHandler.saveDataMatrix(DATA_FILES_PATH + File.separator + type + "_InData.txt", "\t", data);
-        String linkage_tree_fname = DATA_FILES_PATH + File.separator + type + "_ClusteringOutput_" + id + ".txt";
-        String error_fname = DATA_FILES_PATH + File.separator + type + "_ClusteringError_" + id + ".txt";
+        Table result = null;
         
-        try {
-
-            File link_file = new File(linkage_tree_fname);
-            Files.deleteIfExists(link_file.toPath());
-
-            ProcessBuilder pb = new ProcessBuilder(
-                    PYTHON_HOME + File.separator + "python",
-                    PYTHON_MODULE_PATH + File.separator + "fast_hierarchical_clustering.py",
-                    DATA_FILES_PATH,
-                    type + "_InData.txt",
-                    linkage,
-                    distance_function,
-                    id,
-                    type + ""
-            );
-            System.out.println(pb.toString());
-            
-            pb.directory(new File(PYTHON_MODULE_PATH));
-            File log = new File(PYTHON_MODULE_PATH + File.separator + "log.txt");
-            pb.redirectErrorStream(true);
-            pb.redirectOutput(ProcessBuilder.Redirect.appendTo(log));
-            Process p = pb.start();
-            assert pb.redirectInput() == ProcessBuilder.Redirect.PIPE;
-            assert pb.redirectOutput().file() == log;
-            assert p.getInputStream().read() == -1;
-
-            //p.destroyForcibly();
-        } catch (Exception e) {
-            System.out.println(e);
-            throw new MultiSlideException("Failed to start clustering.");
-        }
-
-        File link_file = new File(linkage_tree_fname);
-        File error_file = new File(error_fname);
-        
-        boolean isClusteringSuccessful = true;
-        int waiting = 0;
-        while (true) {
-            if (link_file.exists() || error_file.exists()) {
-                isClusteringSuccessful = true;
+        List<String[]> fields = new ArrayList<>();
+        switch (params.getType()) {
+            case ClusteringParams.TYPE_FEATURE_CLUSTERING: {
+                if (group_by != null && group_by.length == 1 && group_by[0].equals("_linker")) {
+                    fields.add(new String[]{"_linker", Table.DTYPE_STRING});
+                    result = new Table(fields, "_id");
+                    break;
+                } else {
+                    fields.add(new String[]{"_index", Table.DTYPE_LONG});
+                    result = new Table(fields, "_id");
+                    break;
+                }
+            }
+            case ClusteringParams.TYPE_SAMPLE_CLUSTERING: {
+                fields.add(new String[]{"_index", Table.DTYPE_LONG});
+                result = new Table(fields, "_Sample_IDs");
                 break;
             }
-            if (waiting > 30) {
-                isClusteringSuccessful = false;
-                break;
-            }
-            waiting++;
-            try {
-                TimeUnit.MILLISECONDS.sleep(200);
-            } catch(InterruptedException e) {
-                Thread.currentThread().interrupt();
-                System.out.println(e);
-            }
         }
-        System.out.println("Waited for: " + waiting);
         
-        if (error_file.exists()) {
-            isClusteringSuccessful = false;
-        }
-
         /*
-        if (isClusteringSuccessful) {
-            // wait another 2 secs for filewrite to finish
-            try {
-                TimeUnit.MILLISECONDS.sleep(2000);
-            } catch(InterruptedException e) {
-                Thread.currentThread().interrupt();
-                System.out.println(e);
-            }
-        }
+        In case of empty input, return empty
         */
+        if (data.count() == 0) {
+            return result;
+        }
+        
+        /*
+        Check that there are colums to cluster
+        */
+        List <String> cols = CollectionUtils.asList(data.columns());
+        if (cols.contains("_id"))
+            cols.remove("_id");
+        if (group_by != null) {
+            for (String s: group_by)
+                cols.remove(s);
+        }
+        if (cols.isEmpty()) {
+            return result;
+        }
+    
+        /*
+        Create a unique request id
+        */
+        String id = System.currentTimeMillis() + "";
+        Random rand = new Random();
+        String request_id = "req_" + id + "." + rand.nextInt();
+        
+        /*
+        Get folder and file paths
+        */
+        String request_path = CACHE_PATH + File.separator + request_id;
 
-        if (isClusteringSuccessful) {
-            double[][] linkage_tree = null;
-            try {
-                linkage_tree = FileHandler.loadDoubleDelimData(linkage_tree_fname, " ", false);
-            } catch (Exception e) {
-                throw new MultiSlideException("Cannot read linkage file " + linkage_tree_fname);
+        try {
+            
+            data.repartition(1)
+                .write()
+                .mode("overwrite")
+                .format("csv")
+                .option("delimiter", "\t")
+                .option("header", "true")
+                .save(request_path);
+            
+            if (phenotype_data != null) {
+                phenotype_data.repartition(1)
+                               .write()
+                               .mode("overwrite")
+                               .format("csv")
+                               .option("delimiter", "\t")
+                               .option("header", "true")
+                               .save(request_path + File.separator + "phenotypes");
             }
-            cache.put(key, id);
-            return new BinaryTree(linkage_tree, leaf_ordering);
+            //Utils.log_dataset(data, 0, "info");
+            
+            HashMap <String, String> props = params.asMap();
+            if (group_by != null && group_by.length > 0) {
+                props.put("operation", "clustering_by_groups");
+                props.put("group_by", String.join(",", group_by));
+            } else {
+                props.put("operation", "clustering");
+            }
+            props.put("dataset_name", dataset_name);
+            FileHandler.savePropertiesFile(request_path + File.separator + "_params", props);
+            
+        } catch (Exception e) {
+            Utils.log_exception(e, "");
+            throw new MultiSlideException("Failed to start hierarchical clustering.");
+        }
+        
+        long n_rows = data.count();
+        int n_cols = data.columns().length;
+        long sz = 0;
+        
+        HashMap <String, String> p = new HashMap <> ();
+        if (params.getType() == ClusteringParams.TYPE_SAMPLE_CLUSTERING) {
+            p.put("transpose", "True");
+            sz = n_cols;
+        } else if (params.getType() == ClusteringParams.TYPE_FEATURE_CLUSTERING) {
+            p.put("transpose", "False");
+            sz = n_rows;
+        }
+        
+        p.put("request_id", request_id);
+        p.put("linkage_strategy", params.getLinkageFunctionS());
+        p.put("distance_metric", params.getDistanceFunctionS());
+        if (sz > 500 && params.getLeafOrdering() == ClusteringParams.OPTIMAL_LEAF_ORDER) {
+            p.put("leaf_ordering", "count_sort_descending");
         } else {
-            throw new MultiSlideException("Failed to perform clustering.");
+            p.put("leaf_ordering", params.getLeafOrderingS());
+        }
+        
+        if (group_by != null && group_by.length > 0) {
+            p.put("group_by", String.join(",", group_by));
+        } else {
+            p.put("group_by", "");
+        }
+        p.put("n_rows", n_rows+"");
+        p.put("n_cols", n_cols+"");
+        
+        ServerResponse resp = analytics_engine_comm.doGet("do_clustering", p);
+
+        if (resp.status == 0) {
+            throw new MultiSlideException(resp.message + ". " + resp.detailed_reason);
+        } else {
+            try {
+                String out_fname = request_path + File.separator + "result.txt";
+                
+                //result.load(out_fname, "\t", true);
+                //return result;
+                
+                List <StructField> f = new ArrayList <> ();
+                
+                switch (params.getType()) {
+                    case ClusteringParams.TYPE_FEATURE_CLUSTERING:
+                    {
+                        if (group_by != null && group_by.length == 1 && group_by[0].equals("_linker")) {
+                            f.add(DataTypes.createStructField("_id", DataTypes.LongType, false));
+                            f.add(DataTypes.createStructField("_linker", DataTypes.StringType, false));
+                        } else {
+                            f.add(DataTypes.createStructField("_id", DataTypes.LongType, false));
+                            f.add(DataTypes.createStructField("_index", DataTypes.LongType, false));
+                        }
+                        break;
+                    }
+                    case ClusteringParams.TYPE_SAMPLE_CLUSTERING:
+                    {
+                        f.add(DataTypes.createStructField("_Sample_IDs", DataTypes.StringType, false));
+                        f.add(DataTypes.createStructField("_index", DataTypes.LongType, false));
+                        break;
+                    }
+                }
+                
+                Dataset <Row> res = spark.read()
+                                         .format("csv")
+                                         .option("sep", "\t")
+                                         .option("header", "true")
+                                         .schema(DataTypes.createStructType(f))
+                                         .load(out_fname);
+                
+                /*
+                Utils.log_info("Hierarchical Clustering result");
+                Utils.log_dataset(res, 0, "info");
+                */
+                
+                result.fromSparkDataframe(res.collectAsList(), true);
+                return result;
+                
+            } catch (Exception e) {
+                throw new MultiSlideException("Failed to read hierarchical clustering results");
+            }
         }
 
     }
     
     public void clearCache() {
-        this.cache.clear();
+        
     }
     
+    
+    /*
     public double[][] extractTopKNodes(double[][] linkage_tree, int start_node, int K) {
         ArrayList <Integer> sub_tree = new ArrayList <Integer> ();
         sub_tree.add((int)linkage_tree[start_node][0]);
@@ -222,5 +268,5 @@ public class HierarchicalClusterer implements Serializable {
             getChild(sub_tree, linkage_tree, (int)linkage_tree[curr_node][1], ++count, K);
         }
     }
-    
+    */
 }
