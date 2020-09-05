@@ -3,9 +3,9 @@ from setuptools import setup
 setup(
     name='pyslide',
     version='0.0.1',
-    packages=['https://github.com/soumitag/multiSLIDE'],
+    packages=[],
     package_dir={'': 'pyslide'},
-    url='',
+    url='https://github.com/soumitag/multiSLIDE',
     license='GPLv3',
     author='Soumita Ghosh and Abhik Datta',
     author_email='',
