@@ -16,3 +16,4 @@ src/pyslide_project/pyslide/.idea/misc.xml
 src/pyslide_project/pyslide/.idea/modules.xml
 src/pyslide_project/pyslide/.idea/pyslide.iml
 src/pyslide_project/pyslide/.idea/vcs.xml
+src/msviz-engine/target/*
