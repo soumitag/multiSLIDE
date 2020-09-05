@@ -17,3 +17,6 @@ src/pyslide_project/pyslide/.idea/modules.xml
 src/pyslide_project/pyslide/.idea/pyslide.iml
 src/pyslide_project/pyslide/.idea/vcs.xml
 src/msviz-engine/target/*
+src/pyslide_project/build/*
+*.egg
+src/pyslide_project/pyslide/pyslide.egg-info/*

@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='pyslide',
     version='0.0.1',
-    packages=['pyslide.stats', 'pyslide.utils'],
+    packages=['https://github.com/soumitag/multiSLIDE'],
     package_dir={'': 'pyslide'},
     url='',
     license='GPLv3',
