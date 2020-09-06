@@ -36,11 +36,11 @@ echo ${MULTISLIDE_GLASSFISH_HOME}
 #export glassfish_dir="/Users/abhikdatta/glassfish4/glassfish/bin"
 # *********************************
 
-#$mongodb_dir/mongod&
-${MULTISLIDE_MONGODB_HOME} --dbpath=${MULTISLIDE_MONGODB_DATA} &
-
 #"$glassfish_dir"/asadmin start-domain
 ${MULTISLIDE_GLASSFISH_HOME}/bin/asadmin start-domain
 #"$glassfish_dir"/asadmin deploy --force=true "$install_dir"/lib/VTBox.war
 ${MULTISLIDE_GLASSFISH_HOME}/bin/asadmin deploy --force=true ${MULTISLIDE_HOME}/libs/msviz-engine.war
 ${MULTISLIDE_GLASSFISH_HOME}/bin/asadmin deploy --force=true ${MULTISLIDE_HOME}/libs/multislide.war
+
+#$mongodb_dir/mongod&
+${MULTISLIDE_MONGODB_HOME} --dbpath=${MULTISLIDE_MONGODB_DATA}
