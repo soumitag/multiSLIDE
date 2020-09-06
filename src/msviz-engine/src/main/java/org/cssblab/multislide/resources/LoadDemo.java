@@ -243,11 +243,13 @@ public class LoadDemo extends HttpServlet {
             analysis.global_map_config.setDefaultDatasetLinking(database.datasets);
             
             // load system configuration details
-            HashMap <String, String> multislide_config = MultiSlideConfig.getMultiSlideConfig(installPath);
+            //HashMap <String, String> multislide_config = MultiSlideConfig.getMultiSlideConfig(installPath);
             
             // create clusterer and significance tester
+            /*
             String py_module_path = multislide_config.get("py-module-path");
             String py_home = multislide_config.get("python-dir");
+            */
             String cache_path = installPath + File.separator + "temp" + File.separator + "cache";
             HierarchicalClusterer clusterer = new HierarchicalClusterer(cache_path, analysis.analytics_engine_comm);
             analysis.setClusterer(clusterer);
@@ -262,7 +264,7 @@ public class LoadDemo extends HttpServlet {
             
             // Finally add analysis to session
             session.setAttribute(analysis.analysis_name, analysis);
-            session.setAttribute("multislide_config", multislide_config);
+            //session.setAttribute("multislide_config", multislide_config);
             
             returnMessage(new ServerResponse(1, "Demo Loaded.", ""), response);
             return;

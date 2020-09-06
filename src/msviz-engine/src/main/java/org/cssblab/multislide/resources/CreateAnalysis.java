@@ -145,11 +145,13 @@ public class CreateAnalysis extends HttpServlet {
                 analysis.global_map_config.setDefaultDatasetLinking(data.datasets);
 
                 // load system configuration details
-                HashMap <String, String> multislide_config = MultiSlideConfig.getMultiSlideConfig(installPath);
+                //HashMap <String, String> multislide_config = MultiSlideConfig.getMultiSlideConfig(installPath);
 
                 // create clusterer
+                /*
                 String py_module_path = multislide_config.get("py-module-path");
                 String py_home = multislide_config.get("python-dir");
+                */
                 String cache_path = installPath + File.separator + "temp" + File.separator + "cache";
                 HierarchicalClusterer clusterer = new HierarchicalClusterer(cache_path, analysis.analytics_engine_comm);
                 analysis.setClusterer(clusterer);
@@ -164,7 +166,7 @@ public class CreateAnalysis extends HttpServlet {
 
                 // Finally add analysis to session
                 session.setAttribute(analysis.analysis_name, analysis);
-                session.setAttribute("multislide_config", multislide_config);
+                //session.setAttribute("multislide_config", multislide_config);
 
                 returnMessage(new ServerResponse(1, "Analysis created", ""), response);
                 return;

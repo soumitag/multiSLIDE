@@ -15,7 +15,7 @@ import java.util.HashMap;
  * @author Soumita
  */
 public class MultiSlideConfig {
-    
+    /*
     public static HashMap <String, String> getMultiSlideConfig(String installPath) {
         return loadConfig(installPath + File.separator + "config" + File.separator + "multislide-config.txt");
     }
@@ -60,6 +60,6 @@ public class MultiSlideConfig {
             return null;
         }
     }
-
+    */
     
 }
