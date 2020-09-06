@@ -44,12 +44,31 @@ public class CORSFilter implements Filter, Serializable {
  
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         Utils.log_info("CORSFilter HTTP Request: " + request.getMethod());
- 
-        // Authorize (allow) all domains to consume the content
-        //((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Origin", "http://localhost:4200");
-        //((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Origin", "*");
-        ((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Origin", "http://localhost:56695/multislide");
-        //((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Origin", "http://137.132.97.109:56695/multislide");
+        
+        String profile = "docker_remote";
+        //String profile = "local";
+        //String profile = "server_109";
+        
+        if (profile.equals("docker_remote")) {
+            /*
+                For remote (Docker) installation
+            */
+            ((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Origin", "http://localhost:8080/multislide");
+            
+        } else if (profile.equals("local")) {
+            /*
+                For local development
+            */
+            ((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Origin", "http://localhost:4200");
+            //((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Origin", "*");
+            
+        } else if (profile.equals("server_109")) {
+            /*
+                For installation on 109 server
+            */
+            ((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Origin", "http://137.132.97.109:56695/multislide");
+        }
+        
         ((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Headers", "origin, content-type, accept, authorization");
         ((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Credentials", "true");
         ((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Methods","GET, OPTIONS, HEAD, PUT, POST");
