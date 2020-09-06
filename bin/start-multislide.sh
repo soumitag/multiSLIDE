@@ -38,10 +38,11 @@ echo ${MULTISLIDE_GLASSFISH_HOME}
 
 #"$glassfish_dir"/asadmin start-domain
 #"$glassfish_dir"/asadmin deploy --force=true "$install_dir"/lib/VTBox.war
-${MULTISLIDE_GLASSFISH_HOME}/bin/asadmin start-domain domain1
+${MULTISLIDE_GLASSFISH_HOME}/bin/asadmin start-domain
 ${MULTISLIDE_GLASSFISH_HOME}/bin/asadmin deploy --force=true ${MULTISLIDE_HOME}/libs/msviz-engine.war
+${MULTISLIDE_GLASSFISH_HOME}/bin/asadmin deploy --force=true ${MULTISLIDE_HOME}/libs/multislide.war
 
-${MULTISLIDE_GLASSFISH_HOME}/bin/asadmin start-domain multislide
-${MULTISLIDE_GLASSFISH_HOME}/bin/asadmin deploy --port 4949 --force=true ${MULTISLIDE_HOME}/libs/multislide.war
+# ${MULTISLIDE_GLASSFISH_HOME}/bin/asadmin start-domain multislide
+# ${MULTISLIDE_GLASSFISH_HOME}/bin/asadmin deploy --port 4949 --force=true ${MULTISLIDE_HOME}/libs/multislide.war
 
 ${MULTISLIDE_MONGODB_HOME} --dbpath=${MULTISLIDE_MONGODB_DATA}
