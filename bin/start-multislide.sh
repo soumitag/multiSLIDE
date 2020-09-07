@@ -45,4 +45,6 @@ ${MULTISLIDE_GLASSFISH_HOME}/bin/asadmin deploy --force=true ${MULTISLIDE_HOME}/
 # ${MULTISLIDE_GLASSFISH_HOME}/bin/asadmin start-domain multislide
 # ${MULTISLIDE_GLASSFISH_HOME}/bin/asadmin deploy --port 4949 --force=true ${MULTISLIDE_HOME}/libs/multislide.war
 
-${MULTISLIDE_MONGODB_HOME} --dbpath=${MULTISLIDE_MONGODB_DATA}
+${MULTISLIDE_MONGODB_HOME} --dbpath=${MULTISLIDE_MONGODB_DATA} &
+
+${MULTISLIDE_PYTHON_HOME} ${MULTISLIDE_HOME}/src/pyslide_project/analytics_server.py ${MULTISLIDE_HOME}
