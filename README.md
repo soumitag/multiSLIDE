@@ -7,7 +7,7 @@
 
 
 
-<!--![Visualization Workflow](multiSLIDE_Visualization_Workflow.png)--!>
+<!--[Visualization Workflow](multiSLIDE_Visualization_Workflow.png)--!>
 
 ## Launch multiSLIDE using a Docker Image  
 
