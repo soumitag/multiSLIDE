@@ -32,8 +32,8 @@ To launch **multiSLIDE** on your local computer:
 	```
 	This command produces an output that looks as follows:
 	```bash
-	CONTAINER ID	IMAGE			   COMMAND 		     CREATED 	      STATUS 	      PORTS 			NAMES
-	51a49fe8601a    soumitag/multislide:2.0    "/bin/sh -c \"/usr/lo…"   4 seconds ago    Up 3 seconds    0.0.0.0:8080->8080/tcp   	youthful_wozniak
+	CONTAINER ID	IMAGE			   COMMAND 		     ...    PORTS 			NAMES
+	51a49fe8601a    soumitag/multislide:2.0    "/bin/sh -c \"/usr/lo…"   ...    0.0.0.0:8080->8080/tcp   	youthful_wozniak
 	```
 	
 	The last column of the output shows the container name. In this example it is "youthful_wozniak"
