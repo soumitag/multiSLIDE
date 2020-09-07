@@ -25,6 +25,21 @@ To launch **multiSLIDE** on your local computer:
 
 **multiSLIDE** should now be available at https://localhost:8080/multislide. Navigate to this link with your browser and start using **multiSLIDE**.
 
+*	To stop **multiSLIDE**, first identify the name of the Docker container where **multiSLIDE** is running using the following command:
+	
+	```bash
+	$ docker ps
+	```
+	This command produces an output that looks as follows:
+	
+	
+	The last column of the output shows the container name. In this example it is 
+	
+	To stop this container use
+	```bash
+	$ docker stop 
+	```
+
 ## Overview
 
 **multiSLIDE** is an open-source tool for query-driven visualization of quantitative single- or multi-omics data. Using pathways and networks as the basis for data linkage, multiSLIDE provides an interactive platform for querying the multi-omics data by genes, pathways, and intermolecular relationships.  
