@@ -31,13 +31,16 @@ To launch **multiSLIDE** on your local computer:
 	$ docker ps
 	```
 	This command produces an output that looks as follows:
+	```bash
+	CONTAINER ID	IMAGE			   COMMAND 		     CREATED 	      STATUS 	      PORTS 			NAMES
+	51a49fe8601a    soumitag/multislide:2.0    "/bin/sh -c \"/usr/lo…"   4 seconds ago    Up 3 seconds    0.0.0.0:8080->8080/tcp   	youthful_wozniak
+	```
 	
-	
-	The last column of the output shows the container name. In this example it is 
+	The last column of the output shows the container name. In this example it is "youthful_wozniak"
 	
 	To stop this container use
 	```bash
-	$ docker stop 
+	$ docker stop youthful_wozniak
 	```
 
 ## Overview
