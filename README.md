@@ -3,7 +3,7 @@
 
 ## Availability
 
-**multiSLIDE** is available online at: http://137.132.97.109:56695/multislide/#/. Alternately, it is easy to launch **multiSLIDE** locally on your computer, instructions are [here](Run_locally.md)  
+**multiSLIDE** is available online at: http://137.132.97.109:56695/multislide/#/. Alternatively, you may launch **multiSLIDE** locally on your computer following the instructions below.
 
 ## Launch multiSLIDE using a Docker Image  
 
