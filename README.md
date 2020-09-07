@@ -13,7 +13,7 @@
 ## Resources
 
 * [Online Version](http://137.132.97.109:56695/multislide/#/) 
-* [Running locally on your computer](Run_locally.md) 
+* [Running locally on your computer](docker_run_multislide.md) 
 * How to use **multiSLIDE** ?
 	* Videos tutorials demonstrating **multiSLIDE**'s functionalities are available [here](https://www.youtube.com/watch?v=AurU37gGxUI&list=PLh0_FmePh5yGFUpJZ9oYycdz8mgpxRdu1&index=1) 
 
