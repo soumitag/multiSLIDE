@@ -5,7 +5,7 @@
 
 **multiSLIDE** is available online at: http://137.132.97.109:56695/multislide/#/. Alternatively, you may launch **multiSLIDE** locally on your computer following the instructions below.
 
-## Launch multiSLIDE using a Docker Image  
+## Launch multiSLIDE locally using a Docker Image  
 
 The preferred way to use a local instance of **multiSLIDE** is using the pre-built Docker image available at Docker Hub.
 
@@ -20,7 +20,7 @@ To launch **multiSLIDE** on your local computer:
 *	To launch **multiSLIDE** execute the following command:
 
 	```bash
-	docker run -d -p 8080:8080 -v multislide_home:/usr/local/multiSLIDE soumitag/multislide:2.0
+	$ docker run -d -p 8080:8080 -v multislide_home:/usr/local/multiSLIDE soumitag/multislide:2.0
 	```
 
 **multiSLIDE** should now be available at https://localhost:8080/multislide. Navigate to this link with your browser and start using **multiSLIDE**.
