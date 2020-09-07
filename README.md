@@ -3,13 +3,11 @@
 
 ## Availability
 
-**multiSLIDE** is available online at: http://137.132.97.109:56695/multislide/#/. Alternatively, you may launch **multiSLIDE** locally on your computer following the instructions below.
+**multiSLIDE** is available online at: http://137.132.97.109:56695/multislide/#/. Alternatively, you may run **multiSLIDE** locally on your computer following the instructions below.
 
 ## Launch multiSLIDE locally using a Docker Image  
 
-The preferred way to use a local instance of **multiSLIDE** is using the pre-built Docker image available at Docker Hub.
-
-To launch **multiSLIDE** on your local computer:
+The preferred way to run a local instance of **multiSLIDE** is using the pre-built Docker image available at Docker Hub, as follows:
 
 *	Install Docker for Mac/Windows/Linux following the instructions [here](https://docs.docker.com/get-docker/)
 *	Pull the **multiSLIDE** Docker image using the following command in Terminal(Mac) or Command Prompt(Windows) or the Linux Shell
@@ -23,9 +21,13 @@ To launch **multiSLIDE** on your local computer:
 	$ docker run -d -p 8080:8080 -v multislide_home:/usr/local/multiSLIDE soumitag/multislide:2.0
 	```
 
-**multiSLIDE** should now be available at https://localhost:8080/multislide. Navigate to this link with your browser and start using **multiSLIDE**.
+**multiSLIDE** should now be available at https://localhost:8080/multislide. Navigate to this link with your browser and start using **multiSLIDE**. If you want to run **multiSLIDE** on a different port, say 9090 instead of 8080, use:
+	```bash
+	$ docker run -d -p 9090:8080 -v multislide_home:/usr/local/multiSLIDE soumitag/multislide:2.0
+	```
+**multiSLIDE** should now be available at https://localhost:9090/multislide
 
-*	To stop **multiSLIDE**, first identify the name of the Docker container where **multiSLIDE** is running using the following command:
+*	To stop **multiSLIDE**, first identify the name of the Docker container running **multiSLIDE** using:
 	
 	```bash
 	$ docker ps
