@@ -127,7 +127,7 @@ export class HomepageComponent implements OnInit {
     if(this.response_onLoadDemo.status == 1){
       this.router.navigateByUrl(
         this.router.createUrlTree(
-          ['visualization_home'], { queryParams: { analysis_name: 'demo_2021158607524066_' + generated_number } }
+          ['visualization_home'], { queryParams: { analysis_name: 'demo_2021158607524066_' + generated_number, source: 'load_demo' } }
         )
       );
     } else if (this.response_onLoadDemo.status == 0) {

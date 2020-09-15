@@ -100,28 +100,33 @@
       <div id="demo_table" *ngIf="demoTouched">
         <table>
             <tr>
-                <td class="demo_td" width="75%">TCGA Glioblastoma Cancer Data</td>
-                <td class="demo_td" width="25%">
+                <td class="demo_td" width="85%">
+                  Unfolded Protein Response in Time-series mRNA and Protein data [1]<br>
+                </td>
+                <td class="demo_td" width="15%">
                   <button type="button" class="highlight_button" (click)="loadDemo(0)">Open</button>
                 </td>    
             </tr>
             <tr>
-                <td class="demo_td" width="75%">Time-series Data (Mol Systems Biology)</td>
-                <td class="demo_td" width="25%">
+                <td class="demo_td" width="80%">
+                  Kinase-Substrate relationships in CPTAC Ovarian Cancer Data [2]
+                </td>
+                <td class="demo_td" width="20%">
                   <button type="button" class="highlight_button" (click)="loadDemo(1)">Open</button>
                 </td>    
             </tr>
             <tr>
-                <td class="demo_td" width="75%">TCGA Breast Cancer Data</td>
-                <td class="demo_td" width="25%">
+                <td class="demo_td" width="80%">
+                  Exploring microRNA to Protein targets using TargetScan Map [3]
+                </td>
+                <td class="demo_td" width="20%">
                   <button type="button" class="highlight_button" (click)="loadDemo(2)">Open</button>
                 </td>    
             </tr>
         </table>
 
       </div>
-  
-  
+      
       <!--
     <nav>
       <a routerLink="/create_analysis" routerLinkActive="active">Create Analyses</a>
@@ -130,5 +135,27 @@
     -->
   
     </form>
+    </div>
+    <br><br><br>
+    <div>
+      <div class="demo_paper_content" *ngIf="demoTouched">
+        <table>
+          <tr>
+              <td class="demo_paper_name" width="100%">
+                [1] Cheng, Zhe, et al. "Differential dynamics of the mammalian mRNA and protein expression response to misfolding stress." Molecular systems biology 12.1 (2016): 855.
+              </td>
+          </tr>
+          <tr>
+              <td class="demo_paper_name" width="100%">
+                [2] Zhang, Hui, et al. "Integrated proteogenomic characterization of human high-grade serous ovarian cancer." Cell 166.3 (2016): 755-765.
+              </td>
+          </tr>
+          <tr>
+              <td class="demo_paper_name" width="100%">
+                [3] Choi, Hyungwon, et al. "Plasma protein and microRNA biomarkers of insulin resistance: A network-based integrative-omics analysis." Frontiers in physiology 10 (2019): 379.
+              </td>
+          </tr>
+        </table>
+      </div>
     </div>
   </div>

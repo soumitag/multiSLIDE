@@ -267,7 +267,7 @@ public class LoadAnalysis extends HttpServlet {
                 analysis.heatmaps = heatmaps;
             }
             
-            // Finally add analysis to session
+            // finally add analysis to session
             session.setAttribute(analysis.analysis_name, analysis);
             
             ServerResponse resp = new ServerResponse(1, analysis.analysis_name, "Analysis loaded");
@@ -295,7 +295,7 @@ public class LoadAnalysis extends HttpServlet {
 
         }
     }
-
+    
     protected void returnMessage(ServerResponse resp, HttpServletResponse response) throws IOException {
         String json = new Gson().toJson(resp);
         response.setContentType("application/json");

@@ -26,7 +26,7 @@ export class VisualizationHomeComponent implements OnInit {
       this.analysis_name = params['analysis_name'];
       for (let key in params) {
         if (key == 'source') {
-          if (params['source'] == 'load_analysis') {
+          if (params['source'] == 'load_analysis' || params['source'] == 'load_demo') {
             is_load_analysis = true;
           }
         }

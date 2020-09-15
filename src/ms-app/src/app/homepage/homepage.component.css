@@ -183,7 +183,7 @@ input[type=text] {
 
 .form_content {
     margin: auto;
-    width: 560px;
+    width: 650px;
     background-color: white;
 }
 
@@ -214,7 +214,21 @@ input[type=text] {
     font-weight: 100;
 }
 
+.demo_paper_content {
+    margin: auto;
+    width: 800px;
+    background-color: white;
+    left: 200px;
+}
+
+.demo_paper_name {
+    height: 25px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 100;
+}
+
 img {
     width: 100%;
     height: 100%;
-  }
+}

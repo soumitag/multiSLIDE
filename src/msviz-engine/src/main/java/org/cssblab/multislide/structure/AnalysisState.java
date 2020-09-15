@@ -81,6 +81,14 @@ public class AnalysisState implements Serializable {
         return a;
     }
     
+    public void renameAnalysis(String analysis_name) {
+        this.analysis_name = analysis_name;
+        for (String key: this.dataset_specs_map.keyList()) {
+            DatasetSpecs specs = this.dataset_specs_map.get(key);
+            specs.changeAnalysisName(analysis_name);
+        }
+    }
+    
     public String asJSON() {
         return new Gson().toJson(this);
     }
