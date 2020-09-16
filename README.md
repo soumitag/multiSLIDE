@@ -21,10 +21,10 @@ The preferred way to run a local instance of **multiSLIDE** is using the pre-bui
 	$ docker run -d -p 8080:8080 -v multislide_home:/usr/local/multiSLIDE soumitag/multislide:2.0
 	```
 
-**multiSLIDE** should now be available at https://localhost:8080/multislide. Navigate to this link with your browser and start using **multiSLIDE**. Starting up the application might take a while, please take a sip of coffee and wait for a minute.<!--If you want to run **multiSLIDE** on a different port, say 9191 instead of 8080, use:-->
+**multiSLIDE** should now be available at http://localhost:8080/multislide. Navigate to this link with your browser and start using **multiSLIDE**. Starting up the application might take a while, please take a sip of coffee and wait for a minute.<!--If you want to run **multiSLIDE** on a different port, say 9191 instead of 8080, use:-->
 
 	
-<!--**multiSLIDE** should now be available at https://localhost:9191/multislide --> 
+<!--**multiSLIDE** should now be available at http://localhost:9191/multislide --> 
 
 *	To stop **multiSLIDE**, first identify the name of the Docker container running **multiSLIDE** using:
 
