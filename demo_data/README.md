@@ -1,6 +1,6 @@
 ## Introduction
 
-This folder contains example input data files and sample information files for **multiSLIDE**.  
+This folder contains example input data files and sample information files for **multiSLIDE** as well as their corresponding workspaces saved as .mslide files.  
 
 ### Sample Dataset 1  - Unfolded Protein Response in Time-series mRNA and Protein data(1)
 
