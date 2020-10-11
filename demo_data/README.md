@@ -21,9 +21,9 @@ This folder contains example input data files and sample information files for *
 
 ## References
 
-(1) Cheng, Zhe, et al. "Differential dynamics of the mammalian mRNA and protein expression response to misfolding stress." Molecular systems biology 12.1 (2016):   855.
-(2) Zhang, Hui, et al. "Integrated proteogenomic characterization of human high-grade serous ovarian cancer." Cell 166.3 (2016): 755-765.
-(3) Choi, Hyungwon, et al. "Plasma protein and microRNA biomarkers of insulin resistance: A network-based integrative-omics analysis." Frontiers in physiology 10 (2019): 379.
+(1) Cheng, Zhe, et al. "Differential dynamics of the mammalian mRNA and protein expression response to misfolding stress." Molecular systems biology 12.1 (2016):   855.  
+(2) Zhang, Hui, et al. "Integrated proteogenomic characterization of human high-grade serous ovarian cancer." Cell 166.3 (2016): 755-765.  
+(3) Choi, Hyungwon, et al. "Plasma protein and microRNA biomarkers of insulin resistance: A network-based integrative-omics analysis." Frontiers in physiology 10 (2019): 379.  
 
 
 
