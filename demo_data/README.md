@@ -4,19 +4,22 @@ This folder contains example input data files and sample information files for *
 
 ### Sample Dataset 1  - Unfolded Protein Response in Time-series mRNA and Protein data(1)
 
-* **Input Data File** mRNA_microarray_U133A_366_IDH_WT_subtyping_row_centered_post_filter.txt **(mRNA)**
-* **Sample Information File** Classification_of_TCGA_IDH-WT_GBMs.txt
+* **Input Data File** mRNA_ER_stress_baseline_normalized.txt **(mRNA)** and protein_ER_stress_baseline_normalized.txt **(protein)**
+* **Sample Information File** ER_Stress_sample_grouping_info.txt
+* **Corresponding .mslide File** UPR_On_ER_Stress_12-Sep-2020_17-12-50.mslide
 
 ### Sample Dataset 2 - Kinase-Substrate relationships in CPTAC Ovarian Cancer Data(2)
 
-* **Input Data Files** mRNA_baselined_removeB.txt **(mRNA)** and protein_baselined_removeB.txt **(protein)**
-* **Sample Information File** Sample_grouping.txt
-
+* **Input Data Files** CPTAC_ovarian_cancer_protein_zscores.txt **(protein)** and CPTAC_ovarian_cancer_phosphoproteome_imputed_zscores.txt **(phosphoproteome)**
+* **Sample Information File** Phenotype_proteomics_based_clusters.txt
+* **Kinase-Substrate Network File** kinase_subtrate_network_28082020.txt
+* **Corresponding .mslide File** CPTAC_Ovarian_Cancer_12-Sep-2020_22-32-11.mslide
 
 ### Sample Dataset 3  - Exploring microRNA to Protein targets using TargetScan Map(3)
 
-* **Input Data Files** mRNA_imputedDat_centered_rounded_73_filtered.txt **(mRNA)** and PROT_imputedDat_rounded_73_filtered.txt **(protein)**
-* **Sample Information File** BRCA_groupinfo_example_new.txt
+* **Input Data Files** microRNA_normalized.txt **(miRNA)** and Plasma_protein_normalized.txt **(protein)**
+* **Sample Information File** Plasma_protein_microRNA_sample_metadata.txt
+* **Corresponding .mslide File** Plasma_Protein_and_MicroRNA_IR_Markers_12-Sep-2020_17-43-53.mslide
 
 
 ## References
