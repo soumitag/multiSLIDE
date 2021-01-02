@@ -4,11 +4,12 @@ This folder contains example input data files and sample information files for *
 
 ### Sample Dataset 1  - Unfolded Protein Response in Time-series mRNA and Protein data(1)
 
-| Tables   |      Are      |  Cool |
-|----------|:-------------:|------:|
-| col 1 is |  left-aligned | $1600 |
-| col 2 is |    centered   |   $12 |
-| col 3 is | right-aligned |    $1 |
+| Filetype                   |      Filename                               |
+|----------------------------|:-------------------------------------------:|
+| Input Data File (mRNA)     |  mRNA_ER_stress_baseline_normalized.txt.    |
+| Input Data File (Protein)  |  protein_ER_stress_baseline_normalized.txt  |
+| Sample Information File.   |   ER_Stress_sample_grouping_info.txt        |
+| Corresponding .mslide File | UPR_On_ER_Stress_12-Sep-2020_17-12-50.mslide|
 
 * **Input Data File** mRNA_ER_stress_baseline_normalized.txt **(mRNA)** and protein_ER_stress_baseline_normalized.txt **(protein)**
 * **Sample Information File** ER_Stress_sample_grouping_info.txt
