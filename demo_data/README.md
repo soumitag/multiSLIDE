@@ -6,16 +6,23 @@ This folder contains example input data files and sample information files for *
 
 | Filetype                   |      Filename                               |
 |----------------------------|:-------------------------------------------:|
-| Input Data File (mRNA)     |  mRNA_ER_stress_baseline_normalized.txt.    |
+| Input Data File (mRNA)     |  mRNA_ER_stress_baseline_normalized.txt     |
 | Input Data File (Protein)  |  protein_ER_stress_baseline_normalized.txt  |
-| Sample Information File.   |   ER_Stress_sample_grouping_info.txt        |
+| Sample Information File    |   ER_Stress_sample_grouping_info.txt        |
 | Corresponding .mslide File | UPR_On_ER_Stress_12-Sep-2020_17-12-50.mslide|
 
-* **Input Data File** mRNA_ER_stress_baseline_normalized.txt **(mRNA)** and protein_ER_stress_baseline_normalized.txt **(protein)**
-* **Sample Information File** ER_Stress_sample_grouping_info.txt
-* **Corresponding .mslide File** UPR_On_ER_Stress_12-Sep-2020_17-12-50.mslide
-
 ### Sample Dataset 2 - Kinase-Substrate relationships in CPTAC Ovarian Cancer Data(2)
+
+| Filetype                                             |      Filename                                              |
+|------------------------------------------------------|:----------------------------------------------------------:|
+| Input Data File (Protein)                            |  CPTAC_ovarian_cancer_protein_zscores.txt                  |
+| Input Data File (Phosphoproteome)                    |  CPTAC_ovarian_cancer_phosphoproteome_imputed_zscores.txt  |
+| Sample Information File                              |   Phenotype_proteomics_based_clusters.txt                  |
+| Kinase-Substrate Network File                        |       kinase_subtrate_network_28082020.txt                 |
+| Kinase-Substrate Network File With Sources Annotated |   kinase_subtrate_network_with_sources_annotated.txt       |
+| Corresponding .mslide File                           | CPTAC_Ovarian_Cancer_12-Sep-2020_22-32-11.mslide           |
+
+
 
 * **Input Data Files** CPTAC_ovarian_cancer_protein_zscores.txt **(protein)** and CPTAC_ovarian_cancer_phosphoproteome_imputed_zscores.txt **(phosphoproteome)**
 * **Sample Information File** Phenotype_proteomics_based_clusters.txt
@@ -24,6 +31,14 @@ This folder contains example input data files and sample information files for *
 * **Corresponding .mslide File** CPTAC_Ovarian_Cancer_12-Sep-2020_22-32-11.mslide
 
 ### Sample Dataset 3  - Exploring microRNA to Protein targets using TargetScan Map(3)
+
+| Filetype                                             |      Filename                                                     |
+|------------------------------------------------------|:-----------------------------------------------------------------:|
+| Input Data File (microRNA)                           |  microRNA_normalized.txt                                          |
+| Input Data File (Proteome)                           |  Plasma_protein_normalized.txt                                    |
+| Sample Information File                              |   Plasma_protein_microRNA_sample_metadata.txt                     |
+| TargetScanMap (miRNA-Protein targets) Network File   |   HS_mirFamilyToTargets with_filename_headers.txt                 |
+| Corresponding .mslide File                           | Plasma_Protein_and_MicroRNA_IR_Markers_12-Sep-2020_17-43-53.mslide|
 
 * **Input Data Files** microRNA_normalized.txt **(miRNA)** and Plasma_protein_normalized.txt **(protein)**
 * **Sample Information File** Plasma_protein_microRNA_sample_metadata.txt
