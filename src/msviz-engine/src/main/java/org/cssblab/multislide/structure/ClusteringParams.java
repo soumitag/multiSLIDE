@@ -40,6 +40,9 @@ public class ClusteringParams implements Serializable {
     public static final int TYPE_SAMPLE_CLUSTERING = 0;
     public static final int TYPE_FEATURE_CLUSTERING = 1;
     
+    public static final int DEFAULT_NUM_SAMPLE_CLUSTERS = 3;
+    public static final int DEFAULT_NUM_FEATURE_CLUSTERS = 5;
+    
     int type;
     boolean use_defaults;
     int linkage_function;
@@ -51,6 +54,8 @@ public class ClusteringParams implements Serializable {
     boolean use_aggregate;
     String aggregate_func;
     */
+    
+    public int numClusterLabels;
 
     public ClusteringParams(int type) throws MultiSlideException {
         if (type != TYPE_SAMPLE_CLUSTERING && type != TYPE_FEATURE_CLUSTERING) {
@@ -74,6 +79,11 @@ public class ClusteringParams implements Serializable {
         this.distance_function = EUCLIDEAN_DISTANCE;
         this.leaf_ordering = ClusteringParams.OPTIMAL_LEAF_ORDER;
         this.dataset = dataset;
+        if (type == TYPE_SAMPLE_CLUSTERING) {
+            this.numClusterLabels = ClusteringParams.DEFAULT_NUM_SAMPLE_CLUSTERS;
+        } else if (type == TYPE_FEATURE_CLUSTERING) {
+            this.numClusterLabels = ClusteringParams.DEFAULT_NUM_FEATURE_CLUSTERS;
+        }
         /*
         this.is_joint = true;
         this.use_aggregate = false;
@@ -83,7 +93,7 @@ public class ClusteringParams implements Serializable {
     public ClusteringParams(
             int type, int linkage_function, 
             int distance_function, int leaf_ordering, 
-            String dataset
+            String dataset, int numClusterLabels
     ) throws MultiSlideException {
         if (type != TYPE_SAMPLE_CLUSTERING && type != TYPE_FEATURE_CLUSTERING) {
             throw new MultiSlideException("Illegal argument for type: " + type);
@@ -94,6 +104,7 @@ public class ClusteringParams implements Serializable {
         this.distance_function = distance_function;
         this.leaf_ordering = leaf_ordering;
         this.dataset = dataset;
+        this.numClusterLabels = numClusterLabels;
         /*
         if(type == HierarchicalClusterer.TYPE_ROW_CLUSTERING) {
             this.is_joint = true;
@@ -267,6 +278,22 @@ public class ClusteringParams implements Serializable {
         return dataset;
     }
     
+    public void setNumClusterLabels(int numClusterLabels) {
+        this.numClusterLabels = numClusterLabels;
+    }
+    
+    public int getNumClusters() {
+        if (this.use_defaults) {
+            if (type == TYPE_SAMPLE_CLUSTERING) {
+                return ClusteringParams.DEFAULT_NUM_SAMPLE_CLUSTERS;
+            } else {
+                return ClusteringParams.DEFAULT_NUM_FEATURE_CLUSTERS;
+            }
+        } else {
+            return this.numClusterLabels;
+        }
+    }
+
     public String getHashString() {
         return type + "_" + linkage_function + "_" + distance_function;
     }
@@ -282,6 +309,7 @@ public class ClusteringParams implements Serializable {
         map.put("distance_function", this.getDistanceFunctionS());
         map.put("linkage_function", this.getLinkageFunctionS());
         map.put("leaf_ordering", this.getLeafOrderingS());
+        map.put("num_clusters", this.getNumClusters()+"");
         return map;
     }
 }

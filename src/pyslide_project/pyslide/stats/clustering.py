@@ -4,7 +4,7 @@ from pyslide.utils.fileutils import read_spark_file
 import fastcluster as fc
 import scipy as sp
 import os
-from scipy.cluster.hierarchy import dendrogram, optimal_leaf_ordering, leaves_list
+from scipy.cluster.hierarchy import dendrogram, optimal_leaf_ordering, leaves_list, fcluster
 
 
 def _impute(data):
@@ -68,7 +68,7 @@ def _reorder_dendrogram(z, dists, leaf_ordering):
 
 
 def hierarchical_clustering(request_id, linkage, distance_metric, leaf_ordering, transpose,
-                            n_rows, n_cols, path_to_data_pool):
+                            n_rows, n_cols, n_clusters, path_to_data_pool):
 
     if linkage not in ['average', 'complete', 'median', 'centroid', 'ward', 'weighted', 'single']:
         raise ValueError('Unsupported linkage function')
@@ -120,8 +120,23 @@ def hierarchical_clustering(request_id, linkage, distance_metric, leaf_ordering,
         """
         Feature clustering
         """
+        _cl = fcluster(z, n_clusters, criterion='maxclust')
+
+        # reorder labels
+        _cl_with_missing = np.concatenate(([_cl[idx] for idx in h], np.ones(len(nan_row_idx))*-1)).astype(np.int)
+
+        # remap labels to sequential cluster numbers
+        label_map = {}
+        index = 0
+        for label in _cl_with_missing:
+            if label not in label_map:
+                index += 1
+                label_map[label] = index
+        _cl_seq = [label_map[i] for i in _cl_with_missing]
+
+        # prepare and return
         _ids = data['_id'].reindex(new_order)
-        result = pd.DataFrame({'_id': _ids, '_index': np.arange(len(_ids))})
+        result = pd.DataFrame({'_id': _ids, '_index': np.arange(len(_ids)), '_class_label': _cl_seq})
 
     result.to_csv(os.path.join(path_to_data_pool, request_id, "result.txt"), sep="\t", header=True, index=False)
 

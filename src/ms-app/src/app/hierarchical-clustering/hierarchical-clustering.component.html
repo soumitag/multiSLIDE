@@ -77,6 +77,13 @@
           </option>
         </select>
       </div>
+
+      <div *ngIf="type==TYPE_COL" style="position: relative; top: 15px; left: 10px; height: 80px; padding-left: 25px;">
+        <label for="clusterNum">Number of Clusters Labels to Visualize</label><br>
+        <input type="text" name="clusterNum" size="3" [(ngModel)]="clustering_params.numClusterLabels"
+              [value]="clustering_params.numClusterLabels"><br>
+        <label style="color: crimson; font-size: 12px;">Note: Cluster labels will be visualized only for independently clustered datasets when linkers are not nested.</label>
+      </div>
       <br>
     </div>
 

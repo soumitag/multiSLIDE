@@ -39,10 +39,10 @@ public class EnrichmentAnalysisParams implements Serializable {
         this.use_pathways = true;
         this.use_ontologies = false;
         this.apply_fdr_d = false;
-        this.fdr_threshold_d = 1;
+        this.fdr_threshold_d = 0.01;
         this.significance_level_e = 0.05;
         this.apply_fdr_e = false;
-        this.fdr_threshold_e = 1;
+        this.fdr_threshold_e = 0.01;
     }
     
     public EnrichmentAnalysisParams(

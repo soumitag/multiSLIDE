@@ -55,6 +55,7 @@ def do_clustering():
         _transpose = _bool(request.args.get('transpose'))
         _n_rows = int(request.args.get('n_rows'))
         _n_cols = int(request.args.get('n_cols'))
+        _n_clusters = int(request.args.get('n_clusters'))
         _grp_by = request.args.get('group_by')
         if _grp_by == '':
             _group_by = []
@@ -71,7 +72,7 @@ def do_clustering():
         else:
             status = hierarchical_clustering(_request_id, _linkage_strategy, _distance_metric,
                                              _leaf_ordering, _transpose,
-                                             _n_rows, _n_cols, app.config['data_pool'])
+                                             _n_rows, _n_cols, _n_clusters, app.config['data_pool'])
         if status == 1:
             resp = StandardResponse(1, message='', detailed_message='')
         else:

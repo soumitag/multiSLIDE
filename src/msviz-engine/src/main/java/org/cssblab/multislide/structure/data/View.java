@@ -9,6 +9,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import org.apache.commons.collections4.map.ListOrderedMap;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -53,6 +55,12 @@ public class View implements Serializable {
     public Dataset<Row> disaggregated_vu;      // columns -> sample ids, rows -> features, cell -> expression / bin number
     public Dataset<Row> aggregated_vu;         // columns -> sample ids, rows -> features, cell -> expression / bin number
     
+    // cluster_labels:
+    // maps _id -> cluster_label, 
+    // ideally this would be part of vu, 
+    // however for simplicity of implementation we keep it seperate
+    public HashMap <Long, Integer> cluster_labels;
+    
     //String linker_colname;
     HashMap<String, Boolean> metadata_columns;         // all metadata columns
     HashMap<String, Boolean> identifier_columns;       // identifier columns (subset of metadata columns), includes linker
@@ -85,7 +93,7 @@ public class View implements Serializable {
             boolean is_joint,
             DatasetSpecs specs,
             HashMap<String, GeneGroup> gene_groups,
-            HashMap<String, GeneGroup> nn_gene_groups,
+            ListOrderedMap<String, GeneGroup> nn_gene_groups,
             SparkSession spark_session,
             AnalysisContainer analysis
     ) throws MultiSlideException, DataParsingException {
@@ -828,10 +836,11 @@ public class View implements Serializable {
         SignificanceTestingParams p = global_map_config.significance_testing_params;
         List <Row> t = this.feature_manifest.filter(p.getSignificanceLevel(), p.getFDRThreshold())
                                             .align(a);
-        
         /*
-        Utils.log_info("getFeatureIDs: " + this.name);
-        this.feature_manifest.show();
+        if (this.name.equals("mi_rna")) {
+            Utils.log_info("getFeatureIDs: " + this.name);
+            this.feature_manifest.show();
+        }
         */
         
         List<List<String>> feature_ids = new ArrayList<>();
@@ -857,6 +866,28 @@ public class View implements Serializable {
         }
         */
         return feature_ids;
+    }
+    
+    public List<Integer> getClusterLabels(GlobalMapConfig global_map_config) {
+        
+        Column[] id_cols = new Column[1];
+        id_cols[0] = col("_id");
+        
+        List<Row> a = this.vu.select(id_cols).collectAsList();
+        
+        SignificanceTestingParams p = global_map_config.significance_testing_params;
+        List <Row> t = this.feature_manifest.filter(p.getSignificanceLevel(), p.getFDRThreshold())
+                                            .align(a);
+        
+        List<Integer> clabels = new ArrayList<>();
+        for (Row row : t) {
+            if (row == null) {
+                clabels.add(-1);
+            } else {
+                clabels.add(this.cluster_labels.get(row.getLong(0)));
+            }
+        }
+        return clabels;
     }
 
     protected int[][] getExpressionBins(GlobalMapConfig global_map_config, int nBins) throws MultiSlideException {
@@ -893,8 +924,15 @@ public class View implements Serializable {
         List <Row> a = this.feature_manifest.filter(p.getSignificanceLevel(), p.getFDRThreshold())
                                             .align(d);
         
-        //Utils.log_info("getExpressionBins:");
-        //Utils.log_dataset_as_list(a, "info");
+        /*
+        if (this.name.equals("mi_rna")) {
+            Utils.log_info("getExpressionBins:");
+            List<Row> d1 = this.vu.collectAsList();
+            List <Row> a1 = this.feature_manifest.filter(p.getSignificanceLevel(), p.getFDRThreshold()).align(d1);
+            Utils.log_dataset_as_list(a1, "info");
+            this.feature_manifest.show();
+        }
+        */
         
         Utils.log_info(name + ": getExpressionBins collection (time) " + (System.nanoTime() - startTime)/1000000 + " milliseconds");
 
@@ -974,7 +1012,7 @@ public class View implements Serializable {
     
     public static List<List<Integer>> getSearchTags(
             Dataset <Row> dataset, FeatureIndex feature_manifest, 
-            GlobalMapConfig global_map_config, HashMap<String, GeneGroup> GGs) {
+            GlobalMapConfig global_map_config, ListOrderedMap<String, GeneGroup> GGs) {
         
         List<String> colList = new ArrayList<>();
         for (String id : GGs.keySet()) {
@@ -1003,7 +1041,7 @@ public class View implements Serializable {
         int indicator;
         for (int i = 1; i < colList.size(); i++) {
             ArrayList<Integer> t = new ArrayList<>();
-            int j = 0;
+            int j = 1;
             for (Row row : d) {
                 if (row != null) {
                     indicator = row.getInt(i);
@@ -1019,7 +1057,7 @@ public class View implements Serializable {
         
     }
     
-    public List<List<Integer>> getSearchTags(GlobalMapConfig global_map_config, HashMap<String, GeneGroup> GGs) {
+    public List<List<Integer>> getSearchTags(GlobalMapConfig global_map_config, ListOrderedMap<String, GeneGroup> GGs) {
         return View.getSearchTags(vu, feature_manifest, global_map_config, GGs);
     }
 
@@ -1074,16 +1112,28 @@ public class View implements Serializable {
         _id_link_table.fromSparkDataframe(_id_link, true);
         return _id_link_table;
     }
+    
+    public boolean hasWithinLinkerOrdering() {
+        Map <String, List<Long>> linker_id_map = this.feature_manifest.getLinkerIdMap();
+        for (List<Long> _ids: linker_id_map.values()) {
+            if (_ids.size() > 1) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /*
     Ordering: Sample and Feature
     */
-    protected Table recomputeFeatureOrdering(AnalysisContainer analysis, Table significance_linker)
+    protected Table recomputeFeatureOrdering(AnalysisContainer analysis, Table _significance_linker)
             throws MultiSlideException, DataParsingException {
         
         Utils.log_info(name + ": recomputeFeatureOrdering() called for " + name);
         Utils.log_info("isGeneFilteringOn: " + analysis.global_map_config.isGeneFilteringOn);
         Utils.log_info("columnOrderingScheme: " + analysis.global_map_config.columnOrderingScheme);
+        
+        this.cluster_labels = null;
         
         /*
             If gene filtering is on and columnOrderingScheme is not 
@@ -1096,7 +1146,7 @@ public class View implements Serializable {
             /*
                 get significance: _id, _significance, _fdr, _index
             */
-            if (significance_linker == null) {
+            if (_significance_linker == null) {
                 Table significance = this.doSignificanceAnalysis(analysis);
                 /*
                 get _id, and _linker columns
@@ -1106,12 +1156,12 @@ public class View implements Serializable {
                     Join to get
                     significance_linker: _id, _significance, _fdr, _index, _linker
                 */
-                significance_linker = _id_linker_table.joinByKey(significance, "inner");
+                _significance_linker = _id_linker_table.joinByKey(significance, "inner");
             }
             
             if (analysis.global_map_config.columnOrderingScheme == GlobalMapConfig.SIGNIFICANCE_COLUMN_ORDERING) {
                 Utils.log_info("1");
-                return significance_linker;
+                return _significance_linker;
             }
         }
 
@@ -1166,8 +1216,32 @@ public class View implements Serializable {
         /*
             if gene filtering is on, filter data before sorting / clustering
          */
+        
+        /*
+            Filter by significance
+         */
+        
+
         Dataset<Row> fd = null;
-        if (significance_linker != null) {
+        Table significance_linker = null;
+        if (_significance_linker != null) {
+            
+            boolean significance_filter, fdr_filter;
+            ArrayList <String> row_mask = new ArrayList <> ();
+
+            SignificanceTestingParams params = analysis.global_map_config.significance_testing_params;
+            for (String _id : _significance_linker) {
+                double sig = _significance_linker.getDouble(_id, "_significance");
+                double fdr = _significance_linker.getDouble(_id, "_fdr");
+
+                significance_filter = !(sig > params.getSignificanceLevel());
+                fdr_filter = !(params.getApplyFDR() && fdr == 0.0);
+
+                if (significance_filter && fdr_filter) {
+                    row_mask.add(_id);
+                }
+            }
+            significance_linker = _significance_linker.filter(row_mask);
             
             /*
             _ids in significance_linker are based on the view (dataset) used for gene filtering
@@ -1177,7 +1251,9 @@ public class View implements Serializable {
             */
             HashMap<String, Boolean> significant_linkers = new HashMap<>();
             for (String _id : significance_linker) {
-                significant_linkers.put(significance_linker.getString(_id, "_linker"), true);
+                if (significance_linker.hasRowIndex(_id)) {
+                    significant_linkers.put(significance_linker.getString(_id, "_linker"), true);
+                }
             }
             
             fd = d.filter(col(this._linker_colname).isInCollection(CollectionUtils.asList(significant_linkers)));
@@ -1218,6 +1294,14 @@ public class View implements Serializable {
              */
             _id_index = this.clusterFeatures(
                     analysis.spark_session, analysis.clusterer, fd, analysis.global_map_config);
+            
+            /*
+                create cluster_labels
+            */
+            this.cluster_labels = new HashMap <> ();
+            for (String _id: _id_index) {
+                this.cluster_labels.put(Long.parseLong(_id), _id_index.getInt(_id, "_cluster_label"));
+            }
             
             Utils.log_info("7");
         }
@@ -1509,7 +1593,7 @@ public class View implements Serializable {
 
         return clusterer.doClustering(
                 spark, this.name,
-                global_map_config.col_clustering_params, 
+                global_map_config.col_clustering_params,
                 d, null, new String[]{});
     }
 

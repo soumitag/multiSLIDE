@@ -118,7 +118,8 @@ public class NetworkNeighborServices extends HttpServlet {
                 String[] neighbor_entrezs = neighbor_entrez_list.split(",", -1);
                 
                 NetworkNeighbor nn = new NetworkNeighbor(
-                    dataset_name, query_entrez, network_type, neighbor_entrezs
+                    dataset_name, query_entrez, network_type, neighbor_entrezs,
+                    analysis.data.datasets.get(dataset_name).linker_entrez_map
                 );
                 analysis.data_selection_state.addNetworkNeighbor(nn);
                 returnMessage(new ServerResponse(1, "Network neighbors added.", ""), response);
@@ -157,11 +158,13 @@ public class NetworkNeighborServices extends HttpServlet {
                         return;
                     }
 
+                    String dataset_name = parser.getString("dataset_name");
                     NetworkNeighbor nn = new NetworkNeighbor(
-                        parser.getString("dataset_name"),
+                        dataset_name,
                         parser.getString("query_entrez"),
                         parser.getString("network_type"),
-                        parser.getStringArray("neighbor_entrez_list")
+                        parser.getStringArray("neighbor_entrez_list"),
+                        analysis.data.datasets.get(dataset_name).linker_entrez_map
                     );
                     analysis.data_selection_state.addNetworkNeighbor(nn);
 

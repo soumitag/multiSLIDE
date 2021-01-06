@@ -78,6 +78,19 @@ public class SerializeAnalysis extends HttpServlet {
                 String filename = serializer.serializeAnalysis(analysis, analysis_filepath, session_folder_path, Serializer.TYPE_JSON);
                 returnMessage(new ServerResponse(1, filename, ""), response);
                 
+            } else if (action.equalsIgnoreCase("generate_view")) {
+                
+                // get base path for analysis
+                ServletContext context = request.getServletContext();
+                String installPath = (String) context.getAttribute("install_path");
+                String session_id = session.getId();
+                
+                String session_folder_path = installPath + File.separator + "temp" + File.separator + session_id;
+                String analysis_filepath = analysis.base_path + File.separator  + "data";
+                Serializer serializer = new Serializer();
+                String filename = serializer.serializeView(analysis, analysis_filepath, session_folder_path);
+                returnMessage(new ServerResponse(1, filename, ""), response);
+                
             } else if (action.equalsIgnoreCase("download")) {
                 
                 parser.addParam("filename", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_REQUIRED);

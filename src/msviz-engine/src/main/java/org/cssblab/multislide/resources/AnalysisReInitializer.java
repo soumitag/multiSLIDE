@@ -83,7 +83,7 @@ public class AnalysisReInitializer extends HttpServlet {
                 
                 if (parser.getString("source").startsWith("init_search")) {
                     String[] search_ids = parser.getStringArray("ids");
-                    analysis.data_selection_state.setSelectedSearchResults(analysis, search_ids);
+                    analysis.data_selection_state.setSelectedSearchResults(analysis, search_ids, analysis.has_miRNAData());
                     analysis.data_selection_state.add_genes_source_type = DataSelectionState.ADD_GENES_SOURCE_TYPE_SEARCH;
                 } else if (parser.getString("source").equals("init_upload")) {
                     String[] functional_group_ids = parser.getStringArray("ids");

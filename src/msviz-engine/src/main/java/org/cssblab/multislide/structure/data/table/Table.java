@@ -273,7 +273,7 @@ public class Table implements Serializable, Iterable<String> {
             rows.put(row_key, row);
         }
     }
-    
+
     @Override
     public Iterator <String> iterator() {
         return rows.keySet().iterator();
@@ -341,7 +341,7 @@ public class Table implements Serializable, Iterable<String> {
             return Long.parseLong(row_key);
         }
         if (!(column_name_dtype_map.get(column_name).equals(Table.DTYPE_LONG))) {
-            throw new MultiSlideException("No column of type 'Integer' with name '" + column_name + "'");
+            throw new MultiSlideException("No column of type 'Long' with name '" + column_name + "'");
         }
         int col_pos = this.column_name_position_map.get(column_name);
         return rows.get(row_key).getLong(col_pos);
@@ -398,6 +398,28 @@ public class Table implements Serializable, Iterable<String> {
             d[i++] = this.get(row_key, s);
             
         return d;
+    }
+    
+    public Table filter(List <String> row_ids) 
+            throws MultiSlideException, DataParsingException {
+        
+        List <String> column_names = this.columns();
+        List <String> dtypes = this.dtypes();
+        
+        List <String[]> names_dtypes = CollectionUtils.zip(column_names, dtypes);
+        for (String[] s: names_dtypes)
+            Utils.log_info("Column: " + s[0] + ", " + s[1]);
+        
+        Table table = new Table(names_dtypes, this.row_index_name);
+
+        for (String row_id : row_ids) {
+            if (this.rows.containsKey(row_id)) {
+                for (String s : this.column_name_position_map.keySet())
+                    _copy_value(this, table, s, row_id);
+            }
+        }
+
+        return table;
     }
     
     public Table joinByKey(Table that, String join_type)

@@ -26,7 +26,7 @@ export class VisualizationHomeComponent implements OnInit {
       this.analysis_name = params['analysis_name'];
       for (let key in params) {
         if (key == 'source') {
-          if (params['source'] == 'load_analysis' || params['source'] == 'load_demo') {
+          if (params['source'] == 'load_analysis' || params['source'] == 'load_demo' || params['source'] == 'open_analysis') {
             is_load_analysis = true;
           }
         }
@@ -50,6 +50,10 @@ export class VisualizationHomeComponent implements OnInit {
   }
 
   onConnectionChange() {
+    this.load_count++;
+  }
+
+  notifyResetConfig(){
     this.load_count++;
   }
 

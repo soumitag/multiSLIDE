@@ -47,22 +47,66 @@
 						</ng-container>
 				
 						<ng-container *ngFor="let tag of data.gene_tags; let g = index">
-							<rect [attr.y]="layout.column_left_x[g]" 
-								[attr.x]="layout.column_header_text_anchor_y" 
-								[attr.height]="layout.cell_width_height-1" 
-								[attr.width]="layout.header_height"
-								[style.fill]="'rgb(240,240,240)'" />
+							<ng-container *ngIf="data.feature_cluster_labels[g] == 0"> 
+								<rect [attr.y]="layout.column_left_x[g]" 
+									[attr.x]="layout.column_header_text_anchor_y" 
+									[attr.height]="layout.cell_width_height-1" 
+									[attr.width]="layout.header_height"
+									[style.fill]="'rgb(240,240,240)'" />
 
-							<text [attr.y]="layout.column_header_text_anchor_x[g]" 
+								<text [attr.y]="layout.column_header_text_anchor_x[g]" 
+									[attr.x]="layout.column_header_text_anchor_y" 
+									[style.font-size.px]="layout.column_label_font_size" 
+									text-anchor="start" 
+									dominant-baseline="middle"
+									font-family="Verdana" 
+									[matMenuTriggerFor]="genes_menu" 
+									[matMenuTriggerData]="{col_index: g}"
+									class="gene_tag">
+									{{data.column_headers[g]}}
+								</text>
+							</ng-container>
+
+							<ng-container *ngIf="data.feature_cluster_labels[g] == 1"> 
+								<rect [attr.y]="layout.column_left_x[g]" 
+									[attr.x]="layout.column_header_text_anchor_y" 
+									[attr.height]="layout.cell_width_height-1" 
+									[attr.width]="layout.header_height"
+									[style.fill]="'rgb(20,40,20)'" />
+
+								<text [attr.y]="layout.column_header_text_anchor_x[g]" 
+									[attr.x]="layout.column_header_text_anchor_y" 
+									[style.font-size.px]="layout.column_label_font_size" 
+									[style.fill]="'rgb(240,240,240)'" 
+									text-anchor="start" 
+									dominant-baseline="middle"
+									font-family="Verdana" 
+									[matMenuTriggerFor]="genes_menu" 
+									[matMenuTriggerData]="{col_index: g}"
+									class="gene_tag">
+									{{data.column_headers[g]}}
+								</text>
+							</ng-container>
+
+						</ng-container>
+
+						<ng-container *ngIf="data.cluster_label_message != ''"> 
+
+							<text [attr.y]="layout.column_header_text_anchor_x[0]-(layout.column_label_font_size*4.5)" 
 								[attr.x]="layout.column_header_text_anchor_y" 
-								[style.font-size.px]="layout.column_label_font_size" 
+								[attr.height]="20" 
+								[attr.width]="layout.header_height"
+								[style.font-size.px]="layout.column_label_font_size-1" 
+								[style.fill]="'rgb(240,0,0)'" 
 								text-anchor="start" 
 								dominant-baseline="middle"
-								font-family="Verdana" 
-								[matMenuTriggerFor]="genes_menu" [matMenuTriggerData]="{col_index: g}"
-								class="gene_tag">
-								{{data.column_headers[g]}}
+								font-family="Verdana">
+								<ng-container *ngFor="let msg of data.cluster_label_message; let m = index">
+									<tspan [attr.x]="layout.column_header_text_anchor_y" 
+										[attr.dy]="layout.column_label_font_size">{{msg}}</tspan>
+								</ng-container>
 							</text>
+
 						</ng-container>
 				
 						<ng-container *ngFor="let row of data.cell_bin_indices; let i = index">
@@ -168,25 +212,26 @@
 										</ng-container>
 								</ng-container>
 								-->
-								<ng-container *ngFor="let position of data.search_tag_positions[i]; let j = index">
+								<ng-container *ngFor="let position of data.search_tag_positions[i]; let j = index;">
 								
-									<ng-container *ngIf="position > 0; else colored_node">
+									<ng-container *ngIf="data.is_search_query[i][j]==1; else colored_node">
 										<rect [attr.y]="layout.column_left_x[0]+(position+0.2)*layout.cell_width_height" 
-											[attr.x]="search_tag_line[2]-(layout.search_tag_background_rects[i][3]/2.0)" 
+											[attr.x]="search_tag_line[2]-(layout.search_tag_background_rects[i][3]/2.0)+0.5" 
 											[attr.height]="layout.cell_width_height*0.6" 
-											[attr.width]="layout.search_tag_background_rects[i][3]" 
-											[style.fill]="'rgb(0,0,0)'"
-											[attr.fill-opacity]="1"/>
+											[attr.width]="layout.search_tag_background_rects[i][3]-1" 
+											[style.fill]="'none'" 
+											[style.stroke]="'rgb(' + global_data.search_tag_colors[global_data.search_tag_color_indices[i]][0] + ',' + global_data.search_tag_colors[global_data.search_tag_color_indices[i]][1] + ',' + global_data.search_tag_colors[global_data.search_tag_color_indices[i]][2] + ')'" 
+											style="stroke-width:1.5;"/>
 									</ng-container>
 	
 									<ng-template #colored_node>
 										<ng-container>
-										<rect [attr.y]="layout.column_left_x[0]+(-position+0.2)*layout.cell_width_height" 
-											[attr.x]="search_tag_line[2]-(layout.search_tag_background_rects[i][3]/2.0)" 
-											[attr.height]="layout.cell_width_height*0.6" 
-											[attr.width]="layout.search_tag_background_rects[i][3]" 
-											[style.fill]="'rgb(' + global_data.search_tag_colors[global_data.search_tag_color_indices[i]][0] + ',' + global_data.search_tag_colors[global_data.search_tag_color_indices[i]][1] + ',' + global_data.search_tag_colors[global_data.search_tag_color_indices[i]][2] + ')'"
-											[attr.fill-opacity]="1"/>
+											<rect [attr.y]="layout.column_left_x[0]+(position+0.2)*layout.cell_width_height" 
+												[attr.x]="search_tag_line[2]-(layout.search_tag_background_rects[i][3]/2.0)" 
+												[attr.height]="layout.cell_width_height*0.6" 
+												[attr.width]="layout.search_tag_background_rects[i][3]" 
+												[style.fill]="'rgb(' + global_data.search_tag_colors[global_data.search_tag_color_indices[i]][0] + ',' + global_data.search_tag_colors[global_data.search_tag_color_indices[i]][1] + ',' + global_data.search_tag_colors[global_data.search_tag_color_indices[i]][2] + ')'"
+												[attr.fill-opacity]="1"/>
 										</ng-container>
 									</ng-template>
 	
@@ -295,22 +340,62 @@
 		
 				<ng-container *ngFor="let tag of data.gene_tags; let g = index">
 					
-					<rect [attr.x]="layout.column_left_x[g]" 
-						[attr.y]="0" 
-						[attr.width]="layout.cell_width_height-2" 
-						[attr.height]="layout.header_height+2"
-						[style.fill]="'rgb(240,240,240)'" />
-					
-					<text [attr.x]="layout.column_header_text_anchor_x[g]" 
-						[attr.y]="layout.column_header_text_anchor_y" 
-						[style.font-size.px]="layout.column_label_font_size" 
+					<ng-container *ngIf="data.feature_cluster_labels[g] == 0">
+						<rect [attr.x]="layout.column_left_x[g]" 
+							[attr.y]="0" 
+							[attr.width]="layout.cell_width_height-2" 
+							[attr.height]="layout.header_height+2"
+							[style.fill]="'rgb(240,240,240)'" />
+						
+						<text [attr.x]="layout.column_header_text_anchor_x[g]" 
+							[attr.y]="layout.column_header_text_anchor_y" 
+							[style.font-size.px]="layout.column_label_font_size" 
+							text-anchor="start" 
+							font-family="Verdana" 
+							[attr.transform]="'rotate(-90 ' + layout.column_header_text_anchor_x[g] + ' ' + layout.column_header_text_anchor_y + ')'"
+							[matMenuTriggerFor]="genes_menu" [matMenuTriggerData]="{col_index: g}"
+							class="gene_tag">
+							{{data.column_headers[g]}}
+						</text>
+					</ng-container>
+
+					<ng-container *ngIf="data.feature_cluster_labels[g] == 1">
+						<rect [attr.x]="layout.column_left_x[g]" 
+							[attr.y]="0" 
+							[attr.width]="layout.cell_width_height-2" 
+							[attr.height]="layout.header_height+2"
+							[style.fill]="'rgb(20,40,20)'" />
+						
+						<text [attr.x]="layout.column_header_text_anchor_x[g]" 
+							[attr.y]="layout.column_header_text_anchor_y" 
+							[style.font-size.px]="layout.column_label_font_size" 
+							[style.fill]="'rgb(240,240,240)'" 
+							text-anchor="start" 
+							font-family="Verdana" 
+							[attr.transform]="'rotate(-90 ' + layout.column_header_text_anchor_x[g] + ' ' + layout.column_header_text_anchor_y + ')'"
+							[matMenuTriggerFor]="genes_menu" 
+							[matMenuTriggerData]="{col_index: g}"
+							class="gene_tag">
+							{{data.column_headers[g]}}
+						</text>
+					</ng-container>
+
+				</ng-container>
+
+				<ng-container *ngIf="data.cluster_label_message != ''"> 
+
+					<text [attr.x]="20" 
+						[attr.y]="60" 
+						[attr.height]="20" 
+						[attr.width]="layout.header_height" 
+						[style.fill]="'rgb(240,0,0)'" 
+						font-size="12px" 
 						text-anchor="start" 
-						font-family="Verdana" 
-						[attr.transform]="'rotate(-90 ' + layout.column_header_text_anchor_x[g] + ' ' + layout.column_header_text_anchor_y + ')'"
-						[matMenuTriggerFor]="genes_menu" [matMenuTriggerData]="{col_index: g}"
-						class="gene_tag">
-						{{data.column_headers[g]}}
+						dominant-baseline="middle"
+						font-family="Verdana">
+						{{data.cluster_label_message[0]}} {{data.cluster_label_message[1]}} {{data.cluster_label_message[2]}}
 					</text>
+
 				</ng-container>
 		
 				<ng-container *ngFor="let row of data.cell_bin_indices; let i = index">
@@ -415,15 +500,16 @@
 						[attr.stroke]="'rgb(' + global_data.search_tag_stroke_colors[global_data.search_tag_color_indices[i]][0] + ',' + global_data.search_tag_stroke_colors[global_data.search_tag_color_indices[i]][1] + ',' + global_data.search_tag_stroke_colors[global_data.search_tag_color_indices[i]][2] + ')'"
 						stroke-width="1" />
 						
-						<ng-container *ngFor="let position of data.search_tag_positions[i]; let j = index">
+						<ng-container *ngFor="let position of data.search_tag_positions[i];  let j=index;">
 								
-								<ng-container *ngIf="position < 0; else colored_node">
-									<rect [attr.x]="layout.column_left_x[0]+(-position+0.2)*layout.cell_width_height" 
-										[attr.y]="search_tag_line[2]-(layout.search_tag_background_rects[i][3]/2.0)" 
+								<ng-container *ngIf="data.is_search_query[i][j]==1; else colored_node">
+									<rect [attr.x]="layout.column_left_x[0]+(position+0.2)*layout.cell_width_height" 
+										[attr.y]="search_tag_line[2]-(layout.search_tag_background_rects[i][3]/2.0)+0.5" 
 										[attr.width]="layout.cell_width_height*0.6" 
-										[attr.height]="layout.search_tag_background_rects[i][3]" 
-										[style.fill]="'rgb(0,0,0)'"
-										[attr.fill-opacity]="1"/>
+										[attr.height]="layout.search_tag_background_rects[i][3]-1" 
+										[style.fill]="'none'" 
+										[style.stroke]="'rgb(' + global_data.search_tag_colors[global_data.search_tag_color_indices[i]][0] + ',' + global_data.search_tag_colors[global_data.search_tag_color_indices[i]][1] + ',' + global_data.search_tag_colors[global_data.search_tag_color_indices[i]][2] + ')'" 
+										style="stroke-width:1.5;"/>
 								</ng-container>
 
 								<ng-template #colored_node>
@@ -520,9 +606,14 @@
 	
 		<mat-menu #neightbors_menu="matMenu">
 			<ng-template matMenuContent let-col_id="col_id">
+				<button mat-menu-item *ngFor="let nn_type of data.network_neighborhood_types" (click)="searchNeighbors(col_id,nn_type[1])">
+					{{nn_type[0]}}
+				</button>
+				<!--
 				<button mat-menu-item (click)="searchNeighbors(col_id, 0)">Protein-Protein Interaction</button>
 				<button mat-menu-item (click)="searchNeighbors(col_id, 1)">miRNA Targets</button>
 				<button mat-menu-item (click)="searchNeighbors(col_id, 2)">Transcription Factor Targets</button>
+				-->
 			</ng-template>
 		</mat-menu>
 	

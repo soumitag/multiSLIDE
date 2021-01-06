@@ -19,6 +19,7 @@ public class LegendData implements Serializable {
     public static final int LEGEND_GROUP_TYPE_GENE_GROUP = 2;
     public static final int LEGEND_GROUP_TYPE_CLUSTER_LABEL = 3;
     public static final int LEGEND_GROUP_TYPE_NETWORK_NEIGHBOR = 4;
+    public static final int LEGEND_GROUP_TYPE_INTER_OMICS_CONNECTION = 5;
     
     private ArrayList <Integer> legend_group_types;
     private ArrayList <String> legend_group_titles;

@@ -78,8 +78,7 @@ public class FunctionalGroupContainer implements Serializable {
         t2.add("Gene_5");
         HashMap <List <String>, List <String>> map2 = new HashMap <> ();
         map2.put(dataset_column_name_key, t2);
-        container[1] = new FunctionalGroupContainer("0", "Pathway_2", map2);
-        
+        container[1] = new FunctionalGroupContainer("1", "Pathway_2", map2);
         
         ArrayList <String> t3 = new ArrayList <> ();
         t3.add("Gene_5");
@@ -90,7 +89,6 @@ public class FunctionalGroupContainer implements Serializable {
         container[2] = new FunctionalGroupContainer("2", "Pathway_3", map3);
         
         return container;
-        
     }
     
     public FunctionalGroupContainer getSummary() {

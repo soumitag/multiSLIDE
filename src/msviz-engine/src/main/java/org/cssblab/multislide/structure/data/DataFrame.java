@@ -6,6 +6,7 @@
 package org.cssblab.multislide.structure.data;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,6 +26,7 @@ import org.cssblab.multislide.structure.AnalysisContainer;
 import org.cssblab.multislide.structure.MultiSlideException;
 import org.cssblab.multislide.structure.data.table.Table;
 import org.cssblab.multislide.utils.CollectionUtils;
+import org.cssblab.multislide.utils.FileHandler;
 import org.cssblab.multislide.utils.FormElementMapper;
 import org.cssblab.multislide.utils.Utils;
 
@@ -72,15 +74,23 @@ public class DataFrame implements Serializable {
             ClinicalInformation clinical_info,
             Searcher searcher,
             long seed
-    ) throws MultiSlideException {
+    ) throws MultiSlideException, DataParsingException, IOException {
         
         this.specs = spec;
         this.name = specs.getUniqueName();
         
         /*
-            1. Load both data amd metadata columns into ds
+            0. check if column names have "."
         */
         String filepath = analysis_basepath + File.separator + specs.getFilenameWithinAnalysisFolder();
+        String message = FileHandler.checkFileHeader(filepath, specs.getDelimiter());
+        if (!message.equals("")) {
+            throw new MultiSlideException(message);
+        }
+        
+        /*
+            1. Load both data amd metadata columns into ds
+        */
         Dataset<Row> data = spark.read()
                                  .format("csv")
                                  .option("sep", FormElementMapper.parseDelimiter(specs.getDelimiter()))
@@ -202,7 +212,8 @@ public class DataFrame implements Serializable {
         
             long unknown_count = seed;
             for (String linker: ds.keySet()) {
-                String entrez = "" + --unknown_count;
+                String entrez = "-" + ++unknown_count;        // the correct version
+                //String entrez = "" + --unknown_count;       // wrong one
                 
                 this.entrez_master.put(entrez, 1);
                 
@@ -221,6 +232,8 @@ public class DataFrame implements Serializable {
                     _l.add(linker);
                     this.entrez_linker_map.put(entrez, _l);
                 }
+                
+                Utils.log_info("e1: " + entrez);
             }
             
         }

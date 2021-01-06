@@ -107,8 +107,21 @@ public class MapLinkLayout implements Serializable {
         /*
             create mappings
         */
-        mappings = new ArrayList <> ();
-        mapping_colors = new ArrayList <> ();
+        
+        HashMap <String, List <int[]>> linkages = getLinkages(analysis, dataset_name_1, dataset_name_2, feature_manifest_1, feature_manifest_2);
+        mappings = linkages.get("mappings");
+        mapping_colors = linkages.get("mapping_colors");
+        
+    }
+
+    public static final HashMap <String, List <int[]>> getLinkages(
+            AnalysisContainer analysis, 
+            String dataset_name_1, String dataset_name_2,
+            FeatureIndex feature_manifest_1, FeatureIndex feature_manifest_2
+    ) throws MultiSlideException  {
+        
+        List <int[]> mappings = new ArrayList <> ();
+        List <int[]> mapping_colors = new ArrayList <> ();
         
         /*
             check if any user provided mapping exists
@@ -200,10 +213,16 @@ public class MapLinkLayout implements Serializable {
 
             }
         }
+        
+        HashMap <String, List <int[]>> retval = new HashMap <> ();
+        retval.put("mappings", mappings);
+        retval.put("mapping_colors", mapping_colors);
+        return retval;
     }
     
     public String asJSON () {
         String json = new Gson().toJson(this);
         return json;
     }
+    
 }

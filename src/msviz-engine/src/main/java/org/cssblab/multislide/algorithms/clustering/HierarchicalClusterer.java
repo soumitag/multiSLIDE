@@ -78,6 +78,11 @@ public class HierarchicalClusterer implements Serializable {
                     fields.add(new String[]{"_linker", Table.DTYPE_STRING});
                     result = new Table(fields, "_id");
                     break;
+                } else if (group_by == null || group_by.length == 0) {
+                    fields.add(new String[]{"_index", Table.DTYPE_LONG});
+                    fields.add(new String[]{"_cluster_label", Table.DTYPE_INT});
+                    result = new Table(fields, "_id");
+                    break;
                 } else {
                     fields.add(new String[]{"_index", Table.DTYPE_LONG});
                     result = new Table(fields, "_id");
@@ -189,6 +194,7 @@ public class HierarchicalClusterer implements Serializable {
         }
         p.put("n_rows", n_rows+"");
         p.put("n_cols", n_cols+"");
+        p.put("n_clusters", params.getNumClusters() + "");
         
         ServerResponse resp = analytics_engine_comm.doGet("do_clustering", p);
 
@@ -209,6 +215,10 @@ public class HierarchicalClusterer implements Serializable {
                         if (group_by != null && group_by.length == 1 && group_by[0].equals("_linker")) {
                             f.add(DataTypes.createStructField("_id", DataTypes.LongType, false));
                             f.add(DataTypes.createStructField("_linker", DataTypes.StringType, false));
+                        } else if (group_by == null || group_by.length == 0) {
+                            f.add(DataTypes.createStructField("_id", DataTypes.LongType, false));
+                            f.add(DataTypes.createStructField("_index", DataTypes.LongType, false));
+                            f.add(DataTypes.createStructField("_cluster_label", DataTypes.IntegerType, false));
                         } else {
                             f.add(DataTypes.createStructField("_id", DataTypes.LongType, false));
                             f.add(DataTypes.createStructField("_index", DataTypes.LongType, false));

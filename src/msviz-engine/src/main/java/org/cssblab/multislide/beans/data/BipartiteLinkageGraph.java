@@ -19,6 +19,17 @@ import org.cssblab.multislide.utils.FileHandler;
  */
 public class BipartiteLinkageGraph implements Serializable {
     
+    class LinkerColorName {
+    
+        public int[] color; 
+        public String name;
+        
+        LinkerColorName(int[] color, String name) {
+            this.color = color;
+            this.name = name;
+        }
+    }
+    
     private static final long serialVersionUID = 1L;
     
     public String display_name;
@@ -30,7 +41,8 @@ public class BipartiteLinkageGraph implements Serializable {
     public String column_name_1;
     public String column_name_2;
     
-    public HashMap <String, HashMap <String, int[]>> linkage;
+    //public HashMap <String, HashMap <String, int[]>> linkage;
+    private final HashMap <String, HashMap <String, LinkerColorName>> linkage;
     
     public BipartiteLinkageGraph(
             String display_name, String filename, String filepath, String delimiter, HashMap <String, String> filename_map
@@ -54,7 +66,22 @@ public class BipartiteLinkageGraph implements Serializable {
     }
     
     public int[] getColor(String column_value_1, String column_value_2) {
-        return linkage.get(column_value_1).get(column_value_2);
+        return linkage.get(column_value_1).get(column_value_2).color;
+    }
+    
+    public String getName(String column_value_1, String column_value_2) {
+        return linkage.get(column_value_1).get(column_value_2).name;
+    }
+    
+    public HashMap <String, int[]> getNameColorMap() {
+        HashMap <String, int[]> map = new HashMap <> ();
+        for (String column_value_1: this.linkage.keySet()) {
+            for (String column_value_2: this.linkage.keySet()) {
+                LinkerColorName cn = this.linkage.get(column_value_1).get(column_value_2);
+                map.put(cn.name, cn.color);
+            }
+        }
+        return map;
     }
     
     private void loadFromFile(String filename, HashMap <String, String> filename_map) 
@@ -97,7 +124,10 @@ public class BipartiteLinkageGraph implements Serializable {
         for (int i=1; i<d.size(); i++) {
             
             int[] colors = new int[3];
-            if (d.get(i).size() > 2) {
+            String name = "";
+            
+            if (d.get(i).size() == 4) {
+                
                 String[] rgb = d.get(i).get(2).split(",");
                 if (rgb.length != 3) {
                     throw new DataParsingException("Invalid RGB string '" + d.get(i).get(2) + "'. Must contain three comma separated values between 0-255.");
@@ -105,6 +135,18 @@ public class BipartiteLinkageGraph implements Serializable {
                 colors[0] = Integer.parseInt(rgb[0]);
                 colors[1] = Integer.parseInt(rgb[1]);
                 colors[2] = Integer.parseInt(rgb[2]);
+                name = d.get(i).get(3);
+                
+            } else if (d.get(i).size() == 3) {
+                
+                String[] rgb = d.get(i).get(2).split(",");
+                if (rgb.length != 3) {
+                    throw new DataParsingException("Invalid RGB string '" + d.get(i).get(2) + "'. Must contain three comma separated values between 0-255.");
+                }
+                colors[0] = Integer.parseInt(rgb[0]);
+                colors[1] = Integer.parseInt(rgb[1]);
+                colors[2] = Integer.parseInt(rgb[2]);
+                
             } else {
                 colors[0] = 175;
                 colors[1] = 175;
@@ -112,10 +154,10 @@ public class BipartiteLinkageGraph implements Serializable {
             }
             
             if (linkage.containsKey(d.get(i).get(0))) {
-                linkage.get(d.get(i).get(0)).put(d.get(i).get(1), colors);
+                linkage.get(d.get(i).get(0)).put(d.get(i).get(1), new LinkerColorName(colors, name));
             } else {
-                HashMap <String, int[]> h = new HashMap <> ();
-                h.put(d.get(i).get(1), colors);
+                HashMap <String, LinkerColorName> h = new HashMap <> ();
+                h.put(d.get(i).get(1), new LinkerColorName(colors, name));
                 linkage.put(d.get(i).get(0), h);
             }
         }

@@ -18,7 +18,10 @@ export class CreateSessionService {
 		console.log("getting response...");
 		
 		return this.httpClient.get ( this.baseUrl, {
-				params: { 'analysis_name': analysis_name },
+				params: { 
+					'analysis_name': analysis_name, 
+					'action': 'create_session' 
+				},
 				withCredentials:true
 		  	})
 			.map(res =>  {

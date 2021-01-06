@@ -189,7 +189,8 @@ export class GlobalMapConfigService {
         'use_defaults': params.use_defaults.toString(),
         'linkage_function': params.linkage_function.toString(),
         'distance_function': params.distance_function.toString(),
-        'leaf_ordering': params.leaf_ordering.toString()
+        'leaf_ordering': params.leaf_ordering.toString(),
+        'numClusterLabels': params.numClusterLabels.toString()
       },
       withCredentials: true
     })
@@ -276,6 +277,21 @@ export class GlobalMapConfigService {
           return Observable.throw(error);
         });
 
+    }
+
+    resetDefaults (analysis_name: string) {
+      return this.httpClient.get ( this.globalMapConfigUrl, {
+        params: { 
+          'analysis_name': analysis_name,
+          'action': 'reset_config'
+        },
+        withCredentials: true
+      })
+      .map(res => <ServerResponseData> res)
+      .catch(error => {
+        console.log(error);
+        return Observable.throw(error);
+      });
     }
 
 }

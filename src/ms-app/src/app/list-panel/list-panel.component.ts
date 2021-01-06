@@ -1,9 +1,10 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, Inject } from '@angular/core';
 import { ListData } from '../list_data'
 import { ListService } from '../list.service';
 import { AnalysisService } from '../analysis.service'
 import { ServerResponseData } from '../server_response'
 import { Observable } from 'rxjs/Observable';
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 
 @Component({
   selector: 'app-list-panel',
@@ -12,21 +13,46 @@ import { Observable } from 'rxjs/Observable';
 })
 export class ListPanelComponent implements OnInit {
 
+  /*
   @Input() analysis_name: string;
-  @Input() lists: ListData[];
-
   @Output() onListChange = new EventEmitter<string>();
   @Output() visualizeListChange = new EventEmitter<string>();
+  */
 
+  analysis_name: string;
+  lists: ListData[];
+  error_getting_data: boolean = false;
   list_service_response: ServerResponseData;
 
-  constructor(private listService: ListService, private analysisService: AnalysisService) { }
+  constructor(
+    private dialogRef: MatDialogRef<ListPanelComponent>, 
+    @Inject(MAT_DIALOG_DATA) data,
+    private listService: ListService, 
+    private analysisService: AnalysisService) { 
+      this.analysis_name = data.analysis_name;
+      this.dialogRef.updatePosition({ top: '110px', left: '500px' });
+      //this.dialogRef.updateSize('550px', '500px');
+  }
 
-  ngOnInit() { }
+  ngOnInit() { 
+    this.getData();
+  }
+
+  getData() {
+    this.listService.getUserLists(this.analysis_name)
+			.subscribe(
+					data => this.lists = data, 
+					() => console.log("observable complete"), 
+					() => this.setErrorResponseonGet());
+  }
+
+  setErrorResponseonGet() {
+    this.error_getting_data = true;
+  }
 
   showListDetails(i) {
     var x = document.getElementById("details_" + i);
-    if (x.style.display === "none") {
+    if (x.style.display === "none" || x.style.display === "") {
       x.style.display = "block";
     } else {
       x.style.display = "none";
@@ -43,9 +69,10 @@ export class ListPanelComponent implements OnInit {
   }
 
   notifyResponse() {
-    this.onListChange.emit();
+    //this.onListChange.emit();
 		if(this.list_service_response.status == 1) {
-			alert(this.list_service_response.message);
+      alert(this.list_service_response.message);
+      this.getData();
 		} else {
 			alert(this.list_service_response.message + '. ' + this.list_service_response.detailed_reason);
 		}
@@ -58,6 +85,25 @@ export class ListPanelComponent implements OnInit {
 					() => console.log("observable complete"));
   }
 
+  removeList(list_name: string) {
+    this.listService.deleteList(this.analysis_name, list_name)
+			.subscribe(
+					data => this.list_service_response = data, 
+					() => console.log("observable complete"), 
+					() => this.notifyListDeleteResponse());
+  }
+
+  notifyListDeleteResponse() {
+    //this.onListChange.emit();
+		if(this.list_service_response.status == 1) {
+      alert(this.list_service_response.message);
+      this.getData();
+		} else {
+			alert(this.list_service_response.message + '. ' + this.list_service_response.detailed_reason);
+		}
+  }
+
+  /*
   visualizeList(list_name: string) {
     this.analysisService.initializeAnalysisFromList(this.analysis_name, list_name)
 			.subscribe(
@@ -71,6 +117,7 @@ export class ListPanelComponent implements OnInit {
             }
           });
   }
+  */
 
   downloadFile(data, list_name) {
     const blob = new Blob([data], { type: 'text/csv' });
@@ -82,5 +129,9 @@ export class ListPanelComponent implements OnInit {
     a.download = list_name + '.txt';
     a.click();
     window.URL.revokeObjectURL(url);
+  }
+
+  close() {
+    this.dialogRef.close();
   }
 }

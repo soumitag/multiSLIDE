@@ -22,6 +22,7 @@ import org.cssblab.multislide.structure.MapConfig;
 import org.cssblab.multislide.structure.MultiSlideException;
 import org.cssblab.multislide.utils.Utils;
 import static org.apache.spark.sql.functions.col;
+import org.cssblab.multislide.beans.data.SignificanceTestingParams;
 import org.cssblab.multislide.datahandling.DataParsingException;
 import org.cssblab.multislide.resources.MultiSlideContextListener;
 import org.cssblab.multislide.structure.data.table.Table;
@@ -48,7 +49,7 @@ public class Selection implements Serializable {
     */
     //private Dataset <Row> consolidated_linker;
     private HashMap <String, GeneGroup> gene_groups;            // keys -> gene_group_ids, value -> gene group objects
-    private HashMap <String, GeneGroup> nn_gene_groups;         // keys -> gene_group_ids, value -> gene group objects
+    private ListOrderedMap <String, GeneGroup> nn_gene_groups;         // keys -> gene_group_ids, value -> gene group objects
     /*
     Sample related information
     */
@@ -59,7 +60,7 @@ public class Selection implements Serializable {
             String[] dataset_names,
             Table feature_selection,
             HashMap <String, GeneGroup> gene_groups,
-            HashMap <String, GeneGroup> nn_gene_groups,
+            ListOrderedMap <String, GeneGroup> nn_gene_groups,
             ListOrderedMap <String, DataFrame> datasets,
             ClinicalInformation clinical_info,
             HashMap <String, Boolean> is_linked
@@ -478,6 +479,18 @@ public class Selection implements Serializable {
     
     public List <List<String>> getFeatureIDs(String dataset_name, GlobalMapConfig global_map_config, String[] identifiers) {
         return this.views.get(dataset_name).getFeatureIDs(global_map_config, identifiers);
+    }
+    
+    public List<Integer> getClusterLabels(String dataset_name, GlobalMapConfig global_map_config) {
+        return this.views.get(dataset_name).getClusterLabels(global_map_config);
+    }
+    
+    public boolean hasClusterLabels(String dataset_name) {
+        return this.views.get(dataset_name).cluster_labels != null;
+    }
+    
+    public boolean hasWithinLinkerOrdering(String dataset_name) {
+        return this.views.get(dataset_name).hasWithinLinkerOrdering();
     }
     
     public List <String> getEntrez(String dataset_name, GlobalMapConfig global_map_config) throws MultiSlideException {

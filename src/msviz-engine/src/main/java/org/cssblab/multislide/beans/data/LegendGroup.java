@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.cssblab.multislide.structure.AnalysisContainer;
 import org.cssblab.multislide.structure.data.ClinicalInformation;
@@ -179,19 +180,95 @@ public class LegendGroup implements Serializable {
         LegendGroup L = new LegendGroup();
         L.title = "Network and Neighbor Types";
         L.legend_names.add("Protein-Protein Interactions");
+        L.legend_names.add("PPI Search Key");
         L.legend_names.add("miRNA Targets");
+        L.legend_names.add("miRNA Targets Search Key");
         L.legend_names.add("Transcription Factor Targets");
-        L.legend_names.add("Search Key");
+        L.legend_names.add("TF Targets Search Key");
+        // L.legend_names.add("Search Key");
+        L.colors.add(NetworkNeighbor.PPI_ENTREZ_NEIGHBOR_COLOR);
         L.colors.add(NetworkNeighbor.PPI_ENTREZ_NEIGHBOR_COLOR);
         L.colors.add(NetworkNeighbor.MIRNA_ID_NEIGHBOR_COLOR);
+        L.colors.add(NetworkNeighbor.MIRNA_ID_NEIGHBOR_COLOR);
         L.colors.add(NetworkNeighbor.TF_ENTREZ_NEIGHBOR_COLOR);
-        L.colors.add(NetworkNeighbor.SEARCH_KEY_COLOR);
+        L.colors.add(NetworkNeighbor.TF_ENTREZ_NEIGHBOR_COLOR);
+        // L.colors.add(NetworkNeighbor.SEARCH_KEY_COLOR);
+        L.stroke_colors.add(NetworkNeighbor.PPI_ENTREZ_NEIGHBOR_STROKE_COLOR);
         L.stroke_colors.add(NetworkNeighbor.PPI_ENTREZ_NEIGHBOR_STROKE_COLOR);
         L.stroke_colors.add(NetworkNeighbor.MIRNA_ID_NEIGHBOR_STROKE_COLOR);
+        L.stroke_colors.add(NetworkNeighbor.MIRNA_ID_NEIGHBOR_STROKE_COLOR);
         L.stroke_colors.add(NetworkNeighbor.TF_ENTREZ_NEIGHBOR_STROKE_COLOR);
-        L.stroke_colors.add(NetworkNeighbor.SEARCH_KEY_COLOR);
+        L.stroke_colors.add(NetworkNeighbor.TF_ENTREZ_NEIGHBOR_STROKE_COLOR);
+        // L.stroke_colors.add(NetworkNeighbor.SEARCH_KEY_COLOR);
         G.add(L);
         return G;
+    }
+    
+    public static ArrayList <LegendGroup> createInterOmicsConnectionsLegendGroup(
+            AnalysisContainer analysis
+    ) {
+        
+        ArrayList <LegendGroup> G = new ArrayList <LegendGroup> ();
+        
+        for (int i=0; i<analysis.data_selection_state.selected_datasets.length-1; i++) {
+            
+            String dataset_name_1 = analysis.data_selection_state.selected_datasets[i];
+            String dataset_name_2 = analysis.data_selection_state.selected_datasets[i+1];
+            
+            BipartiteLinkageGraph linkage = null;
+            if (analysis.data_selection_state.user_defined_between_omics_linkages.containsKey(dataset_name_1 + "_" + dataset_name_2)) {
+                linkage = analysis.data_selection_state.user_defined_between_omics_linkages.get(dataset_name_1 + "_" + dataset_name_2);
+            } else if (analysis.data_selection_state.user_defined_between_omics_linkages.containsKey(dataset_name_2 + "_" + dataset_name_1)) {
+                linkage = analysis.data_selection_state.user_defined_between_omics_linkages.get(dataset_name_2 + "_" + dataset_name_1);
+            }
+            
+            HashMap <String, String> mapping_names = new HashMap <> ();
+            HashMap <String, int[]> mapping_colors = new HashMap <> ();
+            
+            if (linkage != null) {
+                
+                List <List<String>> feature_ids_1 = analysis.data.selected.getFeatureIDs(
+                        linkage.dataset_name_1, analysis.global_map_config, new String[]{linkage.column_name_1});
+            
+                List <List<String>> feature_ids_2 = analysis.data.selected.getFeatureIDs(
+                            linkage.dataset_name_2, analysis.global_map_config, new String[]{linkage.column_name_2});
+
+                for (int j=0; j<feature_ids_1.size(); j++) {
+                    for (int k=0; k<feature_ids_2.size(); k++) {
+                        if (linkage.isConnected(feature_ids_1.get(j).get(0), feature_ids_2.get(k).get(0))) {
+                            String name = linkage.getName(feature_ids_1.get(j).get(0), feature_ids_2.get(k).get(0));
+                            int[] color = linkage.getColor(feature_ids_1.get(j).get(0), feature_ids_2.get(k).get(0));
+                            if (!name.equals("") || color[0]!=175 || color[1]!=175 || color[2]!=175) {
+                                String key = name + "_" + color[0] + "_" + color[1] + "_" + color[2];
+                                mapping_names.put(key, name);
+                                mapping_colors.put(key, color);
+                            }
+                        }
+                    }
+                }
+                
+                LegendGroup L = new LegendGroup();
+                L.title = "Inter-omics Connections (" + linkage.display_name + ")";
+                G.add(L);
+                
+                for (String key : mapping_names.keySet()) {
+                    String name = mapping_names.get(key);
+                    L.legend_names.add(name);
+                    int[] colors = mapping_colors.get(key);
+                    double[] colors_d = new double[3];
+                    int index = 0;
+                    for (int c: colors) {
+                        colors_d[index++] = c;
+                    }
+                    L.colors.add(colors_d);
+                    L.stroke_colors.add(colors_d);
+                }
+                
+            }
+        }
+        
+        return G;
+
     }
     
     /*

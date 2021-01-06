@@ -39,13 +39,34 @@ export class HomepageComponent implements OnInit {
   open_text: string = '';
   demo_text: string = '';
 
+  analysis_names_ids: string[][];
+
   constructor(private router: Router, 
               private createSessionService: CreateSessionService, 
               private analysisService: AnalysisService, 
               private renderer: Renderer2, 
               private uploadService: DatauploadService) { }
 
-  ngOnInit() { }
+  ngOnInit() {
+    this.getActiveAnalyses();
+    /*
+    this.analysis_names_ids = new Array(0);
+    for (let i=0; i<3; i++) {
+      let a = new Array(2);
+      a[0] = "analysis name 1";
+      a[0] = "analysis_1342423423453";
+      this.analysis_names_ids.push(a);
+    }
+    */
+  }
+
+  getActiveAnalyses() {
+    this.uploadSubscription = this.analysisService.getActiveAnalyses()
+      .subscribe(
+          data => this.analysis_names_ids = data, 
+          () => console.log("error getting available analyses")
+      );
+  }
 
   handleFileInput(files: FileList) {
     let fileItem = files.item(0);
@@ -135,6 +156,14 @@ export class HomepageComponent implements OnInit {
       this.buttonDisabled = false;
     }
     
+  }
+
+  loadAnalysis(analysis_id: string){
+    this.router.navigateByUrl(
+      this.router.createUrlTree(
+        ['visualization_home'], { queryParams: { analysis_name: analysis_id, source: 'open_analysis' } }
+      )
+    );
   }
 
   showButtonText(button_id) {

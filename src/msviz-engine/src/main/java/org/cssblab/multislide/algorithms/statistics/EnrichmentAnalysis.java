@@ -133,8 +133,7 @@ public class EnrichmentAnalysis implements Serializable {
         p.put("apply_fdr_d", params.apply_fdr_d+"");
         p.put("fdr_rate_d", params.fdr_threshold_d+"");
         p.put("include_pathways", params.use_pathways+"");
-        //p.put("include_ontologies", params.use_ontologies+"");
-        p.put("include_ontologies", "False");
+        p.put("include_ontologies", params.use_ontologies+"");
         p.put("significance_level_e", params.significance_level_e+"");
         p.put("apply_fdr_e", params.apply_fdr_e+"");
         p.put("fdr_rate_e", params.fdr_threshold_e+"");

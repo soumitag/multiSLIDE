@@ -95,6 +95,16 @@
   
       <div id="open_table" *ngIf="openerTouched">
         <label for="active_analyses">Active Analyses</label><br>
+        <table width="70%">
+          <tr *ngFor="let analysis of analysis_names_ids; let i = index">
+              <td class="demo_td" width="85%">
+                {{analysis[0]}}<br>
+              </td>
+              <td class="demo_td" width="15%">
+                <button type="button" class="highlight_button" (click)="loadAnalysis(analysis[1])">Open</button>
+              </td>    
+          </tr>
+        </table>
       </div>
 
       <div id="demo_table" *ngIf="demoTouched">

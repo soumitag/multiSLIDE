@@ -30,5 +30,7 @@ export class GlobalMapConfig {
     phenotype_sorting_params: PhenotypeSortingParams;
     isDatasetLinkingOn: boolean;
     dataset_linkings = [];
+    reset_config: boolean;
+    isShowClusterLabelsOn: boolean;
     
 }

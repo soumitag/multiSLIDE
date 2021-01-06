@@ -171,6 +171,14 @@ public class AnalysisContainer implements Serializable {
         this.enrichment_analyzer = enrichment_analyzer;
     }
     
+    public boolean has_miRNAData() {
+        boolean has_mi_rna = false;
+        for (String name: this.data.datasets.keySet()) {
+            has_mi_rna = has_mi_rna || this.data.datasets.get(name).specs.has_mi_rna;
+        }
+        return has_mi_rna;
+    }
+    
     public ArrayList<ArrayList<Integer>> getSearchTags() {
         ArrayList<ArrayList<Integer>> search_tags = new ArrayList<ArrayList<Integer>>();
         ArrayList<Integer> search_tags_0 = new ArrayList<Integer>();

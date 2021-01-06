@@ -105,7 +105,10 @@ public class GlobalMapConfigServices extends HttpServlet {
                 "set_phenotype_sorting_params", 
                 "set_map_orientation",
                 "set_is_dataset_linking_on",
-                "set_database_linkings"
+                "set_database_linkings",
+                "reset_config",
+                "set_show_cluster_labels",
+                "set_num_cluster_labels"
             };
             
             HashMap <String, Boolean> _atomic_transactions = new HashMap <> ();
@@ -125,6 +128,9 @@ public class GlobalMapConfigServices extends HttpServlet {
             _atomic_transactions.put("set_map_orientation", true);
             _atomic_transactions.put("set_is_dataset_linking_on", true);
             _atomic_transactions.put("set_database_linkings", true);
+            _atomic_transactions.put("reset_config", true);
+            _atomic_transactions.put("set_show_cluster_labels", true);
+            _atomic_transactions.put("set_num_cluster_labels", true);
             
             DataParser parser = new DataParser(request);
             parser.addParam("analysis_name", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_REQUIRED);
@@ -331,6 +337,8 @@ public class GlobalMapConfigServices extends HttpServlet {
                 parser.addParam("linkage_function", RequestParam.DATA_TYPE_INT, RequestParam.PARAM_TYPE_REQUIRED);
                 parser.addParam("distance_function", RequestParam.DATA_TYPE_INT, RequestParam.PARAM_TYPE_REQUIRED);
                 parser.addParam("leaf_ordering", RequestParam.DATA_TYPE_INT, RequestParam.PARAM_TYPE_REQUIRED);
+                parser.addParam("numClusterLabels", RequestParam.DATA_TYPE_INT, RequestParam.PARAM_TYPE_REQUIRED);
+                
                 if (!parser.parse()) {
                     returnMessage(new ServerResponse(0, "Bad param", parser.error_msg), response);
                     return;
@@ -347,7 +355,8 @@ public class GlobalMapConfigServices extends HttpServlet {
                             parser.getInt("linkage_function"), 
                             parser.getInt("distance_function"), 
                             parser.getInt("leaf_ordering"),
-                            parser.getString("dataset")
+                            parser.getString("dataset"),
+                            parser.getInt("numClusterLabels")
                         ));
                         
                         /*
@@ -359,6 +368,7 @@ public class GlobalMapConfigServices extends HttpServlet {
                     analysis.data.selected.recomputeSampleOrdering(analysis);
                     //analysis.global_map_config.setCurrentSampleStart(0);
                 } else if (parser.getInt("type") == ClusteringParams.TYPE_FEATURE_CLUSTERING) {
+                    
                     if (parser.getBool("use_defaults")) {
                         analysis.setColClusteringParams(new ClusteringParams(
                             ClusteringParams.TYPE_FEATURE_CLUSTERING, 
@@ -370,7 +380,8 @@ public class GlobalMapConfigServices extends HttpServlet {
                             parser.getInt("linkage_function"), 
                             parser.getInt("distance_function"), 
                             parser.getInt("leaf_ordering"),
-                            parser.getString("dataset")
+                            parser.getString("dataset"),
+                            parser.getInt("numClusterLabels")
                         ));
                         
                         /*
@@ -497,6 +508,59 @@ public class GlobalMapConfigServices extends HttpServlet {
                 for(String s: t.keySet())
                     Utils.log_info("dataset: " + s + "\tis_linked=" + t.get(s));
                 
+                returnMessage(new ServerResponse(1, "Done", ""), response);
+                
+            } else if(action.equalsIgnoreCase("reset_config")){
+                analysis.global_map_config = new GlobalMapConfig();
+                analysis.setRowClusteringParams(
+                        new ClusteringParams(
+                                ClusteringParams.TYPE_SAMPLE_CLUSTERING, 
+                                analysis.data_selection_state.selected_datasets[0]
+                        )
+                );
+                analysis.setColClusteringParams(
+                        new ClusteringParams(
+                                ClusteringParams.TYPE_FEATURE_CLUSTERING, 
+                                analysis.data_selection_state.selected_datasets[0]
+                        )
+                );
+                analysis.global_map_config.resetSignificanceTestingParameters(
+                        analysis.data_selection_state.selected_datasets, 
+                        analysis.data_selection_state.selected_phenotypes
+                );
+                analysis.global_map_config.setPhenotypeSortingParams(
+                        new PhenotypeSortingParams(analysis.data_selection_state.selected_phenotypes)
+                );
+                analysis.global_map_config.setDefaultDatasetLinking(analysis.data.datasets);
+                
+                ServletContext context = request.getServletContext();
+                ColorPalette gene_group_color_palette = (ColorPalette)context.getAttribute("gene_group_color_palette");
+                analysis.clearCaches();
+            
+                analysis.data.createSelection(
+                        analysis, 
+                        gene_group_color_palette
+                );
+                
+                Map<String, Heatmap> heatmaps = new ListOrderedMap <> ();
+                for (String dataset_name : analysis.data_selection_state.selected_datasets) {
+
+                    Heatmap heatmap = new Heatmap(analysis, dataset_name,
+                                analysis.data.datasets.get(dataset_name).specs,
+                                20, "data_bins", "SEISMIC", -1, 1);
+                    heatmap.genColorData((PyColorMaps) context.getAttribute("colormaps"));
+                    heatmap.assignBinsToRows(analysis.spark_session, analysis.data.selected);
+                    heatmaps.put(dataset_name, heatmap);
+                }
+                analysis.heatmaps = heatmaps;
+                
+                returnMessage(new ServerResponse(1, "Done", ""), response);
+                
+            } else if(action.equalsIgnoreCase("set_show_cluster_labels")){
+                
+                parser.addParam("param_value", RequestParam.DATA_TYPE_BOOLEAN, RequestParam.PARAM_TYPE_REQUIRED);
+                if (!parser.parse()) { returnMessage(new ServerResponse(0, "Bad param", parser.error_msg), response); return; }
+                analysis.global_map_config.setShowClusterLabelsOn(parser.getBool("param_value"));
                 returnMessage(new ServerResponse(1, "Done", ""), response);
                 
             }

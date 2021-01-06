@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import org.cssblab.multislide.utils.Utils;
 
@@ -49,9 +50,10 @@ public class NetworkNeighbor implements Serializable {
     String dataset_name;
     String[] neighbor_entrez_list;
     
-    public NetworkNeighbor(String dataset_name, String query_entrez, String network_type, String[] neighbor_entrez_list) {
+    public NetworkNeighbor(String dataset_name, String query_entrez, String network_type, 
+                           String[] neighbor_entrez_list, HashMap <String, List<String>> linker_entrez_map) {
         this.setDatasetName(dataset_name);
-        this.setQueryEntrez(query_entrez);
+        this.setQueryEntrez(query_entrez, network_type, linker_entrez_map);
         this.setNetworkType(network_type);
         this.setNeighborEntrezList(query_entrez, neighbor_entrez_list);
         this.createNeighborID();
@@ -65,8 +67,17 @@ public class NetworkNeighbor implements Serializable {
         return query_entrez;
     }
 
-    public final void setQueryEntrez(String query_entrez) {
-        this.query_entrez = query_entrez;
+    public final void setQueryEntrez(String query_entrez, String network_type, 
+            HashMap <String, List<String>> linker_entrez_map) {
+        if (network_type.equals(NetworkNeighbor.NETWORK_TYPE_MIRNA_ID)) {
+            if (linker_entrez_map.containsKey(query_entrez)) {
+                this.query_entrez = linker_entrez_map.get(query_entrez).get(0);
+            } else {
+                this.query_entrez = query_entrez;
+            }
+        } else {
+            this.query_entrez = query_entrez;
+        }
     }
 
     public String getNetworkType() {

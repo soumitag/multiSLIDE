@@ -95,11 +95,11 @@ public final class SearchHandler implements Serializable {
             if (query.contains(",")) {
                 String keyword = "none";
                 String search_type = "contains";
-                return searchMultipleInAllDBs(keyword, search_type, query, searcher);   // search multiple comma separated terms in all 11 DBs
+                return searchMultipleInAllDBs(keyword, search_type, query, searcher, has_miRNA_data);   // search multiple comma separated terms in all 11 DBs
             } else {
                 String keyword = "none";
                 String search_type = "contains";
-                return searchSingleInAllDBs(keyword, search_type, query, searcher);     // search a single query term in all 11 DBs
+                return searchSingleInAllDBs(keyword, search_type, query, searcher, has_miRNA_data);     // search a single query term in all 11 DBs
             }
         }
         
@@ -321,12 +321,12 @@ public final class SearchHandler implements Serializable {
                     if (has_miRNA_Data) {
                         ArrayList<PathwayObject> part_mirna_paths = searcher.processmiRNAPathQuery(query, search_type, query_type);
                         for (int x = 0; x < part_mirna_paths.size(); x++) {
-                            current_search_results.add(SearchResultObject.makeSearchResultObject(query, part_mirna_paths.get(x)));
+                            current_search_results.add(SearchResultObject.makeSearchResultObject(query, part_mirna_paths.get(x), true));
                         }
                     }
                     
                     for (int i = 0; i < part_paths.size(); i++) {
-                        current_search_results.add(SearchResultObject.makeSearchResultObject(query, part_paths.get(i)));
+                        current_search_results.add(SearchResultObject.makeSearchResultObject(query, part_paths.get(i), false));
                     }
                 }
 
@@ -338,11 +338,11 @@ public final class SearchHandler implements Serializable {
                     if (has_miRNA_Data) {
                         ArrayList<GoObject> part_mirna_go_terms = searcher.processmiRNAGOQuery(query, search_type, query_type);
                         for (int x = 0; x < part_mirna_go_terms.size(); x++) {
-                            current_search_results.add(SearchResultObject.makeSearchResultObject(query, part_mirna_go_terms.get(x)));
+                            current_search_results.add(SearchResultObject.makeSearchResultObject(query, part_mirna_go_terms.get(x), true));
                         }
                     }
                     for (int i = 0; i < part_go_terms.size(); i++) {
-                        current_search_results.add(SearchResultObject.makeSearchResultObject(query, part_go_terms.get(i)));
+                        current_search_results.add(SearchResultObject.makeSearchResultObject(query, part_go_terms.get(i), false));
                     }
                 }
 
@@ -354,7 +354,7 @@ public final class SearchHandler implements Serializable {
                     String query = st.nextToken();
                     ArrayList<GeneObject> part_genes = searcher.processGeneQuery(query, search_type, query_type);
                     for (int i = 0; i < part_genes.size(); i++) {
-                        current_search_results.add(SearchResultObject.makeSearchResultObject(query, part_genes.get(i)));
+                        current_search_results.add(SearchResultObject.makeSearchResultObject(query, part_genes.get(i), false));
                     }
                 }
 
@@ -365,7 +365,7 @@ public final class SearchHandler implements Serializable {
 
     }
     
-    public static ArrayList <SearchResultObject> searchSingleInAllDBs(String keyword, String search_type, String queryString, Searcher searcher) {
+    public static ArrayList <SearchResultObject> searchSingleInAllDBs(String keyword, String search_type, String queryString, Searcher searcher, boolean has_miRNA_data) {
         
         ArrayList <SearchResultObject> collated_search_results = new ArrayList <SearchResultObject> ();
         List <Future<ArrayList <SearchResultObject>>> futuresList = new ArrayList<>();
@@ -385,6 +385,18 @@ public final class SearchHandler implements Serializable {
                 }
 		collated_search_results.addAll(result_i);
             }
+            
+            if (has_miRNA_data) {
+                ArrayList<PathwayObject> part_mirna_paths = searcher.processmiRNAPathQuery(queryString, search_type, "pathname");
+                for (int x = 0; x < part_mirna_paths.size(); x++) {
+                    collated_search_results.add(SearchResultObject.makeSearchResultObject(queryString, part_mirna_paths.get(x), true));
+                }
+                ArrayList<GoObject> part_mirna_go_terms = searcher.processmiRNAGOQuery(queryString, search_type, "goterm");
+                for (int x = 0; x < part_mirna_go_terms.size(); x++) {
+                    collated_search_results.add(SearchResultObject.makeSearchResultObject(queryString, part_mirna_go_terms.get(x), true));
+                }
+            }
+            
         } catch (Exception err) {
             Utils.log_exception(err, "Execution Exception\n");
         }
@@ -396,12 +408,12 @@ public final class SearchHandler implements Serializable {
         return collated_search_results;
     }
     
-    public static ArrayList <SearchResultObject> searchMultipleInAllDBs(String keyword, String search_type, String query, Searcher searcher) {
+    public static ArrayList <SearchResultObject> searchMultipleInAllDBs(String keyword, String search_type, String query, Searcher searcher, boolean has_miRNA_data) {
         ArrayList <SearchResultObject> collated_search_results = new ArrayList <> ();
         StringTokenizer st = new StringTokenizer(query, ",");
         while(st.hasMoreTokens()){
             ArrayList <SearchResultObject> result_i = null;
-            result_i = searchSingleInAllDBs (keyword, search_type, st.nextToken(), searcher);
+            result_i = searchSingleInAllDBs (keyword, search_type, st.nextToken(), searcher, has_miRNA_data);
             collated_search_results.addAll(result_i);
         }
         return collated_search_results;

@@ -163,7 +163,7 @@ public class FeatureListServices extends HttpServlet {
             try {
                 lists.removeFeatureList(list_name);
                 returnMessage(new ServerResponse(1, "Feature list '" + list_name + "' deleted.", ""), response);
-            } catch (MultiSlideException mse) {
+            } catch (MultiSlideException mse) { 
                 ServerResponse resp = new ServerResponse(0, "Remove feature list FAILED.", mse.getMessage());
                 returnMessage(resp, response);
             }

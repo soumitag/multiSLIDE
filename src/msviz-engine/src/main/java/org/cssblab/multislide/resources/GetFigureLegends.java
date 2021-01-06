@@ -67,6 +67,11 @@ public class GetFigureLegends extends HttpServlet {
                 legend_data.addLegendGroup("Network Neighbors", Ln, LegendData.LEGEND_GROUP_TYPE_NETWORK_NEIGHBOR);
             }
             
+            if (!analysis.data_selection_state.user_defined_between_omics_linkages.isEmpty()) {
+                ArrayList <LegendGroup> Ln = LegendGroup.createInterOmicsConnectionsLegendGroup(analysis);
+                legend_data.addLegendGroup("Inter-omics Connections", Ln, LegendData.LEGEND_GROUP_TYPE_INTER_OMICS_CONNECTION);
+            }
+            
             String json = legend_data.legendDataAsJSON();
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");

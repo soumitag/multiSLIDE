@@ -50,12 +50,17 @@ public class EnrichmentAnalysisResult implements Serializable {
         if (!TYPES.containsKey(type)) {
             throw new MultiSlideException("Unknown type for Enrichment Analysis Result");
         }
-        this.type = type;
+
         this.big_k = big_k;
         this.small_k = small_k;
         this.big_N = big_N;
         this.small_N = small_N;
         this.pathid = pathid;
+        if (type.equals("pathway")) {
+            this.type = "pathid";
+        } else if (type.equals("gene-ontology")) {
+            this.type = "goid";
+        }
         this.pathname = pathname;
         this.p_value = p_value;
     }

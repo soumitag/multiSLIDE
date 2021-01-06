@@ -80,11 +80,13 @@ export class MapContainerComponent implements OnInit {
   isColsPerPageEditable: boolean = false;
   isRowLabelWidthEditable: boolean = false;
   isColHeaderHeightEditable: boolean = false;
+  isNumClustersLabelsEditable: boolean = false;
 
   tempPrevRowsPerPageValue: number;
   tempPrevColsPerPageValue: number;
   tempPrevRowLabelWidthValue: number;
   tempPrevColHeaderHeightValue: number;
+  tempPrevNumClustersLabels: number;
 
   sigtestDialogRef: MatDialogRef<SignificanceTestingComponent>;
   clusteringDialogRef: MatDialogRef<HierarchicalClusteringComponent>;
@@ -273,6 +275,20 @@ export class MapContainerComponent implements OnInit {
     }
   }
 
+  /*
+  toggleNumClustersLabels(n: number) {
+    if (n == 1) {
+      this.isNumClustersLabelsEditable = true;
+      this.tempPrevNumClustersLabels = this.config.numClusterLabels;
+    } else if (n == 0) {
+      this.isNumClustersLabelsEditable = false;
+      if (this.tempPrevNumClustersLabels != this.config.numClusterLabels) {
+        this.setNumClusterLabels(this.tempPrevNumClustersLabels);
+      }
+    }
+  }
+  */
+
   toggleRowLabelWidth(n: number) {
     if (n == 1) {
       this.isRowLabelWidthEditable = true;
@@ -316,10 +332,11 @@ export class MapContainerComponent implements OnInit {
       this.openClusteringDialog(1);
     } else if (this.config.columnOrderingScheme == 2) {
       // hierarchical clustering
-      this.openClusteringDialog(2);
+      //this.openClusteringDialog(2);
+      this.openSignificanceTestingPanel();
     } else if (this.config.columnOrderingScheme == 3) {
       // significance
-      this.openSignificanceTestingPanel();
+      //this.openSignificanceTestingPanel();
     }
   }
 
@@ -417,8 +434,12 @@ export class MapContainerComponent implements OnInit {
       left: '300'
     };
 
+    //console.log('open dataset linking panel')
+    console.log(this.config.dataset_linkings);
     var prev_dataset_linked_vals = new Map();
-    for (let [key, value] of this.config.dataset_linkings) {
+    //for (let [key, value] of this.config.dataset_linkings) {
+    for (var key in this.config.dataset_linkings) {
+      var value = this.config.dataset_linkings[key]
       prev_dataset_linked_vals.set(key, value);
     }
 
@@ -746,6 +767,27 @@ export class MapContainerComponent implements OnInit {
         });
   }
 
+  /*
+  setNumClusterLabels(fallback_value: number) {
+    this.globalMapConfigService.setGlobalMapConfigParam(
+      this.analysis_name, 'set_num_cluster_labels', this.config.numClusterLabels.toString()
+    )
+      .subscribe(
+        data => this.server_response = data,
+        () => console.log("error"),
+        () => {
+          if (this.server_response.status == 1) {
+            //this.getHeatmapLayout();
+            this.getMapContainerLayout();
+            this.load_layout_count++;
+          } else {
+            this.config.numClusterLabels = fallback_value;
+            alert(this.server_response.message + ' ' + this.server_response.detailed_reason);
+          }
+        });
+  }
+  */
+
   setRowClusteringParams(params: ClusteringParams) {
     this.globalMapConfigService.setClusteringParams(
       this.analysis_name, params
@@ -820,6 +862,27 @@ export class MapContainerComponent implements OnInit {
           alert(this.server_response.message + ' ' + this.server_response.detailed_reason);
         }
       });
+  }
+
+  toggleShowClusterLabels(){
+    this.globalMapConfigService.updateGlobalMapConfigParam(
+      this.analysis_name, 'set_show_cluster_labels', this.config.isShowClusterLabelsOn.toString()
+    ).subscribe(
+      data => this.server_response = data,
+      () => console.log("error"),
+      () => {
+        if (this.server_response.status == 1) {
+          //this.getHeatmapLayout();
+          //this.getMapContainerLayout();
+          //this.getGlobalHeatmapData();
+          this.load_count++;
+        } else {
+          // roll (toggle) back
+          this.config.isShowClusterLabelsOn = !this.config.isShowClusterLabelsOn;
+          alert(this.server_response.message + ' ' + this.server_response.detailed_reason);
+        }
+      });
+
   }
 
   toggleDatasetLinking() {

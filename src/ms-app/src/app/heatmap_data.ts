@@ -32,5 +32,10 @@ export class HeatmapData {
   column_headers: string[];
   gene_tags: number[][];
   search_tag_positions: number[][];
-  //is_search_query: number[][];
+  is_search_query: number[][];
+
+  feature_cluster_labels: number[];
+  network_neighborhood_types: string[][];
+  mi_rna_ids: string[];
+  cluster_label_message: string[];
 }

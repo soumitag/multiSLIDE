@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.collections4.map.ListOrderedMap;
 import org.cssblab.multislide.beans.data.BipartiteLinkageGraph;
 import org.cssblab.multislide.beans.data.EnrichmentAnalysisResult;
 import org.cssblab.multislide.beans.data.FunctionalGroupContainer;
@@ -45,7 +46,7 @@ public class DataSelectionState implements Serializable {
     public EnrichmentAnalysisResult[] selected_enriched_groups;
     public FunctionalGroupContainer[] selected_functional_groups;
     
-    public HashMap <String, NetworkNeighbor> network_neighbors;
+    public ListOrderedMap <String, NetworkNeighbor> network_neighbors;
     public HashMap <String, BipartiteLinkageGraph> user_defined_between_omics_linkages;
     
     // add genes panel state (except selection): search results, enrichment params
@@ -64,7 +65,7 @@ public class DataSelectionState implements Serializable {
         this.selected_phenotypes = new String[0];
         this.selected_searches = new SearchResultSummary[0];
         this.selected_enriched_groups = new EnrichmentAnalysisResult[0];
-        this.network_neighbors = new HashMap <> ();
+        this.network_neighbors = new ListOrderedMap <> ();
         this.history = new HashMap <> ();
         this.current_search_results = new ArrayList <> ();
         this.enrichment_analysis_params = new EnrichmentAnalysisParams("", "");
@@ -88,17 +89,17 @@ public class DataSelectionState implements Serializable {
             Utils.log_info("datasets: " + s);
     }
 
-    public void setSelectedSearchResults(AnalysisContainer analysis, String[] search_ids) throws MultiSlideException {
+    public void setSelectedSearchResults(AnalysisContainer analysis, String[] search_ids, boolean has_miRNA_data) throws MultiSlideException {
         
         this.selected_searches = new SearchResultSummary[search_ids.length];
         
         int count = 0;
         for (String _id: search_ids) {
-            String[] parts = _id.split("_", 2);
+            String[] parts = _id.split("_", 0);
             byte type = Byte.parseByte(parts[0]);
             String grp_id = parts[1];
             SearchResultObject ob = this.recreateSearchResultObject(
-                    analysis.searcher, grp_id, SearchResultSummary.mapGeneGroupCodeToType(type)
+                    analysis.searcher, grp_id, SearchResultSummary.mapGeneGroupCodeToType(type), has_miRNA_data
             );
             ob.computeNumGeneIntersections(analysis.data);
             this.selected_searches[count++] = ob.getSummary();
@@ -216,7 +217,7 @@ public class DataSelectionState implements Serializable {
     }
     
     public void clearNetworkNeighbors() {
-        this.network_neighbors = new HashMap <String, NetworkNeighbor> ();
+        this.network_neighbors = new ListOrderedMap <> ();
     }
     
     public void setDefaultDatasetAndPhenotypes(String[] datasets, String[] phenotypes) {
@@ -333,27 +334,42 @@ public class DataSelectionState implements Serializable {
         group_id can be entrez, pathid or goid
         returns the group name (display name)
     */
-    private SearchResultObject recreateSearchResultObject(Searcher searcher, String group_id, String queryType) throws MultiSlideException{
+    private SearchResultObject recreateSearchResultObject(Searcher searcher, String group_id, 
+            String queryType, boolean has_miRNA_Data) throws MultiSlideException{
         
         if (queryType.equals("entrez") || queryType.equals("gene_group_entrez")) {
             ArrayList<GeneObject> genes = searcher.processGeneQuery(group_id, "exact", "entrez");            
             for (int i = 0; i < genes.size(); i++) {
                 GeneObject gene = genes.get(i);
-                return SearchResultObject.makeSearchResultObject(queryType, gene);
+                return SearchResultObject.makeSearchResultObject(queryType, gene, false);
             }
             return null;
         } else if (queryType.equals("pathid")) {
             ArrayList<PathwayObject> part_paths = searcher.processPathQuery(group_id, "exact", queryType);
             for (int i = 0; i < part_paths.size(); i++) {
                 PathwayObject path = part_paths.get(i);
-                return SearchResultObject.makeSearchResultObject(queryType, path);
+                return SearchResultObject.makeSearchResultObject(queryType, path, false);
+            }
+            if (has_miRNA_Data) {
+                ArrayList<PathwayObject> part_mirna_paths = searcher.processmiRNAPathQuery(group_id, "exact", queryType);
+                for (int i = 0; i < part_mirna_paths.size(); i++) {
+                    PathwayObject path = part_mirna_paths.get(i);
+                    return SearchResultObject.makeSearchResultObject(queryType, path, true);
+                }
             }
             return null;
         } else if (queryType.equals("goid")) {
             ArrayList<GoObject> part_go_terms = searcher.processGOQuery(group_id, "exact", queryType);
             for (int i = 0; i < part_go_terms.size(); i++) {
                 GoObject go = part_go_terms.get(i);
-                return SearchResultObject.makeSearchResultObject(queryType, go);
+                return SearchResultObject.makeSearchResultObject(queryType, go, false);
+            }
+            if (has_miRNA_Data) {
+                ArrayList<GoObject> part_mirna_go_terms = searcher.processmiRNAGOQuery(group_id, "exact", queryType);
+                for (int i = 0; i < part_mirna_go_terms.size(); i++) {
+                    GoObject go = part_mirna_go_terms.get(i);
+                    return SearchResultObject.makeSearchResultObject(queryType, go, true);
+                }
             }
             return null;
         } else {

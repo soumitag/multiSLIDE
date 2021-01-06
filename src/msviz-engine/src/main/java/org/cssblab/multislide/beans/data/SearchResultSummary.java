@@ -33,6 +33,7 @@ public class SearchResultSummary implements Serializable {
     public int background_count;
     public int intersection_count;
     public int[] intersection_counts_per_dataset;
+    public boolean is_mirna;
     
     public SearchResultSummary () { }
     
@@ -41,7 +42,8 @@ public class SearchResultSummary implements Serializable {
             String display_tag, 
             String _id, 
             int background_count, 
-            int[] intersection_counts_per_dataset
+            int[] intersection_counts_per_dataset,
+            boolean is_mirna
     ) {
         this.type = summary_type;
         this.display_tag = display_tag;
@@ -50,6 +52,7 @@ public class SearchResultSummary implements Serializable {
         this.background_count = background_count;
         this.intersection_counts_per_dataset = intersection_counts_per_dataset;
         this.intersection_count = Utils.arrayMax(intersection_counts_per_dataset);
+        this.is_mirna = is_mirna;
     }
     
     public void createHTMLDisplayTag(String query) {
@@ -72,6 +75,9 @@ public class SearchResultSummary implements Serializable {
             this.html_display_tag_pre += " [" + this.background_count + "," + this.intersection_count + "]";
             this.html_display_tag_mid = "";
             this.html_display_tag_post = "";
+        }
+        if (this.is_mirna) {
+            this.html_display_tag_post += " (miRNA)";
         }
     }
     

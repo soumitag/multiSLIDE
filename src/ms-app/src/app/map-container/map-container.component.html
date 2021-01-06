@@ -71,7 +71,7 @@
 
     </div>
 
-    <div class="control_ribbon" style="position: absolute; top: 45px; width: 550px"
+    <div class="control_ribbon" style="position: absolute; top: 45px; width: 510px"
       [style.left]="control_ribbon_left + 135 + 220 + 610 + 'px'">
       <div class="map_container_controls">
         <label>Display Genes Along</label><br>
@@ -136,7 +136,13 @@
           </div>
         </ng-template>
       </div>
-
+    </div>
+    <div class="control_ribbon" style="position: absolute; top: 45px; width: 210px" [style.left]="control_ribbon_left + 135 + 220 + 610 + 520 + 'px'" >
+      <div class="map_container_controls_end">
+        <label for="showClusterLabels">Show Cluster Labels</label>&nbsp;
+        <mat-slide-toggle class="" color="primary" [(ngModel)]="config.isShowClusterLabelsOn" [disabled]="config.columnOrderingScheme!=1"
+          (change)="toggleShowClusterLabels()" ></mat-slide-toggle>
+      </div>
     </div>
 
   </ng-container>

@@ -6,6 +6,7 @@
 package org.cssblab.multislide.structure.data;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,6 +46,7 @@ import org.cssblab.multislide.structure.NetworkNeighbor;
 import org.cssblab.multislide.structure.data.table.Table;
 import org.cssblab.multislide.utils.CollectionUtils;
 import org.cssblab.multislide.utils.FormElementMapper;
+import org.cssblab.multislide.utils.Utils;
 
 /**
  *
@@ -70,7 +72,7 @@ public class Data implements Serializable {
             ColorPalette categorical_palette, 
             ColorPalette continuous_palette,
             Searcher searcher
-    ) throws MultiSlideException {
+    ) throws MultiSlideException, DataParsingException, IOException {
         
         this.clinical_info = new ClinicalInformation(categorical_palette, continuous_palette);
         for(DatasetSpecs spec: dataset_specs_map) {
@@ -143,7 +145,7 @@ public class Data implements Serializable {
         /*
         Consolidate user selection from "Add Network Neighbors"
         */
-        HashMap <String, GeneGroup> nn_gene_groups = new HashMap <>();
+        ListOrderedMap <String, GeneGroup> nn_gene_groups = new ListOrderedMap <>();
         Table b = getUserNetworkNeighborSelection(analysis, nn_gene_groups);
         //nn_entrez_dataset.show();
         
@@ -189,29 +191,57 @@ public class Data implements Serializable {
         */
         if (analysis.data_selection_state.add_genes_source_type == DataSelectionState.ADD_GENES_SOURCE_TYPE_SEARCH) {
             
-            List <String[]> column_names_dtypes = new ArrayList <> ();
-            
+            /*
+             use hashmap first to ensure there aren't multiple instances of "gene_group_entrez", 
+             as all individual genes have group_id "gene_group_entrez"
+            */
+            HashMap <String, Boolean> cnames = new HashMap <> ();
             for (SearchResultSummary search : analysis.data_selection_state.selected_searches) {
                 
                 GeneGroup gene_group = new GeneGroup(search.mapGeneGroupCodeToType(), search._id, search.display_tag);
-                column_names_dtypes.add(new String[]{gene_group.getID(), Table.DTYPE_INT});
+                // column_names_dtypes.add(new String[]{gene_group.getID(), Table.DTYPE_INT});
+                cnames.put(gene_group.getID(), Boolean.TRUE);
+            }
+            
+            List <String[]> column_names_dtypes = new ArrayList <> ();
+            for (String id: cnames.keySet()) {
+                column_names_dtypes.add(new String[]{id, Table.DTYPE_INT});
             }
             
             Table table = new Table(column_names_dtypes, "_entrez");
             
             int i = 0;
+            List <String> miRNA_Datasets = get_miRNA_Datasets();
             for (SearchResultSummary search : analysis.data_selection_state.selected_searches) {
                 
-                List <String> entrezs = getGroupEntrez(analysis.searcher, search._id, search.mapGeneGroupCodeToType());
                 GeneGroup gene_group = new GeneGroup(search.mapGeneGroupCodeToType(), search._id, search.display_tag);
                 gene_groups.put(gene_group.getID(), gene_group);
                 
+                List <String> entrezs = getGroupEntrez(analysis.searcher, search._id, search.mapGeneGroupCodeToType());
                 for (String entrez : entrezs) {
                     table.set(gene_group.getID(), entrez, 1);
                 }
+                
+                /*
+                    Speacial handling of miRNA data
+                */
+                if (miRNA_Datasets.size() > 0) {
+                    List <String> miRNA_ids = get_miRNA_GroupIDs(analysis.searcher, search._id, search.mapGeneGroupCodeToType());
+                    for (String mi_RNA_id : miRNA_ids) {
+                        String mirnaid = mi_RNA_id.toLowerCase();
+                        for (String dataset_name: miRNA_Datasets) {
+                            if (this.datasets.get(dataset_name).linker_entrez_map.containsKey(mirnaid)) {
+                                List <String> entrez_list = this.datasets.get(dataset_name).linker_entrez_map.get(mirnaid);
+                                for (String e : entrez_list)
+                                    table.set(gene_group.getID(), e, 1);
+                            }
+                        }
+                    }
+                }
+                
                 i++;
             }
-            
+
             /*
             List<StructField> fields = new ArrayList<>();
             fields.add(DataTypes.createStructField("_entrez", DataTypes.StringType, false));
@@ -355,7 +385,7 @@ public class Data implements Serializable {
     
     private Table getUserNetworkNeighborSelection(
             AnalysisContainer analysis, 
-            HashMap <String, GeneGroup> gene_groups
+            ListOrderedMap <String, GeneGroup> gene_groups
     ) throws MultiSlideException, DataParsingException {
         
         /*
@@ -476,6 +506,37 @@ public class Data implements Serializable {
         }
         
         return entrez_list;
+    }
+    
+    private List <String> get_miRNA_GroupIDs(Searcher searcher, String group_id, String queryType) {
+        
+        List <String> entrez_list = new ArrayList <> ();
+        
+        if (queryType.equals("pathid")) {
+            ArrayList<PathwayObject> part_paths = searcher.processmiRNAPathQuery(group_id, "exact", queryType);
+            for (int i = 0; i < part_paths.size(); i++) {
+                PathwayObject path = part_paths.get(i);
+                entrez_list.addAll(path.entrez_ids);
+            }
+        } else if (queryType.equals("goid")) {
+            ArrayList<GoObject> part_go_terms = searcher.processmiRNAGOQuery(group_id, "exact", queryType);
+            for (int i = 0; i < part_go_terms.size(); i++) {
+                GoObject go = part_go_terms.get(i);
+                entrez_list.addAll(go.entrez_ids);
+            }
+        }
+        
+        return entrez_list;
+    }
+    
+    private List<String> get_miRNA_Datasets() {
+        List <String> d = new ArrayList <> ();
+        for (DataFrame df : this.datasets.valueList()) {
+            if (df.specs.has_mi_rna) {
+                d.add(df.name);
+            }
+        }
+        return d;
     }
     
     /*

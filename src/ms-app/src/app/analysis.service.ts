@@ -11,7 +11,8 @@ export class AnalysisService {
 
 	private baseUrl = LocalSettings.MSVIZ_ENGINE_URL + "/AnalysisReInitializer";  // web api URL
 	private demoUrl = LocalSettings.MSVIZ_ENGINE_URL + "/LoadDemo"; 
-	private serializeUrl = LocalSettings.MSVIZ_ENGINE_URL + "/SerializeAnalysis"; 
+	private serializeUrl = LocalSettings.MSVIZ_ENGINE_URL + "/SerializeAnalysis";
+	private createSessionUrl = LocalSettings.MSVIZ_ENGINE_URL + "/CreateSession";
 	
 	constructor(private httpClient: HttpClient) { }
 
@@ -102,6 +103,21 @@ export class AnalysisService {
 		});
 	}
 
+	serializeView(analysis_name: string) {
+		return this.httpClient.get ( this.serializeUrl, {
+			params: { 
+				'analysis_name': analysis_name,
+				'action': 'generate_view'
+			},
+			withCredentials: true,
+		})
+		.map(res => <ServerResponseData> res)
+		.catch(error => {
+			console.log(error);
+			return Observable.throw(error);
+		});
+	}
+
 	downloadWorkspace(analysis_name: string, filename: string) {
 		return this.httpClient.get ( this.serializeUrl, {
 			params: { 
@@ -133,4 +149,19 @@ export class AnalysisService {
 			return Observable.throw(error);
 		});
 	}
+
+	getActiveAnalyses() {
+		return this.httpClient.get(this.createSessionUrl, {
+		  params: {
+			'action': 'get_active_analyses'
+		  },
+		  withCredentials: true
+		  })
+			.map(res => <string[][]>res)
+			.catch(error => {
+			  console.log(error);
+			  return Observable.throw(error);
+			});
+	  }
+	
 }

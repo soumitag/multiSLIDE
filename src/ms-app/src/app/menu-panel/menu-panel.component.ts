@@ -11,6 +11,8 @@ import { Router } from '@angular/router';
 import { SaveWorkspaceComponent } from '../save-workspace/save-workspace.component'
 import { CloseAnalysisComponent } from '../close-analysis/close-analysis.component'
 import { LocalSettings } from '../local-settings'
+import { GlobalMapConfigService } from '../global-map-config.service';
+import { ListPanelComponent } from '../list-panel/list-panel.component';
 
 @Component({
   selector: 'app-menu-panel',
@@ -23,6 +25,7 @@ export class MenuPanelComponent implements OnInit {
   @Output() notifySelectionPanelToggle = new EventEmitter();
   @Output() onListChange = new EventEmitter<string>();
   @Output() onConnectionChange = new EventEmitter<string>();
+  @Output() doresetConfig = new EventEmitter<string>();
   /*
   @Output() clusteringParamsChange = new EventEmitter<string>();
   */
@@ -30,6 +33,7 @@ export class MenuPanelComponent implements OnInit {
   server_response: ServerResponseData;
   createListDialogRef: MatDialogRef<CreateListComponent>;
   uploadListDialogRef: MatDialogRef<UploadListComponent>;
+  viewListDialogRef: MatDialogRef<ListPanelComponent>;
   uploadConnectionsDialogRef: MatDialogRef<UploadConnectionComponent>;
   //clusteringDialogRef: MatDialogRef<ClusteringDialogComponent>;
   clusteringDialogRef: MatDialogRef<HierarchicalClusteringComponent>;
@@ -38,6 +42,7 @@ export class MenuPanelComponent implements OnInit {
     private dialog: MatDialog, 
     private listService: ListService, 
     private analysisService: AnalysisService, 
+    private configService: GlobalMapConfigService, 
     private router: Router) { }
 
   ngOnInit() {
@@ -51,8 +56,39 @@ export class MenuPanelComponent implements OnInit {
     this.notifySelectionPanelToggle.emit();
   }
 
+  resetDefault(){
+    this.configService.resetDefaults(this.analysis_name)
+        .subscribe(
+            data => this.handleResetResponse(data), 
+            () => console.log("observable complete"));
+  }
+
+  handleResetResponse(server_response: ServerResponseData) {
+    if (server_response.status == 1) {
+      this.doresetConfig.emit();
+    } else {
+      alert(server_response.message + ". " + server_response.detailed_reason);
+    }
+  }
+
   showHomePage() {
     window.open(LocalSettings.HOME_URL, '_blank');
+  }
+
+  showManual() {
+    window.open("https://github.com/soumitag/multiSLIDE/blob/master/multiSLIDE_User_Manual.pdf", '_blank');
+  }
+
+  showLocalInstallation() {
+    window.open("https://github.com/soumitag/multiSLIDE/blob/master/multiSLIDE_Installation_and_System_requirements.pdf", '_blank');
+  }
+
+  showAbout() {
+    window.open("https://github.com/soumitag/multiSLIDE", '_blank');
+  }
+
+  showReportIssues(){
+    window.open("https://github.com/soumitag/multiSLIDE/issues", '_blank');
   }
 
   openCreateListDialog() {
@@ -106,6 +142,21 @@ export class MenuPanelComponent implements OnInit {
     }
   }
 
+  openViewListDialog() {
+		const dialogConfig = new MatDialogConfig();
+		dialogConfig.height = '800';
+		dialogConfig.width = '300';
+		dialogConfig.position = {
+			top: '300',
+			left: '300'
+    };
+    dialogConfig.data = {
+			analysis_name: this.analysis_name
+		};
+    this.viewListDialogRef = this.dialog.open(ListPanelComponent, dialogConfig);
+    
+  }
+
   notifyResponse() {
 		if(this.server_response.status == 1) {
       alert(this.server_response.message);
@@ -138,7 +189,7 @@ export class MenuPanelComponent implements OnInit {
     }
   }
 
-  saveWorkspace() {
+  saveWorkspace(type: string) {
     const dialogConfig = new MatDialogConfig();
 		dialogConfig.height = '600';
 		dialogConfig.width = '900';
@@ -147,7 +198,8 @@ export class MenuPanelComponent implements OnInit {
 			left: '100'
 		};
 		dialogConfig.data = {
-			analysis_name: this.analysis_name,
+      analysis_name: this.analysis_name,
+      type: type
 		};
 		var saveWorkspaceDialog = this.dialog.open(SaveWorkspaceComponent, dialogConfig);
 

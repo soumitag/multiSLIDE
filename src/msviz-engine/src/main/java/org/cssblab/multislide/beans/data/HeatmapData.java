@@ -8,6 +8,7 @@ package org.cssblab.multislide.beans.data;
 import com.google.gson.Gson;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import org.cssblab.multislide.graphics.Heatmap;
 import org.cssblab.multislide.structure.AnalysisContainer;
@@ -35,7 +36,11 @@ public class HeatmapData implements Serializable {
     public double hist_frequencies[];
     public boolean[] search_tag_origin_map_ind;
     public List <List <Integer>> search_tag_positions;
-    //public ArrayList <ArrayList <Integer>> is_search_query;
+    public ArrayList <ArrayList <Integer>> is_search_query;
+    public List <Integer> feature_cluster_labels;
+    public List <String[]> network_neighborhood_types;
+    public String mi_rna_ids[];
+    public String[] cluster_label_message;
     
     /*
     public int rowsPerPageDisplayed;
@@ -102,14 +107,29 @@ public class HeatmapData implements Serializable {
             }
         }
         
-        search_tag_positions = new ArrayList <> ();
-        //is_search_query = new ArrayList <> ();
+        List <List <Integer>> temp = analysis.data.selected.getSearchTags(dataset_name, analysis.global_map_config);
         
-        this.search_tag_positions = analysis.data.selected.getSearchTags(dataset_name, analysis.global_map_config);
+        search_tag_positions = new ArrayList <> ();
+        is_search_query = new ArrayList <> ();
+        for (int i=0; i<temp.size(); i++) {
+            ArrayList <Integer> search_tag_positions_i = new ArrayList <> ();
+            ArrayList <Integer> is_search_query_i = new ArrayList <> ();
+            for (int j=0; j<temp.get(i).size(); j++) {
+                search_tag_positions_i.add(Math.abs(temp.get(i).get(j))-1);
+                if (temp.get(i).get(j) < 0) {
+                    is_search_query_i.add(1);
+                } else {
+                    is_search_query_i.add(0);
+                }
+            }
+            this.is_search_query.add(is_search_query_i);
+            this.search_tag_positions.add(search_tag_positions_i);
+        }
+        
         /*
-        Temporarily create an indicator variable wil all 0s
+        Temporarily create an indicator variable , will be all 0s
         till a better strategy is designed to differentiate query vs neighbors in the same position list
-        */
+        
         for (int i=0; i<this.search_tag_positions.size(); i++) {
             ArrayList <Integer> is_search_query_i = new ArrayList <> ();
             for (int j=0; j<this.search_tag_positions.get(i).size(); j++) {
@@ -117,6 +137,73 @@ public class HeatmapData implements Serializable {
             }
             //this.is_search_query.add(is_search_query_i);
         }
+        */
+        
+        this.feature_cluster_labels = new ArrayList <> (feature_ids.size());
+        for (List<String> feature_id : feature_ids) {
+            this.feature_cluster_labels.add(0);
+        }
+        
+        
+        HashMap <String, Boolean> dataset_linkages = analysis.global_map_config.getDatasetLinkages();
+        boolean is_linked = dataset_linkages.get(dataset_name);
+        if (is_linked) {
+            if (dataset_name.equals(analysis.global_map_config.col_clustering_params.getDatasetName())) {
+                is_linked = false;
+            }
+        }
+        
+        if (analysis.global_map_config.columnOrderingScheme == GlobalMapConfig.HIERARCHICAL_COLUMN_ORDERING && 
+                analysis.global_map_config.isShowClusterLabelsOn) {
+            
+            if (!is_linked && analysis.data.selected.hasClusterLabels(dataset_name)) {
+
+                if (analysis.data.selected.hasWithinLinkerOrdering(dataset_name)) {
+                    
+                    this.cluster_label_message = new String[]{"*Cluster labels are", "not displayed when", "linkers are nested"};
+                } else {
+                
+                    List <Integer> fc_labels = analysis.data.selected.getClusterLabels(dataset_name, analysis.global_map_config);
+                    this.feature_cluster_labels = new ArrayList <> (feature_ids.size());
+                    fc_labels.forEach((label) -> {
+                        this.feature_cluster_labels.add(label%2);
+                    });
+                    this.cluster_label_message = new String[0];
+                }
+
+            } else {
+                this.cluster_label_message = new String[]{"*Cluster labels are", "not displayed for", "linked datasets"};
+            }
+        } else {
+            this.cluster_label_message = new String[0];
+        }
+        
+        network_neighborhood_types = new ArrayList <> ();
+        if (analysis.data.datasets.get(dataset_name).specs.has_mi_rna) {
+            
+            network_neighborhood_types.add(new String[]{"miRNA Targets", "1"});
+            
+            List <List<String>> mirna_ids = selected_data.getFeatureIDs(
+                dataset_name, analysis.global_map_config, new String[]{analysis.data.datasets.get(dataset_name).specs.getMIRNAColname()});
+            
+            mi_rna_ids = new String[mirna_ids.size()];
+            for (int i=0; i<mirna_ids.size(); i++) {
+                mi_rna_ids[i] = mirna_ids.get(i).get(0);
+            }
+            
+        } else if (analysis.data.datasets.get(dataset_name).specs.has_linker) {
+            
+            network_neighborhood_types.add(new String[]{"Protein-Protein Interaction", "0"});
+            network_neighborhood_types.add(new String[]{"Transcription Factor Targets", "2"});
+        }
+        
+        /*
+        this.feature_cluster_labels = new int[feature_ids.size()];
+        for (int i=0; i<this.feature_cluster_labels.length; i++) {
+            int r = (int)Math.floor(i/5);
+            this.feature_cluster_labels[i] = r%2;
+        }
+        */
         
         Utils.log_info("HeatmapData time to 3 " + (System.nanoTime() - startTime)/1000000 + " milliseconds");
     }

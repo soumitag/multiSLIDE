@@ -3,6 +3,8 @@ package org.cssblab.multislide.resources;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -13,6 +15,7 @@ import org.cssblab.multislide.beans.data.ServerResponse;
 import org.cssblab.multislide.datahandling.DataParser;
 import org.cssblab.multislide.datahandling.DataParsingException;
 import org.cssblab.multislide.datahandling.RequestParam;
+import org.cssblab.multislide.structure.AnalysisContainer;
 import org.cssblab.multislide.utils.SessionManager;
 
 /**
@@ -35,64 +38,109 @@ public class CreateSession extends HttpServlet {
         
         try {
             
+            String[] actions = new String[]{
+                "create_session",
+                "get_active_analyses"
+            };
+            
             DataParser parser = new DataParser(request);
-            parser.addParam("analysis_name", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_REQUIRED);
+            parser.addParam("action", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_REQUIRED, actions);
+            
             if (!parser.parse()) {
-                returnMessage(new ServerResponse(0, "Bad param", parser.error_msg), response);
+                returnMessage(new ServerResponse(0, "Unsupported action", parser.error_msg), response);
                 return;
             }
-            String analysis_name = parser.getString("analysis_name");
+            
+            String action = parser.getString("action");
+            if(action.equalsIgnoreCase("create_session")) {
+            
+                parser.addParam("analysis_name", RequestParam.DATA_TYPE_STRING, RequestParam.PARAM_TYPE_REQUIRED);
+                if (!parser.parse()) {
+                    returnMessage(new ServerResponse(0, "Bad param", parser.error_msg), response);
+                    return;
+                }
+                String analysis_name = parser.getString("analysis_name");
 
-            // get installation directory
-            ServletContext context = request.getServletContext();
-            String installPath = (String)context.getAttribute("install_path");
+                // get installation directory
+                ServletContext context = request.getServletContext();
+                String installPath = (String)context.getAttribute("install_path");
 
-            // get the current session's id
-            String session_id;
-            HttpSession session = request.getSession(true);
-            // check if a session already exists
-            if (request.getSession(false) == null) {
-                // if not, create new session
-                session = request.getSession(true);
-                session_id = session.getId();
-            } else {
-                // if it does, check if an analysis of same name exists in the session
-                if (session.getAttribute(analysis_name) == null) {
-                    // if not, create required temp folders for this analysis
+                // get the current session's id
+                String session_id;
+                HttpSession session = request.getSession(true);
+                // check if a session already exists
+                if (request.getSession(false) == null) {
+                    // if not, create new session
+                    session = request.getSession(true);
                     session_id = session.getId();
                 } else {
-                    // if it does, send back to previous page with error message
-                    //return failure
-                    String detailed_reason = "An analysis with the name " + analysis_name + " already exists";
-                    ServerResponse resp = new ServerResponse(0, "Analysis exists", detailed_reason);
+                    // if it does, check if an analysis of same name exists in the session
+                    if (session.getAttribute(analysis_name) == null) {
+                        // if not, create required temp folders for this analysis
+                        session_id = session.getId();
+                    } else {
+                        // if it does, send back to previous page with error message
+                        //return failure
+                        String detailed_reason = "An analysis with the name " + analysis_name + " already exists";
+                        ServerResponse resp = new ServerResponse(0, "Analysis exists", detailed_reason);
+                        returnMessage(resp, response);
+                        return;
+                    }
+
+                }
+
+                // create session directory
+                SessionManager.createSessionDir(installPath, session_id);
+
+                // set base url
+                String url = request.getRequestURL().toString();
+                String base_url = url.substring(0, url.length() - request.getRequestURI().length()) + request.getContextPath() + "/";
+                session.setAttribute("base_url", base_url);
+
+                String detailed_reason = "Analysis with the name " + analysis_name + " created";
+                ServerResponse resp = new ServerResponse(1, "Analysis created", detailed_reason);
+                returnMessage(resp, response);
+            
+            }  else if(action.equalsIgnoreCase("get_active_analyses")) {
+                
+                HttpSession session = request.getSession(false);
+                if (session == null) {
+                    ServerResponse resp = new ServerResponse(0, "Session not found", "Possibly due to time-out");
                     returnMessage(resp, response);
                     return;
                 }
-
+                
+                ArrayList <String[]> list = new ArrayList <> ();
+                Enumeration keys = session.getAttributeNames();                
+                while (keys.hasMoreElements()) {
+                    String key = (String)keys.nextElement();
+                    Object obj = session.getAttribute(key);
+                    if (obj instanceof AnalysisContainer) {
+                        AnalysisContainer ac = (AnalysisContainer)obj;
+                        list.add(new String[]{ac.analysis_name, key});
+                    }
+                }
+                
+                String json = new Gson().toJson(list);
+                sendData(response, json);
             }
-
-            // create session directory
-            SessionManager.createSessionDir(installPath, session_id);
-
-            // set base url
-            String url = request.getRequestURL().toString();
-            String base_url = url.substring(0, url.length() - request.getRequestURI().length()) + request.getContextPath() + "/";
-            session.setAttribute("base_url", base_url);
-            
-            String detailed_reason = "Analysis with the name " + analysis_name + " created";
-            ServerResponse resp = new ServerResponse(1, "Analysis created", detailed_reason);
-            returnMessage(resp, response);
         
         } catch (DataParsingException dpe) {
-            returnMessage(new ServerResponse(0, "A data parsing exception occured when creating session", dpe.getMessage()), response);
+            returnMessage(new ServerResponse(0, "A data parsing exception occured", dpe.getMessage()), response);
         } catch (Exception e) {
-            returnMessage(new ServerResponse(0, "A unknown exception occured when creating session", e.getMessage()), response);
+            returnMessage(new ServerResponse(0, "A unknown exception occured", e.getMessage()), response);
         }
 
     }
     
     protected void returnMessage(ServerResponse resp, HttpServletResponse response) throws IOException {
         String json = new Gson().toJson(resp);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(json);
+    }
+    
+    protected void sendData(HttpServletResponse response, String json) throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(json);

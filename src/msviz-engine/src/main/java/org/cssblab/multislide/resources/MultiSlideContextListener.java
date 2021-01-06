@@ -43,6 +43,7 @@ public class MultiSlideContextListener implements ServletContextListener {
         // set install path
         Map <String, String> env = System.getenv();
         String install_path = env.get("MULTISLIDE_HOME");
+        //String install_path = "D:\\multiSLIDE";
         
         ServletContext context = event.getServletContext();
         context.setAttribute("install_path", install_path);

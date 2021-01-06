@@ -298,7 +298,7 @@ public class Searcher implements Serializable {
             } else {
                 result = new GeneObject(((String) aliases.get(0).get(DBElementName)), key, gene_query_subtype);
             }
-            db_map.add(SearchResultObject.makeSearchResultObject(query_string, result));
+            db_map.add(SearchResultObject.makeSearchResultObject(query_string, result, false));
         }   
         return db_map;
     }
@@ -312,7 +312,7 @@ public class Searcher implements Serializable {
             List<BasicDBObject> aliases = (List<BasicDBObject>) match.get("genes");
             PathwayObject result = new PathwayObject(pathway, pathid, "", pathway_search_subtype);
             result.nGenes = aliases.size();
-            db_map.add(SearchResultObject.makeSearchResultObject(query_string, result));
+            db_map.add(SearchResultObject.makeSearchResultObject(query_string, result, false));
         }
         return db_map;
     }
@@ -327,7 +327,7 @@ public class Searcher implements Serializable {
             List<BasicDBObject> aliases = (List<BasicDBObject>) match.get("genes");
             GoObject result = new GoObject(id, go, "", term, go_search_subtype);
             result.nGenes = aliases.size();
-            db_map.add(SearchResultObject.makeSearchResultObject(query_string, result));
+            db_map.add(SearchResultObject.makeSearchResultObject(query_string, result, false));
         }
         return db_map;
     }
@@ -1012,4 +1012,5 @@ public class Searcher implements Serializable {
         
         return db_entrezs;
     }
+    
 }

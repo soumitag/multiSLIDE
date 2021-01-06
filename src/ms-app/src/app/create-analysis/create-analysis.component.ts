@@ -83,6 +83,7 @@ export class CreateAnalysisComponent implements OnInit {
   }
 
   handleFileUploadSuccess() {
+    this.serverResponseOnFileAction = "File has been uploaded."
     this.getDatasetSpecs();
   }
 
@@ -232,21 +233,14 @@ export class CreateAnalysisComponent implements OnInit {
       // All are currently closed - User Asked to Open One
       this.previewTouched = true
       this.preview_curr_id = id
-      //document.getElementById("btn-"+id).innerHTML = "Close Preview"
     } else {
       if(this.preview_curr_id != id) {
         console.log("In case 2")
-        // preview_curr_id is Open - User Asked to Open a different One (id)
-        //document.getElementById("btn-"+this.preview_curr_id).innerHTML = "Preview"
-        //document.getElementById("btn-"+id).innerHTML = "Close Preview"
         this.preview_curr_id = id
       } else {
         console.log("In case 3")
-        // preview_curr_id is Open - User Asked to close it
         this.preview_curr_id = -1
-        //document.getElementById("btn-"+id).innerHTML = "Preview"
         this.previewTouched = false
-        //this.showClosedBook = true;
       }
     }
   }  

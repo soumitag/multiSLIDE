@@ -40,6 +40,7 @@ public class GlobalMapConfig implements Serializable {
     public int gridLayout;
     public double colHeaderHeight;
     public double rowLabelWidth;
+    //public double numClusterLabels;
     /*
     public int userSpecifiedRowsPerPage;
     public int userSpecifiedColsPerPage;
@@ -65,12 +66,16 @@ public class GlobalMapConfig implements Serializable {
     private int visualization_type;
     private String[] row_identifiers;
     
+    public boolean isShowClusterLabelsOn;
+    
     public GlobalMapConfig() throws MultiSlideException {
         this.mapOrientation = GlobalMapConfig.MAP_ORIENTATION_GENES_ALONG_X;
         this.mapResolution = "M";
         this.gridLayout = -1;
         this.rowLabelWidth = 100;
         this.colHeaderHeight = 100;
+        
+        
         /*
         this.userSpecifiedRowsPerPage = GlobalMapConfig.DEFAULT_ROWS_PER_PAGE;
         this.userSpecifiedColsPerPage = GlobalMapConfig.DEFAULT_COLS_PER_PAGE;
@@ -96,6 +101,9 @@ public class GlobalMapConfig implements Serializable {
         
         this.isDatasetLinkingOn = false;
         this.dataset_linkings = new HashMap<>();
+        
+        //this.isShowClusterLabelsOn = false;
+        //this.numClusterLabels = 5;
     }
     
     public String makeDescString(int nFeatures, int nSamples) {
@@ -153,6 +161,7 @@ public class GlobalMapConfig implements Serializable {
         this.isDatasetLinkingOn = isDatasetLinkingOn;
     }
     
+    
     public HashMap <String, Boolean> getDatasetLinkages() {
         
         HashMap <String, Boolean> are_linked;
@@ -168,7 +177,6 @@ public class GlobalMapConfig implements Serializable {
             for (String name: dataset_linkings.keySet())
                 are_linked.put(name, Boolean.FALSE);
         }
-        
         
         Utils.log_info("isDatasetLinkingOn: " + isDatasetLinkingOn);
         for(String s: are_linked.keySet())
@@ -247,6 +255,10 @@ public class GlobalMapConfig implements Serializable {
         return userSpecifiedColsPerPage;
     }
     */
+    
+    public void setShowClusterLabelsOn(boolean isShowClusterLabelsOn) {
+        this.isShowClusterLabelsOn = isShowClusterLabelsOn;
+    }
     
     public double getColHeaderHeight() {
         return colHeaderHeight;

@@ -36,7 +36,14 @@ export class SignificanceTestingComponent implements OnInit {
   ngOnInit() {}
 
   saveChanges() {
-    this.dialogRef.close(this.significance_testing_params);
+    if (this.significance_testing_params.apply_fdr) {
+      this.dialogRef.close(this.significance_testing_params);
+    } else {
+      if(confirm("You have chosen to not perform multiple testing correction. For control of false positives, multiple testing correction is recommended. Do you wish to continue without it?")) {
+        this.dialogRef.close(this.significance_testing_params);              
+      }
+    }
+    
   }
 
   close() {

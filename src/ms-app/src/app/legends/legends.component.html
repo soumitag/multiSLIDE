@@ -52,7 +52,7 @@
             <div *ngFor="let lg of legend_group" class="legend">
                 <label class="legend_group_heading">{{lg.title}}</label><br>
                 <div *ngFor="let names of lg.legend_names; let i = index" class="legend_inner">
-                    <svg width=190 height=18 style="position: relative; top: 2px">
+                    <svg *ngIf="i%2==0" width=190 height=18 style="position: relative; top: 2px">
                         <!--
                         <circle cx="7.5px" cy="7.5px" r="7.5px"
                             [style.fill]="'rgb(' + lg.colors[i][0] + ',' + lg.colors[i][1] + ',' + lg.colors[i][2] + ')'"
@@ -70,9 +70,40 @@
                               fill="black"
                               dominant-baseline="middle">{{names}}</text>
                     </svg>
+                    <svg *ngIf="i%2==1" width=190 height=18 style="position: relative; top: 2px">
+                        <rect x="6" y="0" width="6" height="18" 
+                              [style.fill]="'none'" 
+							  [attr.stroke]="'rgb(' + lg.colors[i][0] + ',' + lg.colors[i][1] + ',' + lg.colors[i][2] + ')'"
+							  style="stroke-width:1.5;"/>
+                        <line x1="0" y1="9" x2="18" y2="9" 
+                              [attr.stroke]="'rgb(' + lg.colors[i][0] + ',' + lg.colors[i][1] + ',' + lg.colors[i][2] + ')'"></line>
+                        <text x="23" y="9" font-size="13px" font-family="'Poppins', sans-serif" text-anchor="start"
+                              fill="black"
+                              dominant-baseline="middle">{{names}}</text>
+                    </svg>
                 </div>
             </div>
         </ng-container>
+
+        <ng-container *ngIf="data.legend_group_types[l]==5">
+            <div *ngFor="let lg of legend_group" class="legend">
+                <label class="legend_group_heading">{{lg.title}}</label><br>
+                <div *ngFor="let names of lg.legend_names; let i = index" class="legend_inner">
+                    <svg width=190 height=20 style="position: relative; top: 0px">
+                        
+                        <path d="M0 5 L0 15 L10 10 z" [attr.fill]="'rgb(' + lg.colors[i][0] + ',' + lg.colors[i][1] + ',' + lg.colors[i][2] + ')'" />
+                        <path d="M28 5 L28 15 L18 10 z" [attr.fill]="'rgb(' + lg.colors[i][0] + ',' + lg.colors[i][1] + ',' + lg.colors[i][2] + ')'" />
+
+                        <line x1="8" y1="10" x2="20" y2="10" 
+                              [attr.stroke]="'rgb(' + lg.colors[i][0] + ',' + lg.colors[i][1] + ',' + lg.colors[i][2] + ')'"></line>
+                        <text x="35" y="11" font-size="13px" font-family="'Poppins', sans-serif" text-anchor="start"
+                              fill="black"
+                              dominant-baseline="middle">{{names}}</text>
+                    </svg>
+                </div>
+            </div>
+        </ng-container>
+
     </div>
 </ng-container>
 <ng-template #loading>Fetching Legend Information...</ng-template>

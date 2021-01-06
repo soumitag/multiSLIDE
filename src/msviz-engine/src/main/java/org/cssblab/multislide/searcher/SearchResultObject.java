@@ -31,11 +31,13 @@ public class SearchResultObject implements Serializable {
     public Double overlap_score;
     //public int num_common_genes;
     public int num_common_genes_in_dataset[];
+    public boolean is_mirna;
     
-    public SearchResultObject (byte type, String query, Object result) {
+    public SearchResultObject (byte type, String query, Object result, boolean is_mirna) {
         this.type = type;
         this.result = result;
         this.query = query;
+        this.is_mirna = is_mirna;
     }
     
     public byte getType() {
@@ -50,16 +52,16 @@ public class SearchResultObject implements Serializable {
         return query;
     }
     
-    public static SearchResultObject makeSearchResultObject(String query, GeneObject result) {
-        return new SearchResultObject(SearchResultObject.TYPE_GENE, query, result);
+    public static SearchResultObject makeSearchResultObject(String query, GeneObject result, boolean is_mirna) {
+        return new SearchResultObject(SearchResultObject.TYPE_GENE, query, result, is_mirna);
     }
     
-    public static SearchResultObject makeSearchResultObject(String query, GoObject result) {
-        return new SearchResultObject(SearchResultObject.TYPE_GO, query, result);
+    public static SearchResultObject makeSearchResultObject(String query, GoObject result, boolean is_mirna) {
+        return new SearchResultObject(SearchResultObject.TYPE_GO, query, result, is_mirna);
     }
     
-    public static SearchResultObject makeSearchResultObject(String query, PathwayObject result) {
-        return new SearchResultObject(SearchResultObject.TYPE_PATHWAY, query, result);
+    public static SearchResultObject makeSearchResultObject(String query, PathwayObject result, boolean is_mirna) {
+        return new SearchResultObject(SearchResultObject.TYPE_PATHWAY, query, result, is_mirna);
     }
     
     public GeneObject getGeneObject() throws Exception {
@@ -223,7 +225,8 @@ public class SearchResultObject implements Serializable {
                     gene.gene_identifier, 
                     gene.entrez_id, 
                     1, 
-                    this.num_common_genes_in_dataset);
+                    this.num_common_genes_in_dataset,
+                    this.is_mirna);
             summary.createHTMLDisplayTag(query);
         } else if (this.type == SearchResultObject.TYPE_GO) {
             GoObject ontology = (GoObject) this.result;
@@ -232,7 +235,8 @@ public class SearchResultObject implements Serializable {
                     ontology.goTerm, 
                     ontology.goID, 
                     ontology.nGenes, 
-                    this.num_common_genes_in_dataset
+                    this.num_common_genes_in_dataset,
+                    this.is_mirna
             );
             summary.createHTMLDisplayTag(query);
         } else if (this.type == SearchResultObject.TYPE_PATHWAY) {
@@ -242,7 +246,8 @@ public class SearchResultObject implements Serializable {
                     pathway.pathway, 
                     pathway._id, 
                     pathway.nGenes, 
-                    this.num_common_genes_in_dataset
+                    this.num_common_genes_in_dataset,
+                    this.is_mirna
             );
             summary.createHTMLDisplayTag(query);
         }

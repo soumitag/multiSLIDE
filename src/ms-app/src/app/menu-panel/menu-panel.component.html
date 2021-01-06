@@ -2,16 +2,18 @@
   <div class="menu_item">Save
     <div class="sub_menu" style="left: 0px;">
       <div class="sub_menu_item" (click)="openSaveViz()">Save Visualizations</div>
-      <div class="sub_menu_item" (click)="saveWorkspace()">Save Workspace</div>
+      <div class="sub_menu_item" (click)="saveWorkspace('workspace')">Save Workspace</div>
+      <div class="sub_menu_item" (click)="saveWorkspace('view')">Save View</div>
     </div>
   </div>
   <div class="menu_item">View
     <div class="sub_menu" style="left: 90px;">
-      <div class="sub_menu_item">Show Cluster Labels</div>
+      <!--<div class="sub_menu_item">Show Cluster Labels</div>-->
       <!--<div class="sub_menu_item">Show Dendrogram</div>-->
       <!--<div class="sub_menu_item">Activity Log</div>-->
-      <div class="sub_menu_item" (click)="toggleSelectionPanel()">Show / Hide Selection Panel</div>
-      <div class="sub_menu_item">Reset to Default Settings</div>
+      <!--<div class="sub_menu_item" (click)="toggleSelectionPanel()">Show / Hide Selection Panel</div>-->
+      <div class="sub_menu_item" (click)="openViewListDialog()">Feature Lists</div>
+      <div class="sub_menu_item" (click)="resetDefault()">Reset to Default Settings</div>
     </div>
   </div>
   <div class="menu_item">Create
@@ -26,9 +28,11 @@
   <div class="menu_item" (click)="showHomePage()">Home</div>
   <div class="menu_item">Help
       <div class="sub_menu" style="left: 396px;">
-        <div class="sub_menu_item">Go To Demo</div>
-        <div class="sub_menu_item">Show Manual</div>
-        <div class="sub_menu_item">About</div>
+        <!--<div class="sub_menu_item">Go To Demo</div>-->
+        <div class="sub_menu_item" (click)="showManual()">Show Manual</div>
+        <div class="sub_menu_item" (click)="showLocalInstallation()">Local Installation Instructions</div>
+        <div class="sub_menu_item" (click)="showReportIssues()">Report Issues</div>
+        <div class="sub_menu_item" (click)="showAbout()">About</div>
       </div>
   </div>
   <div class="menu_item" (click)="closeAnalysis()">Close</div>

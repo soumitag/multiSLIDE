@@ -13,7 +13,7 @@ export class ClusteringParams {
     linkage_function: number;
     distance_function: number;
     leaf_ordering: number;
-
+    numClusterLabels: number;
   /*
   constructor() {
     this.type = 0;

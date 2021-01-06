@@ -94,7 +94,7 @@ public class HeatmapLayout implements Serializable {
     public double hist_width;
     public double hist_height;
 
-    private transient final double bottom_buffer = 0;
+    private transient double bottom_buffer = 0;
     private transient final double map_feature_label_buffer = 5;
     private transient final double header_genetag_buffer = 6;
     private transient final double genetag_map_buffer = 6;
@@ -167,7 +167,7 @@ public class HeatmapLayout implements Serializable {
             
             this.info_hist_panel_width = INFO_HIST_PANEL_WIDTH_GENES_ALONG_X;
             this.info_panel_top = 50.0;
-            this.info_panel_left = 10.0;
+            this.info_panel_left = 25.0;
             this.hist_left = 10.0;
             this.hist_top = 275.0;
             this.hist_width = 270.0;
@@ -241,11 +241,13 @@ public class HeatmapLayout implements Serializable {
         gene_tag_background_width = nEntrez * this.cell_width_height;
         
         svg_height = plot_title_height + header_height + header_genetag_buffer 
-                + nGeneTags * HeatmapLayout.GENE_TAG_HEIGHT + (nGeneTags - 1) * HeatmapLayout.BETWEEN_GENE_TAG_BUFFER
-                + genetag_map_buffer + map_height + map_search_tag_buffer + search_tag_height * nSearchTags + bottom_buffer;
+                        + nGeneTags * HeatmapLayout.GENE_TAG_HEIGHT 
+                        + (nGeneTags - 1) * HeatmapLayout.BETWEEN_GENE_TAG_BUFFER
+                        + genetag_map_buffer + map_height + map_search_tag_buffer 
+                        + (this.search_tag_bar_height+this.between_search_tags_buffer) * nSearchTags + bottom_buffer;
 
         svg_width = LEFT_BUFFER + INFO_HIST_PANEL_WIDTH_GENES_ALONG_X + INFO_HIST_PANEL_MAP_GAP + nPhenotypes * cell_width_height + PHENOTYPE_MAP_BUFFER
-                + map_width + map_feature_label_buffer + row_name_width + row_label_color_bar_buffer + colorbar_width;
+                                + map_width + map_feature_label_buffer + row_name_width + row_label_color_bar_buffer + colorbar_width;
 
         plot_title_x = (LEFT_BUFFER + INFO_HIST_PANEL_WIDTH_GENES_ALONG_X + INFO_HIST_PANEL_MAP_GAP)/2.0;
         plot_title_y = 90.0;
@@ -284,7 +286,7 @@ public class HeatmapLayout implements Serializable {
         }
         
         for(int i = 0; i < this.column_header_text_anchor_x.length; i++){
-            this.column_header_text_anchor_x[i] = map_start_x + (i+0.5)*this.cell_width_height;
+            this.column_header_text_anchor_x[i] = map_start_x + (i+0.7)*this.cell_width_height;
         }
         
         for(int i = 0; i < this.row_name_text_anchor_y.length; i++){
@@ -344,7 +346,7 @@ public class HeatmapLayout implements Serializable {
             double colHeaderHeight,
             double rowLabelWidth
     ) {
-     
+        
         double search_tag_height = this.search_tag_bar_height;
         
         if (colHeaderHeight >= HeatmapLayout.MIN_COL_HEADER_HEIGHT) {
@@ -355,7 +357,12 @@ public class HeatmapLayout implements Serializable {
         }
         
         int nSearchTags = network_neighbors.size();
-
+        if (nSearchTags == 0) {
+            bottom_buffer = 0;
+        } else {
+            bottom_buffer = 1;
+        }
+        
         double map_height = cell_width_height * nSamples;
         double map_width = cell_width_height * nEntrez;
         map_height = Math.max(map_height, HeatmapLayout.MIN_MAP_HEIGHT);

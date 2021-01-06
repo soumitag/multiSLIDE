@@ -114,13 +114,16 @@ public class LoadDemo extends HttpServlet {
             String mslide_filename = "";
             switch (demo_number) {
                 case 0:
-                    mslide_filename = "UPR_On_ER_Stress_12-Sep-2020_17-12-50.mslide";
+                    //mslide_filename = "UPR_On_ER_Stress_12-Sep-2020_17-12-50.mslide";
+                    mslide_filename = "UPR_On_ER_Stress_06-Jan-2021_12-39-12.mslide";
                     break;
                 case 1:
-                    mslide_filename = "CPTAC_Ovarian_Cancer_12-Sep-2020_22-32-11.mslide";
+                    //mslide_filename = "CPTAC_Ovarian_Cancer_12-Sep-2020_22-32-11.mslide";
+                    mslide_filename = "CPTAC_Ovarian_Cancer_06-Jan-2021_13-48-20.mslide";
                     break;
                 case 2:
-                    mslide_filename = "Plasma_Protein_and_MicroRNA_IR_Markers_12-Sep-2020_17-43-53.mslide";
+                    //mslide_filename = "Plasma_Protein_and_MicroRNA_IR_Markers_12-Sep-2020_17-43-53.mslide";
+                    mslide_filename = "Plasma_Protein_and_MicroRNA_IR_Markers_06-Jan-2021_12-32-37.mslide";
                     break;
                 default:
                     Utils.log("Failed in load demo: invalid demo_number");

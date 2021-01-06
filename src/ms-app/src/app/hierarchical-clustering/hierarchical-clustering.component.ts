@@ -50,7 +50,11 @@ export class HierarchicalClusteringComponent implements OnInit {
     this.type = data.clustering_params.type;
     this.rc_type = data.rc_type;
     this.dialogRef.updatePosition({ top: '110px', left: '700px' });
-    this.dialogRef.updateSize('550px','600px');
+    if (this.type==this.TYPE_ROW) {
+      this.dialogRef.updateSize('550px','620px');
+    } else if (this.type==this.TYPE_COL) {
+      this.dialogRef.updateSize('550px','700px');
+    }
     console.log(this.clustering_params)
   }
 

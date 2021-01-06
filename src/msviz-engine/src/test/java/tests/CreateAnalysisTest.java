@@ -455,7 +455,8 @@ public class CreateAnalysisTest {
                             ClusteringParams.AVERAGE_LINKAGE, 
                             ClusteringParams.EUCLIDEAN_DISTANCE, 
                             ClusteringParams.OPTIMAL_LEAF_ORDER,
-                            "mRNA"
+                            "mRNA",
+                            5
                         ));
             
             analysis.global_map_config.setSignificanceTestingParameters(new SignificanceTestingParams(

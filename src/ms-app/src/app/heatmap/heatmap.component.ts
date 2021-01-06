@@ -50,6 +50,8 @@ export class HeatmapComponent implements OnInit, OnChanges {
 	nEntrez: number;
 	//isTransposed: boolean = true;
 
+	Math: any = Math;
+
 	public hist = {
 		data: [
 
@@ -351,6 +353,12 @@ export class HeatmapComponent implements OnInit, OnChanges {
 			search_type = 'mirna_id';
 		} else if (search_type_code == 2) {
 			search_type = 'tf_entrez';
+		}
+
+		if (search_type_code == 1) {
+			var entrez = this.data.mi_rna_ids[col_index];
+		} else {
+			var entrez = this.data.entrez[col_index];
 		}
 
 		const dialogConfig = new MatDialogConfig();

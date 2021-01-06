@@ -47,6 +47,23 @@ export class ListService {
 		});
   }
 
+  deleteList(analysis_name: string, feature_list_name:string): Observable<ServerResponseData> {
+	console.log("create feature list...")
+	return this.httpClient.get(this.baseUrl, {
+		params: {
+			'analysis_name': analysis_name,
+			'action': 'delete_list',
+			'list_name': feature_list_name,								
+		},
+		withCredentials: true
+	})
+		.map(res => <ServerResponseData>res)
+		.catch(error => {
+			console.log(error);
+			return Observable.throw(error);
+		});
+  }
+
   createListAndAdd(analysis_name: string, entrez: string, add_type: string): Observable<ServerResponseData> {
 	console.log("create and add in feature list...")
 	return this.httpClient.get(this.baseUrl, {

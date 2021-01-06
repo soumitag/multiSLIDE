@@ -184,7 +184,7 @@ public class DatasetSpecs implements Serializable {
         
         if (this.linker_identifier_type.equals("mirna_id_2021158607524066")) {
             this.has_mi_rna = true;
-            this.mi_rna_colname = this.linker_identifier_type;
+            this.mi_rna_colname = linker_colname;
         }
     }
     
@@ -248,6 +248,14 @@ public class DatasetSpecs implements Serializable {
             return this.linker_colname;
         } else {
             return "__pseudo__linker__";
+        }
+    }
+    
+    public String getMIRNAColname() {
+        if (this.has_mi_rna) {
+            return this.mi_rna_colname;
+        } else {
+            return null;
         }
     }
     

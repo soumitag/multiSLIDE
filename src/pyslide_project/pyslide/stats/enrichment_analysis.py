@@ -115,13 +115,13 @@ class EnrichmentAnalysis:
                             self._pathway_gene_map[path][entrez] = True
 
         if self._include_ontologies:
-            for go in self.go_map:
-                self.go_sz[go] = {}
-                self.go_sz[go]['successes_in_population_big_k'] = len(self.go_map[go])
-                self.go_sz[go]['successes_in_sample_small_k'] = 0
+            for go in self._go_map:
+                self._go_sz[go] = {}
+                self._go_sz[go]['successes_in_population_big_k'] = len(self._go_map[go])
+                self._go_sz[go]['successes_in_sample_small_k'] = 0
                 for entrez in sig_entrez_list:
-                    if entrez in self.go_map[go]:
-                        self.go_sz[go]['successes_in_sample_small_k'] += 1
+                    if entrez in self._go_map[go]:
+                        self._go_sz[go]['successes_in_sample_small_k'] += 1
                         if go in self._go_gene_map:
                             self._go_gene_map[go][entrez] = True
                         else:
@@ -179,7 +179,7 @@ class EnrichmentAnalysis:
                 if go in self._go_gene_map and write_to_file:
                     s = self._get_formatted_genes(self._go_gene_map[go])
 
-                d[str(index) + 'p'] = ['gene-ontology', go, _term,
+                d[str(index) + 'g'] = ['gene-ontology', go, _term,
                                        self._go_sz[go]['successes_in_population_big_k'],
                                        self._go_sz[go]['successes_in_sample_small_k'],
                                        self._go_probabilities[go], s]

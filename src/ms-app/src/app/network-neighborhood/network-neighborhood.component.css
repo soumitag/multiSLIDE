@@ -67,7 +67,7 @@ button:hover {
     width: 20px;
     height: 20px;
     cursor: pointer;
-    background-image: url('/assets/img/plus512_silver_filled.png');
+    background-image: url('assets/img/plus512_silver_filled.png');
     background-size: 20px 20px;
 }
 

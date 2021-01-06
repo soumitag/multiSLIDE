@@ -79,6 +79,38 @@ public class FileHandler {
         return previewData;
     }
     
+    public static String checkFileHeader (String folderpath, String fileDelimiter) throws DataParsingException, IOException {
+        
+        File f = new File(folderpath);
+        String[][] previewData;        
+        
+        if (f.exists()) {
+            
+            String delim = FormElementMapper.parseDelimiter(fileDelimiter);
+            previewData = FileHandler.loadDelimData(folderpath, delim, false, 1);
+            
+            ArrayList <String> offending_cols = new ArrayList <> ();
+            for (String header: previewData[0]) {
+                if (header.contains(".")) {
+                    offending_cols.add(header);
+                }
+            }
+            
+            if(offending_cols.size() > 0) {
+                String message = "";
+                message += "multiSLIDE uses Apache Spark which does not like dots in column names.";
+                message += " Kindly replace the dots in the following column names and try again: ";
+                message += String.join(", ", offending_cols);
+                return message;
+            }
+            
+        } else {
+            throw new DataParsingException("");
+        }
+        
+        return "";
+    }
+    
     public static String[][] loadDelimData (String inFile, 
                                             String delim, 
                                             boolean hasHeader, 

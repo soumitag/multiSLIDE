@@ -63,22 +63,20 @@
         </div>
       </div>
 
-
-
       <!--
-    <div class="input">
-      <label>Number of Omics Datasets</label>
-      <label>{{numOmicsDataset}}</label>
+      <div class="input">
+        <label>Number of Omics Datasets</label>
+        <label>{{numOmicsDataset}}</label>
+        
+        <select name="numOmicsDataset" [(ngModel)]="numOmicsDataset" (ngModelChange)="setNumOmics()" required>
+            <option *ngFor="let N of omicsDatasetsAllowed" [value]="N">{{N}}</option>
+        </select>
       
-      <select name="numOmicsDataset" [(ngModel)]="numOmicsDataset" (ngModelChange)="setNumOmics()" required>
-          <option *ngFor="let N of omicsDatasetsAllowed" [value]="N">{{N}}</option>
-      </select>
-    
-    </div>
-    <div class="errorMsg" *ngIf="submitTouched && (selectedUploadType == '' || selectedUploadType == null)">
-      Please select data type.
-    </div>
--->
+      </div>
+      <div class="errorMsg" *ngIf="submitTouched && (selectedUploadType == '' || selectedUploadType == null)">
+        Please select data type.
+      </div>
+      -->
 
       <div class="each_data_container">
         <app-data-uploader [analysis_name]="analysis_name"
