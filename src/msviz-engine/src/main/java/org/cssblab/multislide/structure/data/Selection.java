@@ -155,6 +155,30 @@ public class Selection implements Serializable {
         sample_ids = new SampleIndex (analysis.spark_session, 
                 this.views.get(dname).recomputeSampleOrdering(analysis, this.phenotypes));
         
+        /*
+            sample count can't be 0 (happens when no rows are selected for a dataset)
+            therefore use a different dataset to try and determine order
+        */
+        if (sample_ids.count() == 0) {
+            for (String dataset_name : dataset_names) {
+                if (!dataset_name.equals(dname)) {
+                    sample_ids = new SampleIndex (analysis.spark_session, 
+                            this.views.get(dataset_name).recomputeSampleOrdering(analysis, this.phenotypes));
+                }
+                if (sample_ids.count() != 0) {
+                    break;
+                }
+            }
+        }
+        /*
+            all attemps to get sample orderings failed, just use the default ordering
+            in this case no data will be displayed anyway, therefore this is 
+            simply to avoid the call from erroring
+        */
+        if (sample_ids.count() == 0) {
+            sample_ids = new SampleIndex (this.getSampleIDs(dname, analysis.global_map_config));
+        }
+        
         Utils.log_info("sample ordering view (time) " + (System.nanoTime() - startTime)/1000000 + " milliseconds");
         
         /*

@@ -146,7 +146,7 @@ def significance_testing(expressions, phenotypes, _phenotype_datatype, _use_para
 
     za = np.array(z, dtype=np.float32)
     significant = fdr(za, _fdr_rate)
-    print(significant)
+    # print(significant)
     z1 = np.column_stack((za, significant.astype(np.float32)))
 
     return z1

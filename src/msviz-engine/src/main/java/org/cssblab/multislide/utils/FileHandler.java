@@ -192,6 +192,12 @@ public class FileHandler {
             int count = 1;
             br1 = new BufferedReader(new FileReader(inFile));
             line = br1.readLine();
+            
+            if (line == null) {
+                data = new String[0][0];
+                return data;
+            }
+            
             if(!delim.equals("|")){
                 lineData = line.split(delim, -1);
             } else {

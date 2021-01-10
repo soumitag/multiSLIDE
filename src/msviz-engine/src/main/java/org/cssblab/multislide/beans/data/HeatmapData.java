@@ -40,7 +40,7 @@ public class HeatmapData implements Serializable {
     public List <Integer> feature_cluster_labels;
     public List <String[]> network_neighborhood_types;
     public String mi_rna_ids[];
-    public String[] cluster_label_message;
+    public String cluster_label_message;
     
     /*
     public int rowsPerPageDisplayed;
@@ -160,7 +160,7 @@ public class HeatmapData implements Serializable {
 
                 if (analysis.data.selected.hasWithinLinkerOrdering(dataset_name)) {
                     
-                    this.cluster_label_message = new String[]{"*Cluster labels are", "not displayed when", "linkers are nested"};
+                    this.cluster_label_message = "*Cluster labels are not displayed for nested linkers";
                 } else {
                 
                     List <Integer> fc_labels = analysis.data.selected.getClusterLabels(dataset_name, analysis.global_map_config);
@@ -168,14 +168,14 @@ public class HeatmapData implements Serializable {
                     fc_labels.forEach((label) -> {
                         this.feature_cluster_labels.add(label%2);
                     });
-                    this.cluster_label_message = new String[0];
+                    this.cluster_label_message = "";
                 }
 
             } else {
-                this.cluster_label_message = new String[]{"*Cluster labels are", "not displayed for", "linked datasets"};
+                this.cluster_label_message = "*Cluster labels are not displayed for linked datasets";
             }
         } else {
-            this.cluster_label_message = new String[0];
+            this.cluster_label_message = "";
         }
         
         network_neighborhood_types = new ArrayList <> ();

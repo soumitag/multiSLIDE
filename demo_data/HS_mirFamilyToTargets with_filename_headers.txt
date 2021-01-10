@@ -1,4 +1,4 @@
-miRNA_normalized_dat_mean_centered_w_fam_names_14072020.txt,miRNA_family	protein_normalized_dat_mean_centered_14072020.txt,entrezs
+microRNA_normalized.txt,miRNA_family	Plasma_protein_normalized.txt,entrezs
 mir-99-5p/100-5p	56603
 mir-99-5p/100-5p	10217
 mir-99-5p/100-5p	55754

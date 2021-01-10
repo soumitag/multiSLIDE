@@ -92,21 +92,18 @@
 
 						<ng-container *ngIf="data.cluster_label_message != ''"> 
 
-							<text [attr.y]="layout.column_header_text_anchor_x[0]-(layout.column_label_font_size*4.5)" 
-								[attr.x]="layout.column_header_text_anchor_y" 
+							<text [attr.x]="10" 
+								[attr.y]="60" 
 								[attr.height]="20" 
-								[attr.width]="layout.header_height"
-								[style.font-size.px]="layout.column_label_font_size-1" 
+								[attr.width]="layout.header_height" 
 								[style.fill]="'rgb(240,0,0)'" 
+								font-size="12px" 
 								text-anchor="start" 
 								dominant-baseline="middle"
 								font-family="Verdana">
-								<ng-container *ngFor="let msg of data.cluster_label_message; let m = index">
-									<tspan [attr.x]="layout.column_header_text_anchor_y" 
-										[attr.dy]="layout.column_label_font_size">{{msg}}</tspan>
-								</ng-container>
+								{{data.cluster_label_message}}
 							</text>
-
+		
 						</ng-container>
 				
 						<ng-container *ngFor="let row of data.cell_bin_indices; let i = index">
@@ -248,7 +245,7 @@
 					</svg>
 
 					<ng-container *ngIf="isForPrint==0">
-						<div style="position: absolute; top: 10px; left: 0px; height:35px; left: 50px;">
+						<div style="position: absolute; top: 10px; left: 0px; height:35px; left: 35px;">
 							<div class="customize_settings_div">
 								<div style="top: 35px; width: 185px;" (click)="openSettingsDialog(0)">&nbsp;<label> Customize Heatmap</label></div>
 								<div>
@@ -386,14 +383,14 @@
 
 					<text [attr.x]="20" 
 						[attr.y]="60" 
-						[attr.height]="20" 
+						[attr.height]="24" 
 						[attr.width]="layout.header_height" 
 						[style.fill]="'rgb(240,0,0)'" 
 						font-size="12px" 
 						text-anchor="start" 
 						dominant-baseline="middle"
 						font-family="Verdana">
-						{{data.cluster_label_message[0]}} {{data.cluster_label_message[1]}} {{data.cluster_label_message[2]}}
+						{{data.cluster_label_message}}
 					</text>
 
 				</ng-container>

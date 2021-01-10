@@ -135,7 +135,8 @@ export class EnrichmentAnalysisComponent implements OnInit {
 
   processServerResponseOnSet(mapped_data_response: MappedData) {
     if (mapped_data_response == null || mapped_data_response.status == 0) {
-      alert("Enrichment Analysis parameters update FAILED. " + mapped_data_response.message + ". " + mapped_data_response.detailed_reason);
+      //alert("Enrichment Analysis parameters update FAILED. " + mapped_data_response.message + ". " + mapped_data_response.detailed_reason);
+      alert("Enrichment Analysis parameters update FAILED. " + mapped_data_response.detailed_reason);
     } else {
       /*
       alert("Enrichment Analysis parameters updated.");

@@ -83,6 +83,15 @@ public class EnrichmentAnalysis implements Serializable {
         
         EnrichmentAnalysisParams params = analysis.data_selection_state.enrichment_analysis_params;
         
+        /*
+            Beware of miRNA data
+        */
+        String dataset_name = params.dataset;
+        HashMap <String, Integer> map = analysis.createIdentifierIndexMap();
+        if (map.get(analysis.data.datasets.get(dataset_name).specs.linker_identifier_type) == 7) {
+            throw new MultiSlideException("Enrichment analysis is currently unavailable for miRNA data. We plan to add this feature in future versions.");
+        }
+                
         try {
             
             phenotype_data.repartition(1)

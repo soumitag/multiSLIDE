@@ -83,8 +83,8 @@ public class SampleIndex implements Serializable {
     */
     
     public SampleIndex(HashMap <String, Boolean> map) {
-        this.map = map;
         
+        this.map = map;
         this.list = new ArrayList <> ();
         this.values = new String[map.size()];
         this.cols = new Column[map.size()];
@@ -94,6 +94,26 @@ public class SampleIndex implements Serializable {
             this.values[i] = value;
             this.list.add(value);
             this.cols[i] = col(value);
+            i++;
+        }
+        
+        this.df = null;
+        this.table = null;
+    }
+    
+    public SampleIndex(String[] sample_ids) {
+        
+        this.map = new HashMap <> ();
+        this.list = new ArrayList <> ();
+        this.values = new String[sample_ids.length];
+        this.cols = new Column[sample_ids.length];
+        
+        int i = 0;
+        for (String value: sample_ids) {
+            this.values[i] = value;
+            this.list.add(value);
+            this.cols[i] = col(value);
+            this.map.put(value, Boolean.TRUE);
             i++;
         }
         

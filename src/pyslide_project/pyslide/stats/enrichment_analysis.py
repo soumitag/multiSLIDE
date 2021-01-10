@@ -270,29 +270,35 @@ def enrichment_analysis(
     else:
         _significant_entrez = [_entrez[i] for i in range(len(z)) if z[i, 0] <= _significance_level_d]
 
-    ea = EnrichmentAnalysis(species, include_pathways=_include_pathways, include_ontologies=_include_ontologies)
-    ea.create_pathway_maps(_entrez)
-    ea.compute_pathway_sizes(_significant_entrez)
-    ea.compute_hyper_geom()
-    df = ea.get_enrichment_analysis_results(_display_headers)
+    if len(_significant_entrez) == 0:
+        filtered_sorted_df = pd.DataFrame(columns=['Functional_Group_Type', 'Group_ID', 'Group_Name',
+                                                   'Num_Genes_In_Background', 'Num_Significant_Genes',
+                                                   'p_value', 'Genes', 'FDR'])
 
-    sorted_df = df.sort_values('prob', inplace=False, ascending=True)
-
-    significant = fdr(sorted_df['prob'].values, _fdr_rate_e)
-    sorted_df.insert(7, 'fdr', significant, allow_duplicates=True)
-
-    if _apply_fdr_e:
-        ind = np.logical_and(sorted_df['prob'] <= _significance_level_e, sorted_df['fdr'])
-        filtered_df = sorted_df.loc[ind]
     else:
-        filtered_df = sorted_df.loc[(sorted_df['prob'] <= _significance_level_e)]
+        ea = EnrichmentAnalysis(species, include_pathways=_include_pathways, include_ontologies=_include_ontologies)
+        ea.create_pathway_maps(_entrez)
+        ea.compute_pathway_sizes(_significant_entrez)
+        ea.compute_hyper_geom()
+        df = ea.get_enrichment_analysis_results(_display_headers)
 
-    if _apply_pathway_sz_filter:
-        filtered_df = filtered_df.loc[(filtered_df['big_K'] >= _min_pathway_sz)]
+        sorted_df = df.sort_values('prob', inplace=False, ascending=True)
 
-    filtered_sorted_df = filtered_df.sort_values(['prob', 'big_K'], inplace=False, ascending=True)
-    filtered_sorted_df.columns = ['Functional_Group_Type', 'Group_ID', 'Group_Name', 'Num_Genes_In_Background',
-                                  'Num_Significant_Genes', 'p_value', 'Genes', 'FDR']
+        significant = fdr(sorted_df['prob'].values, _fdr_rate_e)
+        sorted_df.insert(7, 'fdr', significant, allow_duplicates=True)
+
+        if _apply_fdr_e:
+            ind = np.logical_and(sorted_df['prob'] <= _significance_level_e, sorted_df['fdr'])
+            filtered_df = sorted_df.loc[ind]
+        else:
+            filtered_df = sorted_df.loc[(sorted_df['prob'] <= _significance_level_e)]
+
+        if _apply_pathway_sz_filter:
+            filtered_df = filtered_df.loc[(filtered_df['big_K'] >= _min_pathway_sz)]
+
+        filtered_sorted_df = filtered_df.sort_values(['prob', 'big_K'], inplace=False, ascending=True)
+        filtered_sorted_df.columns = ['Functional_Group_Type', 'Group_ID', 'Group_Name', 'Num_Genes_In_Background',
+                                      'Num_Significant_Genes', 'p_value', 'Genes', 'FDR']
     if _display_headers:
         filtered_sorted_df.to_csv(os.path.join(path_to_data_pool, request_id, "result.txt"), sep="\t", header=True,
                                   index=False)

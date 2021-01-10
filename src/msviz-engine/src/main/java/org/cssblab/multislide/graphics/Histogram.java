@@ -117,8 +117,10 @@ public class Histogram implements Serializable {
             sum += frequencies[i];
         }
         normedFrequencies = new double[frequencies.length];
-        for (int i=0; i<frequencies.length; i++) {
-            normedFrequencies[i] = (double)frequencies[i]/sum;
+        if (sum > 0) {  // avoid NaNs
+            for (int i=0; i<frequencies.length; i++) {
+                normedFrequencies[i] = (double)frequencies[i]/sum;
+            }
         }
     }
     

@@ -1,7 +1,9 @@
   <div class="hc_title">Significance Testing Parameters</div>
   <div class="hc_module_controls">
-      <div style="position: relative; top: 15px; left: 10px; height: 80px">
+      <div style="position: relative; top: 15px; left: 10px; height: 95px">
         <label for="selectedDataset">Dataset</label><br>
+        <label style="color: crimson; font-size: 12px;">This parameter is only used for synchronized datasets</label>
+        <br>
         <select name="selectedDataset" [(ngModel)]="significance_testing_params.dataset">
           <option *ngFor="let dataset of dataset_names; let i = index" [value]="dataset"
             [attr.selected]="dataset == significance_testing_params.dataset ? true : null">

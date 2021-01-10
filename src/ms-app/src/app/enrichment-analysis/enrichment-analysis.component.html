@@ -3,6 +3,9 @@
   <div style="width: 900px;">
   <div style="position: relative; top: 15px; left: 10px; height: 800px; width: 450px; display:inline-block;">
     <div class="enrichment_results_container">
+      <div *ngIf="enrichment_analysis_results.length == 0" class="enrichment_result_tr" style="color: black">
+        <i>No matching results were found. Please relax the filtering criteria and try again.</i>
+      </div>
       <div *ngFor="let result of enrichment_analysis_results; let i = index" class="enrichment_result_tr">
         <!--<div (click)="toggleResult(i)"
           [ngClass]="{'enrichment_result_td_selected': isPathSelected(i), 'enrichment_result_td': !isPathSelected(i)}"

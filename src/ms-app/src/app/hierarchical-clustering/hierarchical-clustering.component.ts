@@ -53,7 +53,7 @@ export class HierarchicalClusteringComponent implements OnInit {
     if (this.type==this.TYPE_ROW) {
       this.dialogRef.updateSize('550px','620px');
     } else if (this.type==this.TYPE_COL) {
-      this.dialogRef.updateSize('550px','700px');
+      this.dialogRef.updateSize('550px','715px');
     }
     console.log(this.clustering_params)
   }
