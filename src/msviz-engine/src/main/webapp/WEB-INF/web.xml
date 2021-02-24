@@ -32,10 +32,6 @@
         <servlet-class>org.cssblab.multislide.resources.DataUploader</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ListUploader</servlet-name>
-        <servlet-class>org.cssblab.multislide.resources.ListUploader</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>CreateAnalysis</servlet-name>
         <servlet-class>org.cssblab.multislide.resources.CreateAnalysis</servlet-class>
     </servlet>
@@ -162,10 +158,6 @@
     <servlet-mapping>
         <servlet-name>NetworkNeighborServices</servlet-name>
         <url-pattern>/NetworkNeighborServices</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ListUploader</servlet-name>
-        <url-pattern>/ListUploader</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>SerializeAnalysis</servlet-name>

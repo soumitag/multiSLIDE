@@ -10,15 +10,19 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.cssblab.multislide.beans.data.ServerResponse;
+import org.cssblab.multislide.graphics.Heatmap;
 import org.cssblab.multislide.structure.AnalysisContainer;
 import org.cssblab.multislide.structure.Lists;
 import org.cssblab.multislide.structure.MultiSlideException;
+import org.cssblab.multislide.structure.data.Selection;
 
 /*
 Provides the following feature list related services:
@@ -134,22 +138,37 @@ public class FeatureListServices extends HttpServlet {
                     returnMessage(resp, response);
                 }
                 
-                ArrayList<String> list_data = new ArrayList <String>();
-                if (add_type.equalsIgnoreCase("single_feature")) {
-                    list_data.add(data);
-                    
-                } else if (add_type.equalsIgnoreCase("feature_group")) {
-                    list_data.addAll(analysis.data.selected.getGeneGroup(data));
-                } else {
-                    ServerResponse resp = new ServerResponse(0, "Add feature(s) FAILED.", "Bad value for 'add_type'.");
+                String dataset_name = request.getParameter("dataset_name");
+                if (dataset_name == null || dataset_name.equals("")) {
+                    ServerResponse resp = new ServerResponse(0, "Add feature(s) FAILED.", "Missing dataset name.");
                     returnMessage(resp, response);
                 }
                 
                 if (add_type.equalsIgnoreCase("single_feature")) {
-                    lists.addToFeatureList (list_name, list_data, "single_feature");
+                    
+                    ArrayList<String> entrez_list = new ArrayList <> ();
+                    entrez_list.add(data);
+                    
+                    ArrayList<String[]> entrez_identifiers = getEntrezInCurrentView (analysis, entrez_list, dataset_name);
+                    lists.addToFeatureList (list_name, entrez_identifiers, "single_feature", dataset_name);
+                    
+                } else if (add_type.equalsIgnoreCase("feature_group")) {
+
+                    // get all entrez for selected group_id
+                    String group_id = data;
+                    ArrayList<String> group_entrez = new ArrayList <> ();
+                    group_entrez.addAll(analysis.data.selected.getGeneGroup(group_id));
+                    
+                    ArrayList<String[]> entrez_identifiers = getEntrezInCurrentView (analysis, group_entrez, dataset_name);
+                    lists.addToFeatureList (list_name, entrez_identifiers, group_id, dataset_name);
+                    
                 } else {
-                    lists.addToFeatureList (list_name, list_data, data);
+                    
+                    ServerResponse resp = new ServerResponse(0, "Add feature(s) FAILED.", "Bad value for 'add_type'.");
+                    returnMessage(resp, response);
+                    
                 }
+                
                 returnMessage(new ServerResponse(1, "Feature list '" + list_name + "' created.", ""), response);
                 
             } catch (MultiSlideException mse) {
@@ -183,18 +202,36 @@ public class FeatureListServices extends HttpServlet {
                     returnMessage(resp, response);
                 }
                 
-                ArrayList<String> list_data = new ArrayList <String>();
+                String dataset_name = request.getParameter("dataset_name");
+                if (dataset_name == null || dataset_name.equals("")) {
+                    ServerResponse resp = new ServerResponse(0, "Add feature(s) FAILED.", "Missing dataset name.");
+                    returnMessage(resp, response);
+                }
+                
                 if (add_type.equalsIgnoreCase("single_feature")) {
-                    list_data.add(data);
-                    lists.addToFeatureList(list_name, list_data, "single_feature");
+                    
+                    ArrayList<String> entrez_list = new ArrayList <> ();
+                    entrez_list.add(data);
+                    
+                    ArrayList<String[]> entrez_identifiers = getEntrezInCurrentView (analysis, entrez_list, dataset_name);
+                    lists.addToFeatureList (list_name, entrez_identifiers, "single_feature", dataset_name);
+                    
                     returnMessage(new ServerResponse(1, "Added features to list '" + list_name + "'.", ""), response);
                     
                 } else if (add_type.equalsIgnoreCase("feature_group")) {
-                    list_data.addAll(analysis.data.selected.getGeneGroup(data));
-                    lists.addToFeatureList(list_name, list_data, data);
+                    
+                    // get all entrez for selected group_id
+                    String group_id = data;
+                    ArrayList<String> group_entrez = new ArrayList <> ();
+                    group_entrez.addAll(analysis.data.selected.getGeneGroup(group_id));
+                    
+                    ArrayList<String[]> entrez_identifiers = getEntrezInCurrentView (analysis, group_entrez, dataset_name);
+                    lists.addToFeatureList (list_name, entrez_identifiers, group_id, dataset_name);
+                    
                     returnMessage(new ServerResponse(1, "Added features to list '" + list_name + "'.", ""), response);
                     
                 } else {
+                    
                     ServerResponse resp = new ServerResponse(0, "Add feature(s) FAILED.", "Bad value for 'add_type'.");
                     returnMessage(resp, response);
                 }
@@ -212,16 +249,26 @@ public class FeatureListServices extends HttpServlet {
                     ServerResponse resp = new ServerResponse(0, "Remove feature(s) FAILED.", "Missing or bad value for 'remove_type'.");
                     returnMessage(resp, response);
                 }
-                String data = request.getParameter("data");
-                if (data == null || data.equals("")) {
-                    ServerResponse resp = new ServerResponse(0, "Remove feature(s) FAILED.", "Missing data.");
+                String entrez = request.getParameter("entrez");
+                if (entrez == null || entrez.equals("")) {
+                    ServerResponse resp = new ServerResponse(0, "Remove feature(s) FAILED.", "Missing entrez.");
+                    returnMessage(resp, response);
+                }
+                String features = request.getParameter("features");
+                if (features == null || features.equals("")) {
+                    ServerResponse resp = new ServerResponse(0, "Remove feature(s) FAILED.", "Missing features.");
+                    returnMessage(resp, response);
+                }
+                String dataset_name = request.getParameter("dataset_name");
+                if (dataset_name == null || dataset_name.equals("")) {
+                    ServerResponse resp = new ServerResponse(0, "Remove feature(s) FAILED.", "Missing dataset name.");
                     returnMessage(resp, response);
                 }
                 
                 if (remove_type.equalsIgnoreCase("single_feature")) {
-                    lists.removeFeatureFromList(list_name, data);
+                    lists.removeFeatureFromList(list_name, entrez, features, dataset_name);
                 } else if (remove_type.equalsIgnoreCase("feature_group")) {
-                    lists.removeGroupFromList(list_name, data);
+                    lists.removeGroupFromList(list_name, entrez);
                 } else {
                     ServerResponse resp = new ServerResponse(0, "Remove feature(s) FAILED.", "Bad value for 'remove_type'.");
                     returnMessage(resp, response);
@@ -236,7 +283,7 @@ public class FeatureListServices extends HttpServlet {
         }
         
         if (action.equalsIgnoreCase("get_metadata")) {
-            String json = lists.getListsMetadata(analysis.searcher);
+            String json = lists.getListsMetadata(analysis);
             //String json = new Gson().toJson(lists_metadata);
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
@@ -252,7 +299,7 @@ public class FeatureListServices extends HttpServlet {
             try {
                 response.setContentType("application/download");
                 response.setHeader("Content-Disposition", "attachment;filename=" + filename);
-                String str = lists.serializeFeatureList(list_name, identifier, delimval, analysis.searcher);
+                String str = lists.serializeFeatureList(list_name, identifier, delimval, analysis);
                 byte[] bytes = str.getBytes();
                 OutputStream os = response.getOutputStream();
                 os.write(bytes, 0, bytes.length);
@@ -272,8 +319,46 @@ public class FeatureListServices extends HttpServlet {
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             
-            
         }
+    }
+    
+    private ArrayList<String[]> getEntrezInCurrentView (
+            AnalysisContainer analysis, ArrayList <String> group_entrez, String dataset_name
+    ) throws MultiSlideException {
+        
+        // get current view
+        Selection selected_data = analysis.data.selected;
+        Heatmap heatmap = analysis.heatmaps.get(dataset_name);
+        List<String> entrez_ids = selected_data.getEntrez(dataset_name, analysis.global_map_config);
+        List<List<String>> feature_ids = selected_data.getFeatureIDs(
+                dataset_name, analysis.global_map_config, heatmap.getMapConfig().getSelectedFeatureIdentifiers());
+        
+        // keep currently displayed features in a map for quick search
+        HashMap <String, List<String>> entrez_disp_features_map = new HashMap<>();
+        for (int i = 0; i < feature_ids.size(); i++) {
+            String e = entrez_ids.get(i);
+            String f = String.join(",", feature_ids.get(i));
+            if (entrez_disp_features_map.containsKey(e)) {
+                entrez_disp_features_map.get(e).add(f);
+            } else {
+                List <String> l = new ArrayList <> ();
+                l.add(f);
+                entrez_disp_features_map.put(e, l);
+            }
+        }
+
+        // get intersection with current view and extract the appropriate identifier
+        ArrayList<String[]> entrez_identifiers = new ArrayList<>();
+        for (int i = 0; i < group_entrez.size(); i++) {
+            String e = group_entrez.get(i);
+            if (entrez_disp_features_map.containsKey(e)) {
+                for (String f: entrez_disp_features_map.get(e)) {
+                    entrez_identifiers.add(new String[]{e, f});
+                }
+            }
+        }
+        
+        return entrez_identifiers;
     }
     
     protected void returnMessage(ServerResponse resp, HttpServletResponse response) throws IOException {

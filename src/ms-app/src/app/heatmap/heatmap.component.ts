@@ -240,7 +240,7 @@ export class HeatmapComponent implements OnInit, OnChanges {
 		alert('Click on Action 2 for entrez = ' + item);
 	}
 
-	createListAndAdd (col_index: number, add_type_ind: number) {
+	createListAndAdd (col_index: number, add_type_ind: number, dataset_name: string, gene_group_key: string) {
 		var add_type = "";
 		var list_data = "";
 		if (add_type_ind == 0) {
@@ -248,12 +248,13 @@ export class HeatmapComponent implements OnInit, OnChanges {
 			list_data = this.data.entrez[col_index];
 		} else if (add_type_ind == 1) {
 			add_type = "feature_group";
-			list_data = this.global_data.gene_group_keys[this.data.gene_tags[col_index][0]];
+			//list_data = this.global_data.gene_group_keys[this.data.gene_tags[col_index][0]];
+			list_data = gene_group_key
 		} else {
 			alert('Bad param: add_type');
 			return;
 		}
-		this.listService.createListAndAdd(this.analysis_name, list_data, add_type)
+		this.listService.createListAndAdd(this.analysis_name, list_data, add_type, dataset_name)
 			.subscribe(
 				data => this.list_service_response = data, 
 				() => console.log("observable complete"), 
@@ -261,7 +262,7 @@ export class HeatmapComponent implements OnInit, OnChanges {
       );
 	}
 
-	addToList (col_index: number, feature_list_name: string, add_type_ind: number) {
+	addToList (col_index: number, feature_list_name: string, add_type_ind: number, dataset_name: string, gene_group_key: string) {
 		
 		var add_type = "";
 		var list_data = "";
@@ -270,13 +271,14 @@ export class HeatmapComponent implements OnInit, OnChanges {
 			list_data = this.data.entrez[col_index];
 		} else if (add_type_ind == 1) {
 			add_type = "feature_group";
-			list_data = this.global_data.gene_group_keys[this.data.gene_tags[col_index][0]];
+			//list_data = this.global_data.gene_group_keys[this.data.gene_tags[col_index][0]];
+			list_data = gene_group_key
 		} else {
 			alert('Bad param: add_type');
 			return;
 		}
 		console.log('Entrez / Group Name: ' + list_data + ', List: ' + feature_list_name);
-		this.listService.addToList(this.analysis_name, list_data, feature_list_name, add_type)
+		this.listService.addToList(this.analysis_name, list_data, feature_list_name, add_type, dataset_name)
 			.subscribe(
 					data => this.list_service_response = data, 
 					() => console.log("observable complete"), 

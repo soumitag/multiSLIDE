@@ -42,6 +42,8 @@
 								[attr.x]="layout.genetag_anchor_y[tag]" 
 								[attr.width]="layout.gene_tag_height" 
 								[attr.height]="layout.cell_width_height"
+								[matMenuTriggerFor]="genes_group_menu" 
+								[matMenuTriggerData]="{gene_group_key: global_data.gene_group_keys[tag]}"
 								[style.fill]="'rgb(' + global_data.gene_tag_colors[tag][0] + ',' + global_data.gene_tag_colors[tag][1] + ',' + global_data.gene_tag_colors[tag][2] + ')'" />
 							</ng-container>
 						</ng-container>
@@ -331,6 +333,8 @@
 						[attr.y]="layout.genetag_anchor_y[tag]" 
 						[attr.width]="layout.cell_width_height" 
 						[attr.height]="layout.gene_tag_height"
+						[matMenuTriggerFor]="genes_group_menu" 
+						[matMenuTriggerData]="{gene_group_key: global_data.gene_group_keys[tag]}"
 						[style.fill]="'rgb(' + global_data.gene_tag_colors[tag][0] + ',' + global_data.gene_tag_colors[tag][1] + ',' + global_data.gene_tag_colors[tag][2] + ')'" />
 					</ng-container>
 				</ng-container>
@@ -350,7 +354,8 @@
 							text-anchor="start" 
 							font-family="Verdana" 
 							[attr.transform]="'rotate(-90 ' + layout.column_header_text_anchor_x[g] + ' ' + layout.column_header_text_anchor_y + ')'"
-							[matMenuTriggerFor]="genes_menu" [matMenuTriggerData]="{col_index: g}"
+							[matMenuTriggerFor]="genes_menu" 
+							[matMenuTriggerData]="{col_index: g}"
 							class="gene_tag">
 							{{data.column_headers[g]}}
 						</text>
@@ -571,31 +576,36 @@
 		</ng-template>
 	
 		
-	
-		<mat-menu #genes_menu="matMenu">
-			<ng-template matMenuContent let-col_index="col_index">
-				<button mat-menu-item [matMenuTriggerFor]="feature_list_menu" [matMenuTriggerData]="{col_id: col_index}">Add to List</button>
-				<button mat-menu-item [matMenuTriggerFor]="feature_group_menu" [matMenuTriggerData]="{col_id: col_index}">Add Gene Group to List</button>
-				<button mat-menu-item [matMenuTriggerFor]="neightbors_menu" [matMenuTriggerData]="{col_id: col_index}">Show Neighbors</button>
-				<!--<button mat-menu-item (click)="onContextMenuAction2(entrez)">Show Info</button>-->
-				<!--<button mat-menu-item (click)="onContextMenuAction2(entrez)">Hide From Current View</button>-->
-				<!--<button mat-menu-item (click)="onContextMenuAction2(entrez)">Show Aliases</button>-->
+		<!---Gene Group Context Menu-->
+		<mat-menu #genes_group_menu="matMenu">
+			<ng-template matMenuContent let-gene_group_key="gene_group_key">
+				<button mat-menu-item [matMenuTriggerFor]="feature_group_menu" [matMenuTriggerData]="{grp_key: gene_group_key}">Add Gene Group to List</button>
 			</ng-template>
 		</mat-menu>
 		
-		<mat-menu #feature_list_menu="matMenu">
-			<ng-template matMenuContent let-col_id="col_id">
-				<button mat-menu-item (click)="createListAndAdd(col_id,0)">New List</button>
-				<button mat-menu-item *ngFor="let featlist of feature_list_names" (click)="addToList(col_id,featlist,0)">
+		<mat-menu #feature_group_menu="matMenu">
+			<ng-template matMenuContent let-grp_key="grp_key">
+				<button mat-menu-item (click)="createListAndAdd('',1,datasetName,grp_key)">New List</button>
+				<button mat-menu-item *ngFor="let featlist of feature_list_names" (click)="addToList('',featlist,1,datasetName,grp_key)">
 					{{featlist}}
 				</button>
 			</ng-template>
 		</mat-menu>
 		
-		<mat-menu #feature_group_menu="matMenu">
+
+		<!---Gene Context Menu-->
+		<mat-menu #genes_menu="matMenu">
+			<ng-template matMenuContent let-col_index="col_index">
+				<button mat-menu-item [matMenuTriggerFor]="feature_list_menu" [matMenuTriggerData]="{col_id: col_index}">Add to List</button>
+				<!--<button mat-menu-item [matMenuTriggerFor]="feature_group_menu" [matMenuTriggerData]="{col_id: col_index}">Add Gene Group to List</button>-->
+				<button mat-menu-item [matMenuTriggerFor]="neightbors_menu" [matMenuTriggerData]="{col_id: col_index}">Show Neighbors</button>
+			</ng-template>
+		</mat-menu>
+		
+		<mat-menu #feature_list_menu="matMenu">
 			<ng-template matMenuContent let-col_id="col_id">
-				<button mat-menu-item (click)="createListAndAdd(col_id,1)">New List</button>
-				<button mat-menu-item *ngFor="let featlist of feature_list_names" (click)="addToList(col_id,featlist,1)">
+				<button mat-menu-item (click)="createListAndAdd(col_id,0,datasetName,'')">New List</button>
+				<button mat-menu-item *ngFor="let featlist of feature_list_names" (click)="addToList(col_id,featlist,0,datasetName,'')">
 					{{featlist}}
 				</button>
 			</ng-template>
@@ -606,11 +616,6 @@
 				<button mat-menu-item *ngFor="let nn_type of data.network_neighborhood_types" (click)="searchNeighbors(col_id,nn_type[1])">
 					{{nn_type[0]}}
 				</button>
-				<!--
-				<button mat-menu-item (click)="searchNeighbors(col_id, 0)">Protein-Protein Interaction</button>
-				<button mat-menu-item (click)="searchNeighbors(col_id, 1)">miRNA Targets</button>
-				<button mat-menu-item (click)="searchNeighbors(col_id, 2)">Transcription Factor Targets</button>
-				-->
 			</ng-template>
 		</mat-menu>
 	

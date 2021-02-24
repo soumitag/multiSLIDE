@@ -234,11 +234,13 @@ public class Data implements Serializable {
                                 List <String> entrez_list = this.datasets.get(dataset_name).linker_entrez_map.get(mirnaid);
                                 for (String e : entrez_list)
                                     table.set(gene_group.getID(), e, 1);
+                                entrezs.addAll(entrez_list);
                             }
                         }
                     }
                 }
                 
+                gene_group.setEntrezList(entrezs);
                 i++;
             }
 
@@ -305,7 +307,7 @@ public class Data implements Serializable {
                     entrezs.addAll(entrezs_k);
                 }
                 
-                GeneGroup gene_group = new GeneGroup("user_defined", uploaded_group._id, uploaded_group.functional_grp_name);
+                GeneGroup gene_group = new GeneGroup("user_defined", uploaded_group._id, uploaded_group.functional_grp_name, entrezs);
                 gene_groups.put(gene_group.getID(), gene_group);
                 
                 for (String entrez : entrezs) {
@@ -336,7 +338,7 @@ public class Data implements Serializable {
             for (EnrichmentAnalysisResult grp : analysis.data_selection_state.selected_enriched_groups) {
                 
                 List <String> entrezs = getGroupEntrez(analysis.searcher, grp.pathid, grp.type);
-                GeneGroup gene_group = new GeneGroup(grp.type, grp.pathid, grp.pathname);
+                GeneGroup gene_group = new GeneGroup(grp.type, grp.pathid, grp.pathname, entrezs);
                 gene_groups.put(gene_group.getID(), gene_group);
                 
                 for (String entrez : entrezs) {

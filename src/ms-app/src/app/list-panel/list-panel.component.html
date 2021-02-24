@@ -1,38 +1,53 @@
-<div class="list_panel_heading">Feature Lists</div>
-<div *ngFor="let list of lists; let i = index" class="list_panel" (click)="showListDetails(i)">
-  <ng-container *ngIf="list.type=='feature_list'; then FeatureList; else SampleList">
-  </ng-container>
-    <ng-template #FeatureList>
-      <div style="min-width: 400px">
+<ng-container *ngIf="lists && lists.length>0; else no_list_message">
+
+  <div class="list_panel_heading">Feature Lists</div>
+  <div *ngFor="let list of lists; let i = index" class="list_panel">
+    <ng-container *ngIf="list.type=='feature_list'; then FeatureList; else SampleList">
+    </ng-container>
+      <ng-template #FeatureList>
+        <div style="min-width: 400px">
+          <label class="list_panel_group_heading" (click)="showListDetails(i)">
+            {{list.name}} ({{list.entrez.length}})
+          </label>
+          <div class="minus_button" matTooltip="{{'Delete ' + list.name}}" (click)="removeList(list.name)"></div>
+          <div class="download_button" matTooltip="{{'Download ' + list.name}}" (click)="serializeList(list.name)"></div>
+        </div>
+        <!--<div class="visualize_button" matTooltip="{{'Visualize List ' + list.name}}" (click)="visualizeList(list.name)"></div>-->
+      </ng-template>
+      <ng-template #SampleList>
         <label class="list_panel_group_heading">
           {{list.name}} ({{list.entrez.length}})
         </label>
-        <div class="minus_button" matTooltip="{{'Delete ' + list.name}}" (click)="removeList(list.name)"></div>
-        <div class="download_button" matTooltip="{{'Download ' + list.name}}" (click)="serializeList(list.name)"></div>
-      </div>
-      <!--<div class="visualize_button" matTooltip="{{'Visualize List ' + list.name}}" (click)="visualizeList(list.name)"></div>-->
-    </ng-template>
-    <ng-template #SampleList>
-      <label class="list_panel_group_heading">
-        {{list.name}} ({{list.entrez.length}})
-      </label>
-      <div class="minus_button" (click)="removeList(list.name)"></div>
-      <div class="download_button" (click)="serializeList(list.name)"></div>
-    </ng-template>
-  <div id="{{'details_'+i}}" class="list_panel_inner">
-    <table>
-      <tr *ngFor="let display_tag of list.display_tags; let j = index" class="list_entry">
-        <td>{{display_tag}}</td>
-        <td>{{list.group_names[list.entrez_group_ids[j]]}}</td>
-        <td width='25%'>
-          <div class="minus_button" 
-            matTooltip="{{'Remove ' + list.entrez[j] + ' from ' + list.name}}" 
-            (click)="removeFromList(i,j)"></div>
-        </td>
-      </tr>
-    </table>
+        <div class="minus_button" (click)="removeList(list.name)"></div>
+        <div class="download_button" (click)="serializeList(list.name)"></div>
+      </ng-template>
+    <div id="{{'details_'+i}}" class="list_panel_inner">
+      <table>
+        <tr *ngFor="let display_tag of list.display_tags; let j = index" class="list_entry">
+          <td>{{display_tag}}</td>
+          <!--<td>{{list.group_names[list.entrez_group_ids[j]]}}</td>-->
+          <td width='25%'>
+            <div class="minus_button" 
+              matTooltip="{{'Remove ' + list.entrez[j] + ' from ' + list.name}}" 
+              (click)="removeFromList(i,j)"></div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="apply_changes_div">
+    <button type="button" (click)="close()">Close</button>
+  </div>
+  
+</ng-container>
+
+<ng-template #no_list_message>
+  <div class="list_panel_heading">Feature Lists</div>
+  <div class="message_div">
+    There are no feature lists to show. Create feature lists using the "Create" menu option and add features to see them here.
   </div>
   <div class="apply_changes_div">
     <button type="button" (click)="close()">Close</button>
   </div>
-</div>
+</ng-template>

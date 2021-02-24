@@ -63,9 +63,9 @@ export class SaveWorkspaceComponent implements OnInit {
       this.show_buttons = false;
     }
   }
-
+  
   cancel() {
-    this.dialogRef.close(this.filename);
+    this.dialogRef.close();
   }
 
   download() {

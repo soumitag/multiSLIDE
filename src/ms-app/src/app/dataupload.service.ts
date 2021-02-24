@@ -19,7 +19,7 @@ export class DatauploadService {
   private removeUrl = LocalSettings.MSVIZ_ENGINE_URL + "/DataRemover";
   private previewUrl = LocalSettings.MSVIZ_ENGINE_URL + "/GetPreview";
   
-  private listUploadUrl = LocalSettings.MSVIZ_ENGINE_URL + "/ListUploader";  // web api URL
+  //private listUploadUrl = LocalSettings.MSVIZ_ENGINE_URL + "/ListUploader";  // web api URL
   private loadAnalysisUrl = LocalSettings.MSVIZ_ENGINE_URL + "/LoadAnalysis";  // web api URL
   
   private current_url: string = '';
@@ -48,6 +48,7 @@ export class DatauploadService {
       });
   }
 
+  /*
   postMultipartListData(fileItem: File, extraData?: FileuploadPayload): Observable<ServerResponseData> {
 
     const formData: FormData = new FormData();
@@ -68,6 +69,7 @@ export class DatauploadService {
         return Observable.throw(error);
       });
   }
+  */
 
   postMultipartAnalysisData(fileItem: File, extraData?: FileuploadPayload): Observable<ServerResponseData> {
 

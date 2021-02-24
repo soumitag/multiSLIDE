@@ -54,6 +54,7 @@ export class UploadListComponent implements OnInit {
     console.log("file input has changed. The file is", this.listfileToUpload);
   }
 
+  /*
   uploadList() {
     this.uploadTouched = true;
     if (this.listfileToUpload != null && this.selectedDelimiter != null && this.selectedDelimiter != '' && this.selectedIdentifier != null && this.selectedIdentifier != '') {
@@ -77,6 +78,7 @@ export class UploadListComponent implements OnInit {
       );
     }
   }
+  */
 
   notifyUploadListStatus() {
     if (this.serverResponseOnListUpload.status == 1) {

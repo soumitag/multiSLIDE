@@ -17,11 +17,11 @@ export class ListService {
   getUserLists (analysis_name): Observable<ListData[]> {
 		console.log("loading feature lists...")
 		return this.httpClient.get ( this.baseUrl, {
-				params: { 
-						  'analysis_name': analysis_name,
-              'action': 'get_metadata'
-						},
-				withCredentials: true
+			params: { 
+				'analysis_name': analysis_name,
+            	'action': 'get_metadata'
+			},
+			withCredentials: true
 		  	})
 			.map(res => <ListData[]> res)
 			.catch(error => {
@@ -64,14 +64,15 @@ export class ListService {
 		});
   }
 
-  createListAndAdd(analysis_name: string, entrez: string, add_type: string): Observable<ServerResponseData> {
+  createListAndAdd(analysis_name: string, entrez: string, add_type: string, dataset_name: string): Observable<ServerResponseData> {
 	console.log("create and add in feature list...")
 	return this.httpClient.get(this.baseUrl, {
 		params: {
 			'analysis_name': analysis_name,
 			'action': 'create_list_and_add',
 			'add_type': add_type,
-			'list_data': entrez							
+			'list_data': entrez,
+			'dataset_name': dataset_name			
 		},
 		withCredentials: true
 	})
@@ -82,7 +83,7 @@ export class ListService {
 		});
   }
 
-  addToList (analysis_name: string, entrez: string, feature_list_name: string, add_type: string): Observable<ServerResponseData> {
+  addToList (analysis_name: string, entrez: string, feature_list_name: string, add_type: string, dataset_name: string): Observable<ServerResponseData> {
 		console.log("loading feature lists...")
 		return this.httpClient.get ( this.baseUrl, {
 				params: { 
@@ -90,7 +91,8 @@ export class ListService {
 						  'action': 'add_features',
 						  'list_name': feature_list_name,
 						  'add_type': add_type,
-						  'list_data': entrez
+						  'list_data': entrez,
+						  'dataset_name': dataset_name
 						},
 				withCredentials: true
 		  	})
@@ -101,15 +103,17 @@ export class ListService {
 			});
   }
 
-  removeFromList (analysis_name: string, entrez: string, feature_list_name: string): Observable<ServerResponseData> {
+  removeFromList (analysis_name: string, entrez: string, features: string, feature_list_name: string, dataset_name: string): Observable<ServerResponseData> {
 		console.log("loading feature lists...")
 		return this.httpClient.get ( this.baseUrl, {
 				params: { 
-						  'analysis_name': analysis_name,
-              'action': 'remove_features',
-              'list_name': feature_list_name,
-              'remove_type': 'single_feature',
-              'data': entrez
+						  	'analysis_name': analysis_name,
+							'action': 'remove_features',
+							'list_name': feature_list_name,
+							'remove_type': 'single_feature',
+							'dataset_name': dataset_name,
+							'entrez': entrez,
+							'features': features
 						},
 				withCredentials: true
 		  	})

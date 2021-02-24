@@ -25,8 +25,8 @@ public class Lists implements Serializable {
     HashMap <String, ArrayList<String[]>> sampleListMap;
     
     public Lists() {
-        featureListMap = new HashMap <String, ArrayList <String[]>> ();
-        sampleListMap = new HashMap <String, ArrayList <String[]>> ();
+        featureListMap = new HashMap <> ();
+        sampleListMap = new HashMap <> ();
     }
     
     public String generateFeatureListName() throws MultiSlideException {
@@ -42,7 +42,7 @@ public class Lists implements Serializable {
     
     public void createEmptyFeatureList(String name) throws MultiSlideException {
         if (!hasFeatureList(name)) {
-            ArrayList <String[]> list =  new ArrayList <String[]> ();
+            ArrayList <String[]> list =  new ArrayList <> ();
             featureListMap.put(name,list);
         } else {
             throw new MultiSlideException("A feature list with the same name already exists. Please specify a different name.");
@@ -57,26 +57,37 @@ public class Lists implements Serializable {
         }
     }
     
-    public void addToFeatureList(String name, ArrayList <String> entrez, String group_name) throws MultiSlideException {
+    public void addToFeatureList(
+            String name, 
+            ArrayList <String[]> entrez_identifiers, 
+            String group_name, 
+            String dataset_name
+   ) throws MultiSlideException {
+        
         if (hasFeatureList(name)) {
             ArrayList <String[]> feature_list = featureListMap.get(name);
-            boolean[] isAlreadyInList = new boolean[entrez.size()];
-            for (int i=0; i<entrez.size(); i++) {
+            boolean[] isAlreadyInList = new boolean[entrez_identifiers.size()];
+            for (int i=0; i<entrez_identifiers.size(); i++) {
                 isAlreadyInList[i] = false;
                 for (int j=0; j<feature_list.size(); j++) {
-                    if (feature_list.get(j)[0].equalsIgnoreCase(entrez.get(i))) {
+                    // match entrez and dataset
+                    if (feature_list.get(j)[0].equalsIgnoreCase(entrez_identifiers.get(i)[0]) &&        // match entrez
+                            feature_list.get(j)[2].equalsIgnoreCase(dataset_name) &&                    // match dataset name
+                            feature_list.get(j)[4].equalsIgnoreCase(entrez_identifiers.get(i)[1]))      // match display features
+                    {
                         isAlreadyInList[i] = true;
                         break;
                     }
                 }
             }
-            for (int i=0; i<entrez.size(); i++) {
+            for (int i=0; i<entrez_identifiers.size(); i++) {
                 if (!isAlreadyInList[i]) {
-                    if (group_name.equalsIgnoreCase("single_feature")) {
-                        feature_list.add(new String[]{entrez.get(i),""});
-                    } else {
-                        feature_list.add(new String[]{entrez.get(i),group_name});
-                    }
+                    feature_list.add(new String[]{
+                        entrez_identifiers.get(i)[0],       // entrez
+                        entrez_identifiers.get(i)[1],       // display feature ids concatenated to a string for display
+                        dataset_name, 
+                        group_name
+                    });
                 }
             }            
         } else {
@@ -84,11 +95,13 @@ public class Lists implements Serializable {
         }
     }
     
-    public void removeFeatureFromList(String name, String entrez) throws MultiSlideException {
+    public void removeFeatureFromList(String name, String entrez, String features, String dataset_name) throws MultiSlideException {
         if (hasFeatureList(name)) {
             ArrayList <String[]> list = featureListMap.get(name);
             for (int i=0; i<list.size(); i++) {
-                if(list.get(i)[0].equalsIgnoreCase(entrez)) {
+                if(list.get(i)[0].equalsIgnoreCase(entrez) && 
+                        list.get(i)[1].equalsIgnoreCase(features) && 
+                        list.get(i)[2].equalsIgnoreCase(dataset_name)) {
                     list.remove(i);
                 }
             }
@@ -114,24 +127,65 @@ public class Lists implements Serializable {
         return featureListMap.containsKey(name);
     }
     
-    public String serializeFeatureList(String name, String identifier, String delimval, Searcher searcher) throws MultiSlideException {
+    /*
+    private ArrayList <String[]> list_entrez_identifiers(ArrayList <String[]> feature_list) {
+        ArrayList <String[]> feature_list_sans_group_id = new ArrayList <> ();
+        for (String[] feature: feature_list) {
+            feature_list_sans_group_id.add(new String[]{feature[0], feature[1], feature[2]});
+        }
+        return feature_list_sans_group_id;
+    }
+    
+    private HashMap <String, ArrayList<String[]>> list_entrez_identifiers() {
+        HashMap <String, ArrayList<String[]>> feature_lists_sans_group_id = new HashMap <> ();
+        for (String name: this.featureListMap.keySet()) {
+            feature_lists_sans_group_id.put(name, this.list_entrez_identifiers(featureListMap.get(name)));
+        }
+        return feature_lists_sans_group_id;
+    }
+    */
+    
+    public String serializeFeatureList(
+            String name, 
+            String identifier, 
+            String delimval, 
+            AnalysisContainer analysis
+    ) throws MultiSlideException {
+        
         if (hasFeatureList(name)) {
-            String str = "";
+            String str = "Identifiers\t" + "Entrez\t" + "Aliases\t" + "Dataset\n";
             ArrayList <String[]> list = featureListMap.get(name);
             for (int i=0; i<list.size(); i++) {
-                ArrayList <String> identifier_values = searcher.getIdentifiersFromDB(list.get(i)[0], 1);
-                String aliases = "";
-                if (identifier_values.size() > 1) {
-                    for (int j=0; j<identifier_values.size()-1; j++) {
-                        aliases += identifier_values.get(j).toUpperCase() + ", ";
-                    }
-                    aliases += identifier_values.get(identifier_values.size()-1).toUpperCase();
+                
+                String entrez = list.get(i)[0];
+                if (entrez.startsWith("-")) {
+                    entrez = "-";
                 }
+                
+                String aliases;
+                if (entrez.startsWith("-")) {
+                    aliases = "-";
+                } else {
+                    ArrayList <String> identifier_values = analysis.searcher.getIdentifiersFromDB(list.get(i)[0], 1);
+                    aliases = "";
+                    if (identifier_values.size() > 1) {
+                        for (int j=0; j<identifier_values.size()-1; j++) {
+                            aliases += identifier_values.get(j).toUpperCase() + ",";
+                        }
+                        aliases += identifier_values.get(identifier_values.size()-1).toUpperCase();
+                    }
+                }
+                // disabling saving of gene groups, as a single gene can be associated with multiple gene groups
+                // instead specifying: identifers, entrez, aliases, dataset name
+                String dataset_name = analysis.data.datasets.get(list.get(i)[2]).specs.display_name;
+                str += list.get(i)[1] + "\t" + entrez + "\t" + aliases + "\t" + dataset_name + "\n";
+                /*
                 if(list.get(i)[1].equalsIgnoreCase("")) {
                     str += list.get(i)[0] + "\t" + aliases + "\n";
                 } else {
                     str += list.get(i)[0] + "\t" + aliases + "\t" + list.get(i)[1] + "\n";
                 }
+                */
             }
             return str;
         } else {
@@ -139,8 +193,8 @@ public class Lists implements Serializable {
         }
     }
     
-    public String getListsMetadata(Searcher searcher) {
+    public String getListsMetadata(AnalysisContainer analysis) {
         //ListData list_data = new ListData();
-        return ListData.getAsJSON (searcher, this.featureListMap, "feature_list", 1);
+        return ListData.getAsJSON (analysis.searcher, this.featureListMap, "feature_list", analysis);
     }
 }

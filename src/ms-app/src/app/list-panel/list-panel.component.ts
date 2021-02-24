@@ -31,7 +31,6 @@ export class ListPanelComponent implements OnInit {
     private analysisService: AnalysisService) { 
       this.analysis_name = data.analysis_name;
       this.dialogRef.updatePosition({ top: '110px', left: '500px' });
-      //this.dialogRef.updateSize('550px', '500px');
   }
 
   ngOnInit() { 
@@ -50,8 +49,16 @@ export class ListPanelComponent implements OnInit {
     this.error_getting_data = true;
   }
 
-  showListDetails(i) {
-    var x = document.getElementById("details_" + i);
+  showListDetails(index) {
+
+    for (var i=0; i<this.lists.length; i++) {
+      if (i != index) {
+        var x = document.getElementById("details_" + i);
+        x.style.display = "none";
+      }
+    }
+
+    var x = document.getElementById("details_" + index);
     if (x.style.display === "none" || x.style.display === "") {
       x.style.display = "block";
     } else {
@@ -60,9 +67,13 @@ export class ListPanelComponent implements OnInit {
   }
 
   removeFromList(list_index: number, entrez_index: number) {
-    this.listService.removeFromList(this.analysis_name, 
-      this.lists[list_index].entrez[entrez_index], this.lists[list_index].name)
-			.subscribe(
+    this.listService.removeFromList(
+      this.analysis_name, 
+      this.lists[list_index].entrez[entrez_index], 
+      this.lists[list_index].features[entrez_index], 
+      this.lists[list_index].name, 
+      this.lists[list_index].dataset_names[entrez_index]
+    ).subscribe(
 					data => this.list_service_response = data, 
 					() => console.log("observable complete"), 
 					() => this.notifyResponse());

@@ -587,10 +587,18 @@ public class Selection implements Serializable {
         return this.gene_groups;
     }
     
-    public ArrayList <String> getGeneGroup(String grp_key) throws MultiSlideException {
+    public List <String> getGeneGroup(String grp_key) throws MultiSlideException {
         // return the GeneGroup where grp_key = gene_group.name + "_" + gene_group.type
         if (this.gene_groups.containsKey(grp_key)) {
             return this.gene_groups.get(grp_key).entrez_list;
+        } else {
+            throw new MultiSlideException("Exception in getGeneGroup() of FilteredSortedData.java: unknown gene group " + grp_key);
+        }
+    }
+    
+    public String getDescriptiveGroupName(String grp_key) throws MultiSlideException {
+        if (this.gene_groups.containsKey(grp_key)) {
+            return this.gene_groups.get(grp_key).getDescriptiveGroupName();
         } else {
             throw new MultiSlideException("Exception in getGeneGroup() of FilteredSortedData.java: unknown gene group " + grp_key);
         }

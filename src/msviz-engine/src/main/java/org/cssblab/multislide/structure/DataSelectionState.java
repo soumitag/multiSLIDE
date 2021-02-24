@@ -95,9 +95,18 @@ public class DataSelectionState implements Serializable {
         
         int count = 0;
         for (String _id: search_ids) {
-            String[] parts = _id.split("_", 0);
+            
+            String[] parts = _id.trim().split("_", 2);
             byte type = Byte.parseByte(parts[0]);
-            String grp_id = parts[1];
+            
+            String grp_id;
+            // special handling for GO
+            if (parts[1].endsWith("_bp") || parts[1].endsWith("_cc") || parts[1].endsWith("_mf")) {
+                grp_id = parts[1].substring(0, parts[1].length()-3);
+            } else {
+                grp_id = parts[1];
+            }
+            
             SearchResultObject ob = this.recreateSearchResultObject(
                     analysis.searcher, grp_id, SearchResultSummary.mapGeneGroupCodeToType(type), has_miRNA_data
             );

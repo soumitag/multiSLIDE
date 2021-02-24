@@ -7,6 +7,7 @@
     font-size: 12px;
     font-weight: normal;
     margin: 10px;
+    max-width: 700px;
 }
 
 .list_panel_inner {
@@ -44,8 +45,13 @@
     color: rgb(231, 29, 3);
 }
 
+.list_entry {
+    height: 25px;
+}
+
 .list_entry:hover {
-    color: black;
+    color: black(121, 1, 1);
+    background-color:rgb(215, 215, 215)
 }
 
 .minus_button {
@@ -95,8 +101,9 @@
 
 .apply_changes_div {
     position: relative; 
-    top: 30px; 
-    width: 500px; 
+    /*top: 30px;*/ 
+    /*width: 500px;*/
+    min-width: 500px;
     padding-top: 18px;
     border-top: black 1px solid; 
     align-content: center;
@@ -121,4 +128,17 @@ button:hover {
     border-color: rgb(255,99,23);
     color: rgb(255,99,0);
     background-color: #fbfbfb;
+}
+
+.message_div {
+    text-align: center;
+    font-family:'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: normal;
+    margin-top: 20px;
+    overflow: hidden;
+    color: dimgray;
+    font-style:italic;
+    max-width: 450px;
+    margin-bottom: 30px;
 }

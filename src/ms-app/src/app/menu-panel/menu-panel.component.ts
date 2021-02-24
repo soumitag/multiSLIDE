@@ -150,11 +150,25 @@ export class MenuPanelComponent implements OnInit {
 			top: '300',
 			left: '300'
     };
+
     dialogConfig.data = {
-			analysis_name: this.analysis_name
+      analysis_name: this.analysis_name
 		};
     this.viewListDialogRef = this.dialog.open(ListPanelComponent, dialogConfig);
-    
+
+    /*
+      for simplicity, whenever feature list are viewed, force heatmaps to reload list data
+      as feature lists might be deleted
+    */
+    this.viewListDialogRef.afterClosed()
+        .subscribe( data=>this.notifyListChange() );
+        
+    this.viewListDialogRef.backdropClick()
+    		.subscribe( data=>this.notifyListChange() );
+  }
+
+  notifyListChange() {
+    this.onListChange.emit();
   }
 
   notifyResponse() {
