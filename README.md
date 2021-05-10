@@ -1,5 +1,9 @@
 # Multi-omics Systems-Level Interactive Data Exploration (multiSLIDE)  
-## User-driven concurrent heatmap visualization of large-scale multi-omics data  
+## User-driven concurrent heatmap visualization of large-scale multi-omics data
+
+Our visualization tool **multiSLIDE** for hypothesis-driven, unbiased exploration of multi-omics data is described here: 
+
+Ghosh, S., Datta, A. & Choi, H. multiSLIDE is a web server for exploring connected elements of biological pathways in multi-omics data. Nat Commun 12, 2279 (2021). https://doi.org/10.1038/s41467-021-22650-x
 
 ## Availability
 
