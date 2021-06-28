@@ -64,4 +64,4 @@ The preferred way to run a local instance of **multiSLIDE** is using the pre-bui
 	* Videos tutorials demonstrating **multiSLIDE**'s functionalities are available [here](https://www.youtube.com/watch?v=AurU37gGxUI&list=PLh0_FmePh5yGFUpJZ9oYycdz8mgpxRdu1&index=1)
 
 
-[![HitCount](http://hits.dwyl.io/soumitag/multiSLIDE.svg)](http://hits.dwyl.io/soumitag/multiSLIDE)
+<!--- [![HitCount](http://hits.dwyl.io/soumitag/multiSLIDE.svg)](http://hits.dwyl.io/soumitag/multiSLIDE) --->
