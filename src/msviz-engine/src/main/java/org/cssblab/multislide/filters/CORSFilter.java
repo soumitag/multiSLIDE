@@ -75,6 +75,8 @@ public class CORSFilter implements Filter, Serializable {
         ((HttpServletResponse) servletResponse).addHeader("X-XSS-Protection", "1; mode=block");
         ((HttpServletResponse) servletResponse).addHeader("X-Frame-Options", "SAMEORIGIN");
         ((HttpServletResponse) servletResponse).addHeader("X-Content-Type-Options", "nosniff");
+        ((HttpServletResponse) servletResponse).addHeader("Strict-Transport-Security", "max-age=16070400; includeSubDomains");  
+        //((HttpServletResponse) servletResponse).addHeader("Content-Security-Policy", "script-src ‘self’"); 
  
         // For HTTP OPTIONS verb/method reply with ACCEPTED status code -- per CORS handshake
         /*
