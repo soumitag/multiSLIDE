@@ -7,7 +7,8 @@ Ghosh, S., Datta, A. & Choi, H. multiSLIDE is a web server for exploring connect
 
 ## Availability
 
-**multiSLIDE** is available online at: http://137.132.97.109:56695/multislide/#/. Alternatively, you may run **multiSLIDE** locally on your computer following the instructions below.
+<!--**multiSLIDE** is available online at: http://137.132.97.109:56695/multislide/#/.-->
+**multiSLIDE** can be installed using the pre-built Docker image, the instructions are provided below.
 
 ## Launch multiSLIDE locally using a Docker Image  
 
