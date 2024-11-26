@@ -28,7 +28,7 @@
     "angular-plotly.js": "^2.0.0",
     "core-js": "^2.5.7",
     "html2canvas": "^1.0.0-alpha.12",
-    "jspdf": "^1.5.3",
+    "jspdf": "^2.3.1",
     "plotly.js": "^1.54.1",
     "rxjs": "^6.5.5",
     "rxjs-compat": "^6.3.3",
